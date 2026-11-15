@@ -8,7 +8,8 @@ Resume rule: re-read this file, take the first open item in the backlog
 | What | By | Status |
 |---|---|---|
 | v1.4.1 items done and checked | Mon 16 Nov | done 14 Nov: release checks on 1586b66, one UI failure fixed in 68ea10d (results in "v1.4.1" below) |
-| v1.4.1 released (his push and tag; then release checks, backup, update, after-release checklist) | Tue 17 Nov | waiting for his push |
+| v1.4.1 released (his push and tag; then release checks, backup, update, after-release checklist) | Tue 17 Nov | done 15 Nov: tagged 14 Nov on 17deae2, install updated and checked |
+| v1.4.2: long captions that hide skipped speech (or ROADMAP) | Tue 18 Nov | started 15 Nov: step 1 (the report) |
 | Project close: docs/PROJECT_SUMMARY.md, final ROADMAP and PROGRESS, cleanup of the dev stack and test files | Fri 20 Nov | |
 | Hard end | 25 Nov | |
 
@@ -2132,15 +2133,45 @@ night, about 1:30-3 am, so nothing long starts that can't finish by 1 am):
   `vcm-audit-frontend:1.4.1`, `aquasec/trivy:0.76.1`; volume
   `vcm-audit-trivy-cache`. Both stacks healthy (3000: 1.4.0; 3001: dev).
 - **Next, in order:**
-  1. [ ] Tanush pushes `main` (the trailer check and the push command are
-     in my message of 14 Nov, 18:40);
-  2. [ ] ci and arm64 green on the pushed head; then the tag command on
-     that hash;
-  3. [ ] after his tag: release checks (8 assets, SHA256SUMS, multi-arch
+  1. [x] Tanush pushed `main` (14 Nov);
+  2. [x] ci and arm64 green on 17deae2; Tanush tagged v1.4.1 on it (14 Nov,
+     18:49); release run 43599183299;
+  3. [x] done 15 Nov (details below): release checks (8 assets, SHA256SUMS, multi-arch
      tags, the Release notes from the CHANGELOG), backup
      `…-backup-1.4.0`, `vcm update` on the install (the backend downloads
      in full once, ~2.3 GB CUDA; the first update where the installed
      1.4.0 `vcm` hands over), the after-release checklist.
+  - **After-release, state (15 Nov, 12:30):** release run 8/8 green; 8
+    assets match SHA256SUMS and the tag; notes = the CHANGELOG section;
+    latest = 1.4.1 (CPU and frontend amd64+arm64, CUDA amd64). Backup
+    `VideoCaptionMaker-backup-1.4.0` (dump 9 tables, media 12 files, 709 MB,
+    `.env` unread; 60 s down). `vcm update` exit 0 in 317 s, 2,388 MB
+    received, installed files = the release's; 1.4.1, alembic head
+    unchanged, videos, captions (md5) and all table counts identical.
+    uid/caps/licences fine; guard 403/404 at both addresses; `vcm doctor`
+    line 2 "Version: 1.4.1 (VCM_VERSION=latest in .env)", no secrets. E2E
+    on the install ALL PASSED (hinglish.mp4 same/en/hi/fr, SRT, VTT, MP4;
+    98, 45, 94, 272 s; fr local, Gemini unreachable). UI checks through the
+    guard (framing, frontend-guard, csp, cls, pipeline-stages,
+    upload-proxy, export-eta, caption-accuracy, export-quality,
+    redo-spelling, export-improving, vocabulary, improve-captions,
+    favicon, editor-cls, editor-targets): 202 of 202 at localhost and at
+    127.0.0.1; `flow.js` PASS at both. Secrets: only `.env.example` in
+    history; only CA bundles in the images; assets = 7 files +
+    SHA256SUMS. Test videos 237-240 deleted (flow.js 237 and 239, I 238
+    and 240); the install is as before the update (84, 220, 221, captions
+    identical, 2 exports, Tanush's 11-word vocabulary kept). Outputs:
+    `test-assets/results/v1.4.1/release/`. **v1.4.1 done (15 Nov).**
+  - **Known gaps of this release (accepted by Tanush, 14 Nov):** no
+    `update_layers.py` snapshot was taken before the update, so the
+    download is measured as the adapter's bytes received, not per layer;
+    and only the Windows GPU install is updated (the Linux CPU install was
+    the audit's `vcm-clean`, removed after it; the CPU and arm64 images are
+    checked in CI).
+  4. [ ] then v1.4.2: long captions that hide skipped speech (Tanush, 14
+     Nov). Due Tue 18 Nov; if not small and measured by then, ROADMAP and
+     go to the project close. Step 1 (report slow captions on leo, new,
+     hinglish) uses `<scratchpad>/slow_dump.py` in the dev worker.
 - The PC was restarted between 13:55 and 17:49 on 14 Nov; nothing was
   running and everything was committed.
 
