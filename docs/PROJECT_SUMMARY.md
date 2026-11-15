@@ -23,7 +23,7 @@ underneath), runs as a single-user app with no login, and serves its UI on
 
 ## 2. Where it stands
 
-- **Current release: v1.4.2** (15 November 2026, tag on `7b5f2ea`). 22
+- **Current release: v1.4.3** (16 November 2026, tag on `4d5dd3f`). 23
   releases since v1.0.0 (8 October 2026), all in
   [CHANGELOG.md](../CHANGELOG.md).
 - **Published:** GitHub Releases (installers, compose files, `vcm`,
@@ -33,10 +33,10 @@ underneath), runs as a single-user app with no login, and serves its UI on
   deployed by `pages.yml`).
 - **Checked on the release:** a release is called done only after the
   published version is installed or updated on a real machine and checked
-  end to end ([TESTING.md](TESTING.md) §6). For v1.4.2: the backend suite (795 passed, 2 skipped), the frontend
+  end to end ([TESTING.md](TESTING.md) §6). For v1.4.3: the backend suite (796 passed, 2 skipped), the frontend
   lint, types, tests and production build, the 7 installer tests, E2E on
   the GPU and the CPU, axe at 0 and 212 UI checks on the dev stack; then
-  on the updated install: E2E, 198 UI checks at `localhost` and at
+  on the updated install: E2E, 202 UI checks at `localhost` and at
   `127.0.0.1`, the request guard, `vcm doctor`, and the data before and
   after the update (identical). The record is in [PROGRESS.md](../PROGRESS.md).
 - **Open work:** none in progress. Everything decided for later is in
@@ -57,6 +57,7 @@ underneath), runs as a single-user app with no login, and serves its UI on
 | 1.4.0 | 12 Nov | Native on Apple silicon and ARM Linux, honest progress on long videos, `vcm doctor` |
 | 1.4.1 | 14 Nov | The fixes and security updates of the final audit of v1.4.0 ([FINAL_AUDIT.md](FINAL_AUDIT.md)): patched OS and Python packages, Node 22, PyJWT instead of python-jose; macOS measured; speech under a collapsed loop captioned |
 | 1.4.2 | 15 Nov | Speech the model skipped under one stretched word is captioned |
+| 1.4.3 | 16 Nov | A full penetration test (no serious issue found) and one defence-in-depth fix: a downloaded export's default name is sanitised ([SECURITY_TEST.md](SECURITY_TEST.md)) |
 
 ## 4. How it works
 
@@ -94,6 +95,22 @@ large-v3 on an NVIDIA GPU, large-v3-turbo or small on the CPU. Details:
   scanned with Trivy and, at v1.4.1's scan, carried 0 fixable critical or
   high OS advisories. What is left, and why it isn't reachable:
   [FINAL_AUDIT.md](FINAL_AUDIT.md) §4. [SECURITY.md](SECURITY.md).
+- **Penetration test (v1.4.3, 15-16 November 2026).** The app was attacked
+  the way its threat model's four actors would — a malicious website, a
+  malicious uploaded file, a device on the LAN, and a tampered download —
+  across ten areas: browser/CSRF/rebinding/CORS/clickjacking, SQL and
+  cross-site-scripting injection, path traversal, malicious media, denial
+  of service, Gemini prompt injection, network isolation, container escape,
+  supply chain and secrets. **No critical or high issue was found**: the
+  guard refused every cross-origin state change, queries are parameterised,
+  filenames and caption text render as escaped text, the FFmpeg allow-list
+  refused files pointing at `/etc/passwd` and internal URLs, the install's
+  processes have no capabilities and publish only the UI, a tampered `vcm`
+  fails its checksum, and the Gemini key is never returned or logged. One
+  low, non-exploitable inconsistency was fixed (the default export filename
+  now passes through `safe_stem`), and the dev compose was documented as
+  not a hardened configuration. The full attack-by-attack table is in
+  [SECURITY_TEST.md](SECURITY_TEST.md).
 - **Accessibility and layout:** axe-core at 0 violations on the dashboard,
   search, settings and editor, light and dark, phone and desktop; the
   editor's caption time buttons at least 24 px each way; layout shift

@@ -353,6 +353,7 @@ Backend tests run against an isolated test database; see
 | [docs/DATABASE.md](docs/DATABASE.md) | Tables, indexes and relationships, Postgres vs ChromaDB vs the media volume, migration history and rules, backup and restore |
 | [docs/API.md](docs/API.md) | Every endpoint, request, response and error, from the app's OpenAPI spec |
 | [docs/SECURITY.md](docs/SECURITY.md) | Threat model, the request guard, `audit.log`, secrets, network use, upload validation, installer checksums, reporting a vulnerability |
+| [docs/SECURITY_TEST.md](docs/SECURITY_TEST.md) | The v1.4.3 penetration test: every attack tried, its result and severity, and the evidence |
 | [docs/ENVIRONMENT.md](docs/ENVIRONMENT.md) | Every environment variable: purpose, default, who sets it, whether it is secret |
 | [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md) | Colour tokens, typography, spacing, components and states, breakpoints, accessibility rules |
 | [docs/CODE_STYLE.md](docs/CODE_STYLE.md) | Python and TypeScript conventions, error handling, logging, lint commands, commit format |
