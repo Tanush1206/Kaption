@@ -3837,3 +3837,21 @@ Dockerfile/deps change, same as v1.4.2); then tag v1.4.3 on that hash; then
 release checks + backup …-backup-1.4.2 + update + after-release checklist;
 then stop the dev stack (keep data+images) and add the pentest summary to
 docs/PROJECT_SUMMARY.md.
+
+**v1.4.3 RELEASED and the install updated (16 Nov).** Tanush tagged v1.4.3
+on 4d5dd3f; ci green, arm64 did not run (no trigger paths), release run 8/8
+green. Release checks: 8 assets match SHA256SUMS and the tag; notes =
+CHANGELOG [1.4.3] + compare link; latest = 1.4.3 (backend cuda 187df2c0f0db
+amd64, cpu amd64+arm64, frontend d751153a1b86 amd64+arm64). Backup
+%LOCALAPPDATA%\VideoCaptionMaker-backup-1.4.2 (9 tables, 12 media, 709 MB,
+.env unread, 58 s down). vcm update exit 0 in 33 s, 1 MB (backend 3 of 18
+layers 0.2 MB; frontend 0 of 13); no TLS retry needed this time. After-release
+checklist: L1 fix present in the shipped backend image (exports.py:338);
+app procs uid 10001 CapEff 0 NoNewPrivs 1; guard 404/403 at localhost and
+127.0.0.1; vcm doctor "Version: 1.4.3", no secrets; E2E on the install ALL
+PASSED (same 139/en 126/hi 139/fr 138, fr local); checks.js 202 passed 0
+failed at both addresses; flow.js PASS at both; secrets clean (git/images/
+assets; Gemini key not returned); data identical before/after (videos,
+captions, table counts, alembic f6b1d8e3a925). Test videos 250-253 deleted
+(flow 250/252, I 251/253); install back to 84/220/221, 2 exports; dev keeps
+7426. Outputs test-assets/results/v1.4.3/release/. **v1.4.3 done.**
