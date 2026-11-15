@@ -120,24 +120,23 @@ throwaway key (noted as a residual).
 
 **No critical or high finding.** Three low / defence-in-depth notes:
 
-- **L1 — the default export filename skips `safe_stem` (low, not exploitable).**
-  When the user types no download name, the saved name comes from
-  `Path(video.original_filename).stem` (`api/exports.py:341`), which is
-  attacker-influenced (the uploaded filename) and does **not** pass through
-  `safe_stem`. It is not exploitable today: the multipart parser won't carry
-  a CR/LF in a filename, and Starlette percent-encodes anything unusual into
-  the `filename*=utf-8''` form. But it is inconsistent with the typed-name
-  path, which does sanitise. A few-line fix routes the default stem through
-  `safe_stem` too, so one function is the single gate. Candidate for a small
-  commit with a test.
+- **L1 — the default export filename skipped `safe_stem` (low, not exploitable). FIXED in v1.4.3.**
+  When the user typed no download name, the saved name came from
+  `Path(video.original_filename).stem`, which is attacker-influenced (the
+  uploaded filename) and did **not** pass through `safe_stem`. It was not
+  exploitable (the multipart parser won't carry a CR/LF in a filename, and
+  Starlette percent-encodes anything unusual into the `filename*=utf-8''`
+  form), but it was inconsistent with the typed-name path. Fixed by routing
+  the default stem through `safe_stem` too, with a failing-first test
+  (`fix(exports): sanitise the default download name through safe_stem`,
+  `tests/test_exports.py::test_a_hostile_original_filename_is_sanitised_in_the_default_download_name`).
 
-- **L2 — the dev stack is unhardened and publishes the data stores (info / by design).**
+- **L2 — the dev stack is unhardened and publishes the data stores (info / by design). NOTED in v1.4.3.**
   `docker-compose.yml` (project `videocaptionmaker`) runs the containers as
   root with default capabilities and publishes Postgres/Redis/ChromaDB on
   `127.0.0.1` for development. This is **not** how an install runs
-  (`docker-compose.prod.yml` drops privileges and publishes only the UI). No
-  change needed; worth a one-line note in SECURITY.md that the dev compose is
-  not a hardened configuration.
+  (`docker-compose.prod.yml` drops privileges and publishes only the UI).
+  SECURITY.md §5a now says so.
 
 - **L3 — images by tag, not digest / unsigned (low, already planned).**
   SECURITY.md §8 already documents this; digest pinning and signing are on
@@ -149,6 +148,6 @@ prevents more than a sound-alike respelling of the injected caption itself.
 
 ## Recommendation
 
-No security release is required. If wanted, **L1** is a small defence-in-depth
-commit (route the default export stem through `safe_stem`, with a failing
-test first). L2 is a one-line doc note. L3 stays on the ROADMAP.
+No critical or high issue, so no urgent release was needed. **L1** was fixed
+as a small defence-in-depth commit and **L2** noted in SECURITY.md, released
+together as **v1.4.3**. **L3** stays on the ROADMAP.

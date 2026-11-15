@@ -9,7 +9,7 @@ automated tests can't reach (GPU, installers, updates).
 | Layer | Tool | Where | Runs in CI |
 |---|---|---|---|
 | Backend lint | ruff (`backend/ruff.toml`) | `backend/` | **yes** (`ci.yml`, job `backend`) |
-| Backend unit and integration | pytest 8 + pytest-asyncio (`asyncio_mode = auto`, **one session-wide event loop**) + httpx `ASGITransport` | `backend/tests/` (797 collected on v1.4.2: 795 pass, 2 skipped) | **yes** (`ci.yml`, job `backend`): the CPU dev image runs against Postgres, Redis and ChromaDB service containers |
+| Backend unit and integration | pytest 8 + pytest-asyncio (`asyncio_mode = auto`, **one session-wide event loop**) + httpx `ASGITransport` | `backend/tests/` (798 collected on v1.4.3: 796 pass, 2 skipped) | **yes** (`ci.yml`, job `backend`): the CPU dev image runs against Postgres, Redis and ChromaDB service containers |
 | Frontend static checks | `next lint` (`next/core-web-vitals`), `tsc --noEmit`, `next build` | `frontend/` | yes (`ci.yml`, job `frontend`) |
 | Installer scripts | `bash -n`, `shellcheck -S warning`, `docker compose config -q` for both compose files; `install/tests/` (`vcm pull`, `update`, `doctor`, in bash and PowerShell 7, against `fake_docker.py`; `test_install_stop.ps1`); `scripts/release_notes.sh` against the CHANGELOG | `install/`, compose files | yes (`ci.yml`, job `scripts`) |
 | Both architectures (v1.4.0) | `scripts/ci_arch_check.sh` (build, a local registry, the real `install.sh`, containers' architecture) and `scripts/ci_smoke.py` (an English and a Hinglish-to-Spanish transcription and a burn, timed) | `ubuntu-24.04` and `ubuntu-24.04-arm` | yes (`arm64.yml`, every push; the times as a notice) |

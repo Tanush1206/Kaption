@@ -6,6 +6,20 @@ commits between tags; hashes are given for reference.
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.4.3] - unreleased
+
+A security hardening fix after a full penetration test (no serious issue was
+found). No migration; the update downloads the app layers only.
+
+### Fixed
+- **A downloaded export is named more safely.** When you don't type a name,
+  an export is saved under the source video's filename. That name is now
+  cleaned the same way a name you type is — a directory, a control character
+  or a character the filesystem reserves is stripped — instead of being
+  passed to the browser to encode. It was not exploitable (the upload never
+  kept such characters in a usable form), and the file you download is
+  otherwise unchanged. See [docs/SECURITY_TEST.md](docs/SECURITY_TEST.md).
+
 ## [1.4.2] - 2026-11-15
 
 A small fix. No migration; the update downloads the app layers only.

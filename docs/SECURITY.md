@@ -349,6 +349,11 @@ which the guard already lets through.
   file belonged to `vcm`, the old video streamed and its export downloaded,
   no model was downloaded again, and a new GPU transcription, a new font and
   an NVENC export all worked.
+- **The dev compose (`docker-compose.yml`) is not hardened.** It runs the
+  containers as root with default capabilities and publishes Postgres, Redis
+  and ChromaDB on `127.0.0.1` for development. The hardening above is in
+  `docker-compose.prod.yml`, which the installer uses; the dev compose is for
+  working on the code on `127.0.0.1`, not for running an install.
 
 ### 5b. `vcm doctor` reports (v1.4.0)
 
