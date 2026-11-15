@@ -252,6 +252,49 @@ async def test_download_round_trip(client, auth_headers, exportable):
     assert "the quick brown" in body
 
 
+@pytest.mark.asyncio
+async def test_a_hostile_original_filename_is_sanitised_in_the_default_download_name(
+    client, auth_headers, sample_video_bytes
+):
+    """
+    When the user types no name, the saved file is named after the video's
+    original filename — which the uploader kept only as a label and never
+    cleaned. It must go through the same `safe_stem` a typed name does, so a
+    control character or a reserved character can't reach the header, rather
+    than relying on the framework to encode it.
+    """
+    from app.database import AsyncSessionLocal
+    from app.models.video import Video
+
+    video_id = await make_video(client, auth_headers, sample_video_bytes)
+    await seed_captions(video_id)
+    async with AsyncSessionLocal() as session:
+        video = await session.get(Video, video_id)
+        # A directory, a carriage return (which would split the header) and a
+        # character Windows reserves, as a hostile upload could send them.
+        video.original_filename = "../../etc/a\rb*c.mp4"
+        await session.commit()
+
+    created = await client.post(
+        f"/api/videos/{video_id}/exports", headers=auth_headers, json={"format": "srt"}
+    )
+    export_id = created.json()["id"]
+    token = (
+        await client.post(
+            f"/api/exports/{export_id}/download-token", headers=auth_headers
+        )
+    ).json()["token"]
+
+    downloaded = await client.get(f"/api/exports/{export_id}/download?token={token}")
+    assert downloaded.status_code == 200
+    disposition = downloaded.headers["content-disposition"]
+    assert "\r" not in disposition and "\n" not in disposition
+    # The directory, the control character and the "*" are gone, leaving the
+    # cleaned stem — not a percent-encoded form of the raw name.
+    assert "abc.srt" in disposition
+    assert "etc" not in disposition
+
+
 def test_the_burn_says_it_has_captions_and_its_size():
     """
     The burn and the original must not land in a folder under names that can

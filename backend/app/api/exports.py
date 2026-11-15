@@ -331,7 +331,11 @@ async def download_export(
         )
 
     video = await video_service.get_owned_video(db, export.video_id, int(payload["sub"]))
-    stem = Path(video.original_filename).stem if video else "captions"
+    # The original filename is a label the uploader kept verbatim, so clean it
+    # the same way a typed name is cleaned (`safe_stem`): it must not reach the
+    # Content-Disposition header with a directory, a control character or a
+    # reserved one, rather than relying on the framework to encode it.
+    stem = (safe_stem(Path(video.original_filename).stem) if video else "") or "captions"
 
     # A name the user typed replaces the video's, and a burn still says what
     # it is (v1.2.2): typed as "holiday", the burn and the original both came
