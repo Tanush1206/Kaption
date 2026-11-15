@@ -287,6 +287,18 @@ Rules the code enforces:
   it again; done only at the end, the loop still covered the speech it was
   written over while that re-check ran ("aaj" ×25 over 2.5 s of a bike
   vlog). The model's non-speech runs are never collapsed.
+- **A word stretched over skipped speech** (v1.4.2, `_refill_slow`): after
+  the re-check of uncaptioned stretches, a segment with a word timed over
+  1.2 s, in audio Silero VAD (threshold 0.5) calls speech, is decoded again
+  alone, padded 0.3 s but never into a neighbour's words. The new words
+  replace it only when they are at least 1.5 times as many and 3 more, every
+  segment at log-probability -0.5 or better, none the model's no-speech
+  marker; what they repeat of a neighbour goes. Measured on three Hinglish
+  videos: one such segment in 12 minutes of a vlog ("is" over 10.2-13.1 s;
+  10 words became 27), none taken elsewhere: a word said slowly decodes to
+  the same words, one held over noise to a loop or the marker. VAD, not the
+  speech-band envelope, because the skipped speech sat 20-25 dB under the
+  file's speaking level; it takes under a second for 15 minutes.
 - **Silence that would swallow the speech is re-measured** (v1.0.11,
   `silence_for`): FFmpeg's `silencedetect` under -40 dB as before, unless
   more than half of the file's voiced envelope windows (speech band within

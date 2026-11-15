@@ -160,6 +160,17 @@ The original 10-milestone build plan is historical and lives in
   `coverage_check.py` and `timing_check.py` on those clips
   (`scripts/language_eval.py pipeline --langs de,en,pt`).
 
+### A caption timed over a word held over noise
+- **What:** when a stretched word is decoded again and the new words are
+  refused (v1.4.2), the old caption still sits on screen for the whole
+  stretched word: new.mp4 8:28.7-8:32.0 "Tis taarikh", "taarikh" timed
+  3.0 s over what the model calls no speech.
+- **Why not in v1.4.2:** shortening the word needs to know where it really
+  ends, and nothing measured says so. Capped at a fixed length, a word said
+  slowly ("sukoon", 2.0 s, at 7:20 of leo.mp4, decoded alone to the same
+  words) would lose its caption while it is still being said. Asked for
+  by Tanush (v1.4.2 brief, step 2), measured, left out.
+
 ### Speech under a sound at the very start of a video
 - **What:** words spoken over a click or a sound effect in a video's first
   second get a caption.

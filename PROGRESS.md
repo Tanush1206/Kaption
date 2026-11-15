@@ -9,7 +9,7 @@ Resume rule: re-read this file, take the first open item in the backlog
 |---|---|---|
 | v1.4.1 items done and checked | Mon 16 Nov | done 14 Nov: release checks on 1586b66, one UI failure fixed in 68ea10d (results in "v1.4.1" below) |
 | v1.4.1 released (his push and tag; then release checks, backup, update, after-release checklist) | Tue 17 Nov | done 15 Nov: tagged 14 Nov on 17deae2, install updated and checked |
-| v1.4.2: long captions that hide skipped speech (or ROADMAP) | Tue 18 Nov | started 15 Nov: step 1 (the report) |
+| v1.4.2: long captions that hide skipped speech (or ROADMAP) | Tue 18 Nov | built and measured 15 Nov (10cee48); next: the release checks on the final commit, then the push and tag commands |
 | Project close: docs/PROJECT_SUMMARY.md, final ROADMAP and PROGRESS, cleanup of the dev stack and test files | Fri 20 Nov | |
 | Hard end | 25 Nov | |
 
@@ -2217,6 +2217,67 @@ night, about 1:30-3 am, so nothing long starts that can't finish by 1 am):
   hinglish; 7780 was also redone and improved). Dev keeps 7426; the dev
   vocabulary is empty again, as it was. The install was only read
   (`/api/system`, video 221's captions).
+
+## v1.4.2 (in progress, 15 Nov 2026)
+Brief (Tanush, 2026-11-14): long captions that hide skipped speech. 1.
+report "slow" captions (over 3 s, word rate far below normal, VAD says
+mostly voiced) on leo, new, hinglish; 2. re-decode each alone with a
+little padding, keep new words only if clearly more, sure, not repeating
+the neighbours, otherwise keep the old text but time it to its real
+words; 3. normal phrasing after; 4. tests (leo 0:06-0:15 more real words,
+music_check on new 0 failures, nothing over music or silence, his truth
+and hinglish.mp4 not worse, new.mp4 GPU time +10% at most); 5.
+before/after. Start-of-video click stays on the ROADMAP. Due Tue 18 Nov,
+else ROADMAP and the project close.
+
+**Resume here:** the fix is committed (10cee48) with docs. Next: the
+release checks once, on the final commit (`bash <scratchpad>/final_checks.sh`,
+about 30 min, `test-assets/results/v1.4.1/final/` is v1.4.1's; point it
+at `v1.4.2/final/` first); delete the videos it makes; then the push
+command (trailer check) and, once ci and arm64 are green, the tag command.
+
+**Step 1, slow captions on v1.4.1's code** (`test-assets/results/v1.4.2/`):
+- the app's speech-band measure calls the leo 0:09.8 stretch quiet (-36
+  to -41 dB, the file speaks at -15), so voiced is Silero VAD at 0.5
+  (under 1 s per file);
+- leo 2: 0:09.8-0:14.4 "Chaar saal se main is ghar mein hoon. 2 BHK." (2.2
+  words/s against 4.5; "is" 2.88 s) and 7:19.5-7:23.2 "chalane mein sukoon
+  ultra pro max." ("sukoon" 2.0 s); new 2: 8:28.7-8:32.0 "Tis taarikh"
+  ("taarikh" 3.0 s) and 13:37.6-13:42.4; hinglish 0.
+- Decoded alone (0.3 s padding): leo 0:09.8 28 words at log-probability
+  -0.13; leo 7:19 the same words; new 8:28 a loop (cr 16.6) or the no-speech
+  marker and words at 0.56; new 13:37 the same words.
+- Segment-level criteria missed leo 0:09.8 (52% of the usual rate) and
+  flagged 5 ordinary pauses on new, so the check is a word timed over 1.2
+  s in VAD speech, which every slow caption with hidden speech had.
+
+**Fix (10cee48):** `_refill_slow` after `_fill_skipped`; new words kept at
+1.5x and +3, log-probability -0.5 or better, no marker, neighbours'
+repeats trimmed. 7 tests (failed before).
+
+**Measured after** (pipeline functions, no videos):
+- leo: one segment taken ("10 words, now 27"); 0:09.8-0:14.4 (4.6 s) is
+  now "Nahi trip par nahi ja raha hoon bike lekar." / "Main yeh ghar se
+  nahi kar raha hoon." / "Chaar saal se main is ghar mein hoon." / "Too
+  BHK." (1.3, 1.1, 1.1, 0.9 s); "2 BHK" became "Too BHK" (the model's).
+  468 -> 471 captions; nothing else changed. Slow captions 2 -> 1.
+- new: nothing taken. Differs only in 8:07-10:28, which varies between
+  runs of the old code too (26 lines in 9:50-10:30 between two old runs).
+  No caption in 0:14-0:27 or 10:30-10:41; "Hey guys, what's up?" at 0:27.5.
+  music_check 0 failures before and after (with --keep "khelta jaoon" and
+  "nahi. Nahi. Nahi.", the Everyday spelling of the 2:47 repetition).
+- hinglish: identical (156). His 0:00-1:31 truth and truth-hi.txt
+  therefore score as before (16.7% and 14.0% strict).
+- GPU time, new.mp4 transcription: 69.5 s before, 66.1 and 69.8 s after.
+  leo 29.2 -> 34.0 s (the first run after a worker restart, with the one
+  re-decode).
+- **Not done:** step 2's "otherwise time it to its real words". When the
+  new words are refused there is no measure of where the stretched word
+  really ends; a fixed cap would cut "sukoon" (said slowly) while it is
+  still said. On the ROADMAP ("A caption timed over a word held over
+  noise").
+- Tests run: tests/test_transcription.py and test_hindi_script.py (126
+  passed), ruff. Full checks once, on the final commit.
 
 ## v1.3.0 (planned)
 Added by Tanush, 2026-10-30. Not started.

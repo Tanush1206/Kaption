@@ -6,6 +6,21 @@ commits between tags; hashes are given for reference.
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.4.2] - unreleased
+
+A small fix. No migration; the update downloads the app layers only.
+
+### Fixed
+- **Speech the model skipped under one long word is captioned.** Now and
+  then the speech model times a short word over several seconds of speech
+  it didn't write down, and one caption sat on screen over all of it: in a
+  bike vlog, "Chaar saal se main is ghar mein hoon. 2 BHK." for 4.6 seconds,
+  over "nayi trip par nahi ja raha hoon bike lekar. Main yeh ghar se…". Such
+  a stretch is now listened to again on its own, and its words are used
+  when there are clearly more of them and the model is sure of them; they
+  come as normal captions of a second or two. Videos already captioned
+  change only with Redo.
+
 ## [1.4.1] - 2026-11-14
 
 Fixes and security updates from the final audit of v1.4.0. No migration.
