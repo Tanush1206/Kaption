@@ -10,7 +10,7 @@ Resume rule: re-read this file, take the first open item in the backlog
 | v1.4.1 items done and checked | Mon 16 Nov | done 14 Nov: release checks on 1586b66, one UI failure fixed in 68ea10d (results in "v1.4.1" below) |
 | v1.4.1 released (his push and tag; then release checks, backup, update, after-release checklist) | Tue 17 Nov | done 15 Nov: tagged 14 Nov on 17deae2, install updated and checked |
 | v1.4.2: long captions that hide skipped speech (or ROADMAP) | Tue 18 Nov | done 15 Nov: tagged on 7b5f2ea, install updated and checked |
-| Project close: docs/PROJECT_SUMMARY.md, final ROADMAP and PROGRESS, cleanup of the dev stack and test files | Fri 20 Nov | docs done 15 Nov (PROJECT_SUMMARY.md, ROADMAP, PROGRESS); cleanup: the list in "v1.4.2" below, waiting for his choice |
+| Project close: docs/PROJECT_SUMMARY.md, final ROADMAP and PROGRESS, cleanup of the dev stack and test files | Fri 20 Nov | done 15 Nov: docs, and the cleanup Tanush chose ("v1.4.2" below); his push of the close commits is left |
 | Hard end | 25 Nov | |
 
 - **Resume from here:** the "Resume here" block in the "v1.4.2" section
@@ -2281,7 +2281,7 @@ Release run 43694191823. **Next, in order** (outputs in
      and 246, I 245 and 247, 204). The install is as before: 84, 220,
      221, captions identical, 2 exports. Outputs:
      `test-assets/results/v1.4.2/release/`. **v1.4.2 done (15 Nov).**
-4. [ ] project close (Fri 20 Nov):
+4. [x] project close (done 15 Nov):
    - [x] docs/PROJECT_SUMMARY.md (what was built, where it stands, how well
      it works as measured, known limitations, looking after it, where
      things are), linked from the README's documentation table;
@@ -2291,8 +2291,15 @@ Release run 43694191823. **Next, in order** (outputs in
      v1.4.0; macOS in CI is on the ROADMAP's "Possible, not planned");
    - [x] PROGRESS: this section; the learning guide (gitignored) extended
      to v1.4.2;
-   - [ ] cleanup, waiting for Tanush's choice (nothing deleted yet). On
-     disk, 15 Nov: the backups `VideoCaptionMaker-backup-1.3.1`, `-1.4.0`
+   - [x] cleanup, as Tanush chose (15 Nov): deleted the backups
+     `VideoCaptionMaker-backup-1.3.1` and `-1.4.0` (each `.env`, dump and
+     media tar; looked at first); `docker builder prune` (his explicit OK,
+     host-wide): 15.95 GB freed, 9.5 GB left that Docker doesn't count as
+     reclaimable; the dev stack stopped (`docker compose -p
+     videocaptionmaker stop`), its volumes and images kept so it can start
+     again. Kept by his choice: `-backup-1.4.1`, the dev stack's data and
+     images. The install on 3000 untouched and healthy (1.4.2; 84, 220,
+     221). What was on disk before, 15 Nov: the backups `VideoCaptionMaker-backup-1.3.1`, `-1.4.0`
      and `-1.4.1` (709 MB each; `-1.4.1` is the one before this update);
      the dev stack (compose project `videocaptionmaker`, running on 3001:
      containers `vcm_*`, 6 named volumes `videocaptionmaker_*` with its
