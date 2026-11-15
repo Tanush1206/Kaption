@@ -9,7 +9,7 @@ Resume rule: re-read this file, take the first open item in the backlog
 |---|---|---|
 | v1.4.1 items done and checked | Mon 16 Nov | done 14 Nov: release checks on 1586b66, one UI failure fixed in 68ea10d (results in "v1.4.1" below) |
 | v1.4.1 released (his push and tag; then release checks, backup, update, after-release checklist) | Tue 17 Nov | done 15 Nov: tagged 14 Nov on 17deae2, install updated and checked |
-| v1.4.2: long captions that hide skipped speech (or ROADMAP) | Tue 18 Nov | built and measured 15 Nov (10cee48); next: the release checks on the final commit, then the push and tag commands |
+| v1.4.2: long captions that hide skipped speech (or ROADMAP) | Tue 18 Nov | built, measured and checked 15 Nov (7544dca); waiting for his push |
 | Project close: docs/PROJECT_SUMMARY.md, final ROADMAP and PROGRESS, cleanup of the dev stack and test files | Fri 20 Nov | |
 | Hard end | 25 Nov | |
 
@@ -2230,11 +2230,15 @@ and hinglish.mp4 not worse, new.mp4 GPU time +10% at most); 5.
 before/after. Start-of-video click stays on the ROADMAP. Due Tue 18 Nov,
 else ROADMAP and the project close.
 
-**Resume here:** the fix is committed (10cee48) with docs. Next: the
-release checks once, on the final commit (`bash <scratchpad>/final_checks.sh`,
-about 30 min, `test-assets/results/v1.4.1/final/` is v1.4.1's; point it
-at `v1.4.2/final/` first); delete the videos it makes; then the push
-command (trailer check) and, once ci and arm64 are green, the tag command.
+**Resume here:** release checks passed on the final commit 7544dca (15
+Nov, 12:46-13:23, `test-assets/results/v1.4.2/final/`): ruff; backend 795
+passed, 2 skipped; frontend lint, types, 10 tests, production build; 7
+installer tests; E2E GPU (same/en/hi/fr, 129, 46, 100, 346 s) and CPU
+(same/en, 196, 248 s) ALL PASSED; shoot, axe 0, `checks.js` 212 passed, 0
+failed. Test videos 7790-7795 deleted (dev keeps 7426; the install 84,
+220, 221). Next: Tanush pushes; ci and arm64 green; the tag command; then
+the release checks, backup `…-backup-1.4.1`, update, after-release
+checklist; then the project close (Fri 20 Nov).
 
 **Step 1, slow captions on v1.4.1's code** (`test-assets/results/v1.4.2/`):
 - the app's speech-band measure calls the leo 0:09.8 stretch quiet (-36
