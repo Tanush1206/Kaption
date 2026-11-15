@@ -9,13 +9,12 @@ Resume rule: re-read this file, take the first open item in the backlog
 |---|---|---|
 | v1.4.1 items done and checked | Mon 16 Nov | done 14 Nov: release checks on 1586b66, one UI failure fixed in 68ea10d (results in "v1.4.1" below) |
 | v1.4.1 released (his push and tag; then release checks, backup, update, after-release checklist) | Tue 17 Nov | done 15 Nov: tagged 14 Nov on 17deae2, install updated and checked |
-| v1.4.2: long captions that hide skipped speech (or ROADMAP) | Tue 18 Nov | built, measured and checked 15 Nov (7544dca); waiting for his push |
+| v1.4.2: long captions that hide skipped speech (or ROADMAP) | Tue 18 Nov | tagged 15 Nov on 7b5f2ea; release checks, backup, update and after-release checklist running |
 | Project close: docs/PROJECT_SUMMARY.md, final ROADMAP and PROGRESS, cleanup of the dev stack and test files | Fri 20 Nov | |
 | Hard end | 25 Nov | |
 
-- **Resume from here:** the "Resume here after a shutdown" block in the
-  "v1.4.1" section below says what is committed, what is running and the
-  next command.
+- **Resume from here:** the "Resume here" block in the "v1.4.2" section
+  below says what is committed, what is running and the next command.
 - **Chunks.** His Claude usage can run out after 1-2 hours and resets
   after about 5; the PC is shut down at night (about 1:30-3 am). Before
   anything long, this file gets the current state and the next step.
@@ -2236,9 +2235,22 @@ passed, 2 skipped; frontend lint, types, 10 tests, production build; 7
 installer tests; E2E GPU (same/en/hi/fr, 129, 46, 100, 346 s) and CPU
 (same/en, 196, 248 s) ALL PASSED; shoot, axe 0, `checks.js` 212 passed, 0
 failed. Test videos 7790-7795 deleted (dev keeps 7426; the install 84,
-220, 221). Next: Tanush pushes; ci and arm64 green; the tag command; then
-the release checks, backup `…-backup-1.4.1`, update, after-release
-checklist; then the project close (Fri 20 Nov).
+220, 221). Tanush pushed `main` and tagged v1.4.2 on 7b5f2ea (15 Nov);
+ci green on it; arm64 didn't run (its path filter: no compose, installer,
+Dockerfile or dependency file changed; last run green on 17deae2).
+Release run 43694191823. **Next, in order** (outputs in
+`test-assets/results/v1.4.2/release/`, same commands as v1.4.1's):
+1. [ ] release checks: run green, 8 assets against SHA256SUMS and the
+   tag, notes = the CHANGELOG section, latest = 1.4.2 on all images;
+2. [ ] snapshot the install (`snap.py`, table counts), backup
+   `%LOCALAPPDATA%\VideoCaptionMaker-backup-1.4.1` (pg_dump, media tar,
+   `.env` copied unread);
+3. [ ] `vcm update` (app layers only), then the after-release checklist:
+   data identical, uid/caps/licences, guard at both addresses, `vcm
+   doctor`, E2E on the install, `checks.js` at localhost and 127.0.0.1,
+   `flow.js` at both, secrets; delete the videos made, by id;
+4. [ ] project close (Fri 20 Nov): docs/PROJECT_SUMMARY.md, final
+   ROADMAP and PROGRESS, cleanup of the dev stack and test files.
 
 **Step 1, slow captions on v1.4.1's code** (`test-assets/results/v1.4.2/`):
 - the app's speech-band measure calls the leo 0:09.8 stretch quiet (-36
@@ -2270,8 +2282,10 @@ repeats trimmed. 7 tests (failed before).
   No caption in 0:14-0:27 or 10:30-10:41; "Hey guys, what's up?" at 0:27.5.
   music_check 0 failures before and after (with --keep "khelta jaoon" and
   "nahi. Nahi. Nahi.", the Everyday spelling of the 2:47 repetition).
-- hinglish: identical (156). His 0:00-1:31 truth and truth-hi.txt
-  therefore score as before (16.7% and 14.0% strict).
+- hinglish: identical (156), so truth-hi.txt scores as before (14.0%
+  strict). His truth is new.mp4 0:00-1:31, not hinglish (corrected 15
+  Nov): its 46 captions there are identical before and after, in both
+  after runs, so 16.7% strict as before.
 - GPU time, new.mp4 transcription: 69.5 s before, 66.1 and 69.8 s after.
   leo 29.2 -> 34.0 s (the first run after a worker restart, with the one
   re-decode).
