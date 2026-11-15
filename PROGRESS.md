@@ -10,7 +10,7 @@ Resume rule: re-read this file, take the first open item in the backlog
 | v1.4.1 items done and checked | Mon 16 Nov | done 14 Nov: release checks on 1586b66, one UI failure fixed in 68ea10d (results in "v1.4.1" below) |
 | v1.4.1 released (his push and tag; then release checks, backup, update, after-release checklist) | Tue 17 Nov | done 15 Nov: tagged 14 Nov on 17deae2, install updated and checked |
 | v1.4.2: long captions that hide skipped speech (or ROADMAP) | Tue 18 Nov | done 15 Nov: tagged on 7b5f2ea, install updated and checked |
-| Project close: docs/PROJECT_SUMMARY.md, final ROADMAP and PROGRESS, cleanup of the dev stack and test files | Fri 20 Nov | |
+| Project close: docs/PROJECT_SUMMARY.md, final ROADMAP and PROGRESS, cleanup of the dev stack and test files | Fri 20 Nov | docs done 15 Nov (PROJECT_SUMMARY.md, ROADMAP, PROGRESS); cleanup: the list in "v1.4.2" below, waiting for his choice |
 | Hard end | 25 Nov | |
 
 - **Resume from here:** the "Resume here" block in the "v1.4.2" section
@@ -2167,8 +2167,8 @@ night, about 1:30-3 am, so nothing long starts that can't finish by 1 am):
     and only the Windows GPU install is updated (the Linux CPU install was
     the audit's `vcm-clean`, removed after it; the CPU and arm64 images are
     checked in CI).
-  4. [ ] then v1.4.2: long captions that hide skipped speech (Tanush, 14
-     Nov). Due Tue 18 Nov; if not small and measured by then, ROADMAP and
+  4. [x] then v1.4.2: long captions that hide skipped speech (Tanush, 14
+     Nov); released 15 Nov (section "v1.4.2"). Due Tue 18 Nov; if not small and measured by then, ROADMAP and
      go to the project close. Step 1 (report slow captions on leo, new,
      hinglish) uses `<scratchpad>/slow_dump.py` in the dev worker.
 - The PC was restarted between 13:55 and 17:49 on 14 Nov; nothing was
@@ -2281,8 +2281,30 @@ Release run 43694191823. **Next, in order** (outputs in
      and 246, I 245 and 247, 204). The install is as before: 84, 220,
      221, captions identical, 2 exports. Outputs:
      `test-assets/results/v1.4.2/release/`. **v1.4.2 done (15 Nov).**
-4. [ ] project close (Fri 20 Nov): docs/PROJECT_SUMMARY.md, final
-   ROADMAP and PROGRESS, cleanup of the dev stack and test files.
+4. [ ] project close (Fri 20 Nov):
+   - [x] docs/PROJECT_SUMMARY.md (what was built, where it stands, how well
+     it works as measured, known limitations, looking after it, where
+     things are), linked from the README's documentation table;
+   - [x] ROADMAP: checked complete against PROGRESS's open items and
+     FINAL_AUDIT; a note at the top says so. The two open items of "v1.3.0
+     (planned)" were done or moved (multi-arch CPU images shipped in
+     v1.4.0; macOS in CI is on the ROADMAP's "Possible, not planned");
+   - [x] PROGRESS: this section; the learning guide (gitignored) extended
+     to v1.4.2;
+   - [ ] cleanup, waiting for Tanush's choice (nothing deleted yet). On
+     disk, 15 Nov: the backups `VideoCaptionMaker-backup-1.3.1`, `-1.4.0`
+     and `-1.4.1` (709 MB each; `-1.4.1` is the one before this update);
+     the dev stack (compose project `videocaptionmaker`, running on 3001:
+     containers `vcm_*`, 6 named volumes `videocaptionmaker_*` with its
+     database, media and model cache, images
+     `videocaptionmaker-backend`/`-worker` 7.5 GB and `-frontend` 1.4 GB;
+     dev keeps video 7426, not mine); Docker's build cache (25 GB, 16 GB
+     reclaimable; shared by every build on the host); 11 unnamed volumes
+     and images whose owner I can't tell (`node:20.20.2-alpine`,
+     `koalaman/shellcheck`, `rhysd/actionlint`, `chromadb/chroma:latest`,
+     `postgres:16-alpine`, `redis:7-alpine`, `llm-utility-lab`,
+     `frontend:1.1.0`), left alone; `test-assets/` (3.2 GB: his videos and
+     truth files, and `results/`, the measurements, kept by the rule).
 
 **Step 1, slow captions on v1.4.1's code** (`test-assets/results/v1.4.2/`):
 - the app's speech-band measure calls the leo 0:09.8 stretch quiet (-36
@@ -2330,15 +2352,17 @@ repeats trimmed. 7 tests (failed before).
   passed), ruff. Full checks once, on the final commit.
 
 ## v1.3.0 (planned)
-Added by Tanush, 2026-10-30. Not started.
+Added by Tanush, 2026-10-30. Closed 15 Nov 2026: the first item shipped in
+v1.4.0, the second is on the ROADMAP ("macOS in CI", possible, not
+planned).
 
-- [ ] **Multi-arch CPU images** (`linux/amd64` + `linux/arm64`), the arm64
+- [x] **Multi-arch CPU images** (`linux/amd64` + `linux/arm64`), the arm64
       half built natively on GitHub's free arm64 runners (no QEMU), so
       Apple-silicon Macs and ARM Linux run without emulation. Check on arm64:
       faster-whisper / CTranslate2, M2M100, IndicXlit and FFmpeg (and the
       FFmpeg allow-list); measure speed against amd64. The CUDA image stays
       amd64. Then the macOS note on the site and in the README changes.
-- [ ] **A macOS test in CI:** run install.sh on a GitHub macOS runner with a
+- [x] **A macOS test in CI:** run install.sh on a GitHub macOS runner with a
       Docker runtime (e.g. Colima) and a short E2E. Known before starting:
       GitHub's Apple-silicon macOS runners have no nested virtualization, so
       a Docker VM may only run on an Intel macOS runner, if one is still
