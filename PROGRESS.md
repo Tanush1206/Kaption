@@ -3812,3 +3812,28 @@ publishes DB ports (by design, doc note); L3 images by tag not digest
 files removed. Evidence: test-assets/results/v1.4.3/pentest/.
 **Next:** reported to Tanush; waiting on whether to do L1 (+ L2 doc note) as
 a small v1.4.3, or ROADMAP them. No fix made yet (he said report first).
+
+**v1.4.3 built (15 Nov): L1 fix + L2 note.** Chose "L1+L2 as v1.4.3".
+Commits (not pushed): 927679e fix(exports) default download name through
+safe_stem (+ failing-first test test_a_hostile_original_filename_is_sanitised…);
+0f0c306 docs (SECURITY.md §5a dev-not-hardened note, SECURITY_TEST.md L1
+FIXED/L2 NOTED, CHANGELOG [1.4.3] unreleased, TESTING 798/796/2). L1 tests
+passed (67 export tests, 1 skip). **Resume:** running full checks once on
+0f0c306 (results test-assets/results/v1.4.3/final/). Then: push step; ci+arm64;
+tag v1.4.3 (date the CHANGELOG); release checks + backup …-backup-1.4.2 +
+update + after-release checklist. THEN (per Tanush) stop the dev stack (keep
+data+images) and add the pentest summary to docs/PROJECT_SUMMARY.md.
+
+**v1.4.3 full checks PASSED on 0f0c306 (16 Nov; PC rebooted overnight, dev
+stack auto-restarted).** ruff clean; backend 796 passed, 2 skipped (253s);
+frontend lint + type-check + 10 tests + production build (exit 0); 7 installer
+tests ALL PASSED (3 bash + 4 PowerShell); E2E GPU ALL PASSED (same 139/en 126/
+hi 140/fr 139, fr local fallback); E2E CPU ALL PASSED (same 140/en 127);
+shoot 4×2×2 ok; axe 0; checks.js 212 passed 0 failed. E2E videos 7803-7808
+deleted (dev keeps 7426; install 84/220/221 untouched). CHANGELOG [1.4.3]
+dated 2026-11-16. Outputs test-assets/results/v1.4.3/final/.
+**Next:** Tanush pushes main; ci green (arm64 won't run — no compose/installer/
+Dockerfile/deps change, same as v1.4.2); then tag v1.4.3 on that hash; then
+release checks + backup …-backup-1.4.2 + update + after-release checklist;
+then stop the dev stack (keep data+images) and add the pentest summary to
+docs/PROJECT_SUMMARY.md.

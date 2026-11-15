@@ -6,7 +6,7 @@ commits between tags; hashes are given for reference.
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [1.4.3] - unreleased
+## [1.4.3] - 2026-11-16
 
 A security hardening fix after a full penetration test (no serious issue was
 found). No migration; the update downloads the app layers only.
