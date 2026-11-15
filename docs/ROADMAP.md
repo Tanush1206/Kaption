@@ -7,6 +7,11 @@ the relevant doc, and delete it here.
 The original 10-milestone build plan is historical and lives in
 [MILESTONES.md](MILESTONES.md).
 
+**At the project close (15 November 2026, v1.4.2)** this list is complete:
+every item that was measured and left, or decided for later, during the
+project is here, and none is in progress. The project's state is in
+[PROJECT_SUMMARY.md](PROJECT_SUMMARY.md).
+
 ## Later
 
 ### `vcm backup` and `vcm restore`

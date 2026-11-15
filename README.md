@@ -347,6 +347,7 @@ Backend tests run against an isolated test database; see
 
 | Document | What it covers |
 |---|---|
+| [docs/PROJECT_SUMMARY.md](docs/PROJECT_SUMMARY.md) | The project at its close: what was built, where it stands, how well it works as measured, where to look for the rest |
 | [docs/PRD.md](docs/PRD.md) | Product overview, users, core flow, features with acceptance criteria, supported languages, formats, models and hardware tiers, non-goals, known limitations, definition of done |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Services and how they communicate, project structure, the job pipeline, hardware detection, translation fallback, startup recovery, dev vs production compose, failure scenarios, dependency rules |
 | [docs/DATABASE.md](docs/DATABASE.md) | Tables, indexes and relationships, Postgres vs ChromaDB vs the media volume, migration history and rules, backup and restore |
