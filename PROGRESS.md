@@ -3776,3 +3776,39 @@ Measured:
   Switching the Gemini model is Tanush's call.
 - When the dependencies next change: move uharfbuzz from its Dockerfile
   layer into pyproject.toml/constraints.txt.
+
+## Security pentest (Tanush, 2026-11-15; findings by Tue 17 Nov, fixes/v1.4.3 by Thu 19 Nov)
+Authorized pentest of my own machine only: dev stack on 3001 and local test
+containers. Never outside this PC; never touch the install on 3000 except
+read-only at the end; never read/print .env; delete every test file and video.
+best-practices skill + playwright-cli. 10 categories (browser/CSRF/rebinding,
+injection/XSS, files/traversal, malicious media, DoS, Gemini Improve prompt
+injection, network/LAN, container escape, supply chain, secrets). Findings go
+in docs/SECURITY_TEST.md (table: attack, result, severity, evidence). Report
+to Tanush in plain words BEFORE any fix. critical/high -> own commit + failing
+test, release v1.4.3; medium/low -> ROADMAP unless a few lines.
+
+**Resume here:** dev stack restarted on 3001 (frontend 127.0.0.1:3001,
+backend direct 127.0.0.1:8000, pg 5432, redis 6379, chroma 8100 — all
+127.0.0.1). Read SECURITY.md and request_guard.py/filenames.py (solid).
+Next: read exports/subtitles/caption_fix/fonts/captions/vocabulary/system,
+grep for dangerouslySetInnerHTML and raw SQL; then run live attacks from a
+scratch origin with playwright-cli and curl. Evidence in
+test-assets/results/v1.4.3/pentest/. Nothing fixed yet.
+
+**Pentest done (15 Nov), findings written.** docs/SECURITY_TEST.md: all 10
+categories tested live on the dev stack (:3001) + read-only install checks.
+**No critical or high finding.** Guard holds (CSRF/rebinding/cross-site/CORS
+all 403; frame-ancestors none); no SQLi (ORM); filename & caption XSS render
+escaped (React); export name sanitised (safe_stem strips CR/LF); FFmpeg
+allow-list refused HLS/concat with no egress; input caps 422; install runs
+uid 10001 CapEff 0 NoNewPrivs 1, no docker.sock, only UI on 127.0.0.1;
+SHA256SUMS refuses a tampered vcm; Gemini key never returned/logged; Improve
+guards (code-verified) allow only a sound-alike respelling of the same
+caption. Three LOW/info notes: L1 default export filename skips safe_stem
+(not exploitable; few-line fix candidate); L2 dev compose unhardened +
+publishes DB ports (by design, doc note); L3 images by tag not digest
+(already ROADMAP). Test videos 7796-7802 deleted (dev keeps 7426); hostile
+files removed. Evidence: test-assets/results/v1.4.3/pentest/.
+**Next:** reported to Tanush; waiting on whether to do L1 (+ L2 doc note) as
+a small v1.4.3, or ROADMAP them. No fix made yet (he said report first).
