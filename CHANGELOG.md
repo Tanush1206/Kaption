@@ -6,7 +6,7 @@ commits between tags; hashes are given for reference.
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [1.4.2] - unreleased
+## [1.4.2] - 2026-11-15
 
 A small fix. No migration; the update downloads the app layers only.
 
