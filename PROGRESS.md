@@ -9,7 +9,7 @@ Resume rule: re-read this file, take the first open item in the backlog
 |---|---|---|
 | v1.4.1 items done and checked | Mon 16 Nov | done 14 Nov: release checks on 1586b66, one UI failure fixed in 68ea10d (results in "v1.4.1" below) |
 | v1.4.1 released (his push and tag; then release checks, backup, update, after-release checklist) | Tue 17 Nov | done 15 Nov: tagged 14 Nov on 17deae2, install updated and checked |
-| v1.4.2: long captions that hide skipped speech (or ROADMAP) | Tue 18 Nov | tagged 15 Nov on 7b5f2ea; release checks, backup, update and after-release checklist running |
+| v1.4.2: long captions that hide skipped speech (or ROADMAP) | Tue 18 Nov | done 15 Nov: tagged on 7b5f2ea, install updated and checked |
 | Project close: docs/PROJECT_SUMMARY.md, final ROADMAP and PROGRESS, cleanup of the dev stack and test files | Fri 20 Nov | |
 | Hard end | 25 Nov | |
 
@@ -2240,15 +2240,47 @@ ci green on it; arm64 didn't run (its path filter: no compose, installer,
 Dockerfile or dependency file changed; last run green on 17deae2).
 Release run 43694191823. **Next, in order** (outputs in
 `test-assets/results/v1.4.2/release/`, same commands as v1.4.1's):
-1. [ ] release checks: run green, 8 assets against SHA256SUMS and the
-   tag, notes = the CHANGELOG section, latest = 1.4.2 on all images;
-2. [ ] snapshot the install (`snap.py`, table counts), backup
-   `%LOCALAPPDATA%\VideoCaptionMaker-backup-1.4.1` (pg_dump, media tar,
-   `.env` copied unread);
-3. [ ] `vcm update` (app layers only), then the after-release checklist:
-   data identical, uid/caps/licences, guard at both addresses, `vcm
-   doctor`, E2E on the install, `checks.js` at localhost and 127.0.0.1,
-   `flow.js` at both, secrets; delete the videos made, by id;
+1. [x] release checks: run 8/8 green; 8 assets match SHA256SUMS and the
+   tag; notes = the CHANGELOG section (lines joined) and the compare
+   link; latest = 1.4.2: backend cuda 09fd576a9791 (amd64), cpu
+   63104fdbf1be (amd64+arm64), frontend 8a6607ba2144 (amd64+arm64);
+2. [x] install before: 1.4.1, videos 84, 220, 221, 1,104 captions, alembic
+   f6b1d8e3a925, his 11-word vocabulary. Layer snapshot taken this time
+   (`layers_before.json`, 16 images). Backup
+   `%LOCALAPPDATA%\VideoCaptionMaker-backup-1.4.1`: 9 tables, 12 media
+   files, 709 MB, `.env` copied unread, 60 s down;
+3. [x] `vcm update`: the first try stopped before changing anything
+   (Docker Hub's token request broken by Quick Heal's TLS scanning:
+   "protocol version not supported", "HTTP response to HTTPS client";
+   35 MB, 24 s, app still 1.4.1 and healthy); the retry exit 0 in 50 s.
+   Downloaded: backend 3 of 18 layers, 0.2 MB of 2,295 MB; frontend 0 of
+   13 (`update_layers.txt`). After-release checklist:
+   - data: videos, captions (md5) and all table counts identical,
+     alembic unchanged; vocabulary 11 words, unchanged by the checks;
+   - uvicorn and celery uid 10001, CapEff 0, NoNewPrivs 1; next-server
+     uid 100; only 127.0.0.1:3000 published; `/licenses` in both images;
+     PyJWT 2.15.1, no python-jose or ecdsa; the worker has `_refill_slow`;
+   - guard: own origin 404, other origin / other port / cross-site /
+     rebinding Host 403, at localhost and 127.0.0.1;
+   - `vcm doctor` exit 0, "Version: 1.4.2 (VCM_VERSION=latest in .env)",
+     no key, e-mail or home folder (three old postgres log lines from 3,
+     12 and 14 Nov, my queries, not the update);
+   - E2E on the install (hinglish.mp4 same/en/hi/fr, SRT, VTT, MP4): ALL
+     PASSED (146, 49, 102, 364 s; fr local, Gemini unreachable);
+   - `checks.js` (same 16 checks as v1.4.1) 198 passed, 0 failed at
+     localhost and at 127.0.0.1. 4 fewer than v1.4.1's 202: at 1440 the
+     real Gemini found nothing to fix on 247, so the 4 Undo cases had
+     nothing to act on (375 had 2 fixes and ran them);
+   - `flow.js` PASS at both (deleted 244 and 246, exported 245 and 247);
+   - secrets: only `.env.example` in git history (and
+     `docs/learning-guide.md`, committed and untracked on 6 Aug 2026,
+     4dc2628, gitignored since, no secret); the key-shaped strings in
+     tests are dummies; in the images only CA bundles (grpc `roots.pem`);
+     assets = 7 files + SHA256SUMS.
+   - Test videos on the install: 244-247 (E2E), all deleted (flow.js 244
+     and 246, I 245 and 247, 204). The install is as before: 84, 220,
+     221, captions identical, 2 exports. Outputs:
+     `test-assets/results/v1.4.2/release/`. **v1.4.2 done (15 Nov).**
 4. [ ] project close (Fri 20 Nov): docs/PROJECT_SUMMARY.md, final
    ROADMAP and PROGRESS, cleanup of the dev stack and test files.
 
