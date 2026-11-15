@@ -1480,3 +1480,98 @@ def test_a_loop_is_collapsed_around_music_not_through_it():
         segment("go go go go go", 1000),
     ])
     assert [(s.text, s.non_speech) for s in found] == [("nan nan nan nan nan nan", True), ("go", False)]
+
+
+# ── A word stretched over speech it doesn't contain (v1.4.2) ───────────────
+
+
+@pytest.fixture
+def slow(monkeypatch):
+    """_refill_slow with VAD and re-decoding faked: VAD speech everywhere unless set, answers from a table."""
+    asked, answers = [], {}
+    state = SimpleNamespace(asked=asked, answers=answers, speech=[(0.0, 600.0)])
+
+    def decode_stretch(model, audio_path, start, end, *rest):
+        asked.append((round(start, 2), round(end, 2)))
+        return answers.get((round(start, 2), round(end, 2)), [])
+
+    monkeypatch.setattr(transcription, "_decode_stretch", decode_stretch)
+    monkeypatch.setattr(transcription, "_speech_stretches", lambda path: state.speech)
+    return state
+
+
+def _timed(words, confidence=-0.2):
+    """A segment from (word, start, end) in seconds, timed as given."""
+    speech = [(int(a * 1000), int(b * 1000), w) for w, a, b in words]
+    return transcription.Segment(speech[0][0], speech[-1][1], " ".join(w for w, _, _ in words), confidence, speech)
+
+
+# leo.mp4 at 0:09.8: the model put "is" over 10.20-13.08 s, and "nayi trip par
+# nahi ja raha hoon bike lekar. Main yeh ghar se..." said in that time had no
+# caption. Decoded alone the stretch says it.
+LEO_BEFORE = [("Main", 8.84, 8.90), ("nahin", 8.90, 9.12), ("kar", 9.12, 9.22), ("raha", 9.22, 9.36), ("hoon.", 9.36, 9.40)]
+LEO_SLOW = [("Chaar", 9.76, 9.78), ("saal", 9.78, 10.14), ("se", 10.14, 10.20), ("main", 10.20, 10.20),
+            ("is", 10.20, 13.08), ("ghar", 13.08, 13.20), ("mein", 13.20, 13.30), ("hoon.", 13.30, 13.52),
+            ("2", 13.52, 13.72), ("BHK.", 13.72, 14.14)]
+LEO_AFTER = [("Ek", 14.48, 14.56), ("gaming", 14.56, 14.84), ("room", 14.84, 15.00)]
+LEO_HEARD = ("Nahin trip par nahin ja raha hoon bike lekar. Main yah ghar se nahin kar raha hoon. "
+             "Chaar saal se main is ghar mein hoon. Too BHK.")
+
+
+def _leo():
+    return [_timed(LEO_BEFORE), _timed(LEO_SLOW), _timed(LEO_AFTER)]
+
+
+def test_speech_under_a_stretched_word_is_decoded_again_and_kept(slow):
+    words = LEO_HEARD.split()
+    step = (14.10 - 9.50) / len(words)
+    slow.answers[(9.46, 14.44)] = [_timed([(w, 9.50 + i * step, 9.50 + (i + 1) * step) for i, w in enumerate(words)], -0.13)]
+
+    found = transcription._refill_slow(None, Path("a.wav"), _leo(), "en", "transcribe", [], [])
+
+    assert slow.asked == [(9.46, 14.44)]
+    assert [s.text for s in found] == ["Main nahin kar raha hoon.", LEO_HEARD, "Ek gaming room"]
+
+
+def test_the_old_words_stay_when_the_new_ones_are_not_clearly_more(slow):
+    """leo.mp4 7:20, "sukoon" drawn out: decoded alone it is the same line, two words longer."""
+    slow.answers[(9.46, 14.44)] = [_timed([(w, 9.8 + i * 0.3, 10.0 + i * 0.3) for i, w in enumerate("Yah Chaar saal se main is ghar mein hoon. 2 BHK.".split())])]
+    found = transcription._refill_slow(None, Path("a.wav"), _leo(), "en", "transcribe", [], [])
+    assert [s.text for s in found][1] == "Chaar saal se main is ghar mein hoon. 2 BHK."
+
+
+def test_the_old_words_stay_when_the_new_ones_are_unsure(slow):
+    """new.mp4 8:29: decoded alone, words at log-probability -0.85."""
+    words = LEO_HEARD.split()
+    slow.answers[(9.46, 14.44)] = [_timed([(w, 9.5 + i * 0.17, 9.6 + i * 0.17) for i, w in enumerate(words)], -0.85)]
+    found = transcription._refill_slow(None, Path("a.wav"), _leo(), "en", "transcribe", [], [])
+    assert [s.text for s in found][1] == "Chaar saal se main is ghar mein hoon. 2 BHK."
+
+
+def test_the_models_no_speech_marker_is_never_more_words(slow):
+    music = _timed([("nan", 9.5 + i * 0.2, 9.7 + i * 0.2) for i in range(20)])
+    music.non_speech = True
+    slow.answers[(9.46, 14.44)] = [music]
+    found = transcription._refill_slow(None, Path("a.wav"), _leo(), "en", "transcribe", [], [])
+    assert [s.text for s in found][1] == "Chaar saal se main is ghar mein hoon. 2 BHK."
+
+
+def test_a_stretched_word_over_silence_is_not_checked(slow):
+    """A word held over a pause or music is no sign of skipped speech: only voiced stretches are decoded again."""
+    slow.speech = [(8.8, 10.2), (13.0, 15.0)]
+    transcription._refill_slow(None, Path("a.wav"), _leo(), "en", "transcribe", [], [])
+    assert slow.asked == []
+
+
+def test_ordinary_words_are_not_checked(slow):
+    transcription._refill_slow(None, Path("a.wav"), [_timed(LEO_BEFORE), _timed(LEO_AFTER)], "en", "transcribe", [], [])
+    assert slow.asked == []
+
+
+def test_new_words_that_repeat_a_neighbour_are_said_once(slow):
+    """Decoded alone the stretch ran into the next line: "...Too BHK ek." before "Ek gaming room"."""
+    words = (LEO_HEARD + " ek").split()
+    step = (14.44 - 9.50) / len(words)
+    slow.answers[(9.46, 14.44)] = [_timed([(w, 9.50 + i * step, 9.50 + (i + 1) * step) for i, w in enumerate(words)], -0.13)]
+    found = transcription._refill_slow(None, Path("a.wav"), _leo(), "en", "transcribe", [], [])
+    assert [s.text for s in found] == ["Main nahin kar raha hoon.", LEO_HEARD, "Ek gaming room"]

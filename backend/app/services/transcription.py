@@ -760,6 +760,7 @@ def transcribe(
         segments = _fill_skipped(
             model, audio_path, segments, language or info.language, task, spans, levels, on_progress=on_recover,
         )
+        segments = _refill_slow(model, audio_path, segments, language or info.language, task, spans, levels)
     if not segments:
         # Whisper skips a 30-second window when it thinks it is probably not
         # speech AND its words are unlikely. A small model on fast speech in
@@ -1026,6 +1027,94 @@ def _fill_skipped(
                 (a.start_ms, a.end_ms, "")
             ]
     return filled
+
+
+# A word timed longer than this, in audio VAD calls speech, is where the
+# model skipped what was said (v1.4.2). On a bike vlog it put "is" over
+# 10.20-13.08 s, and "nayi trip par nahi ja raha hoon bike lekar. Main yeh
+# ghar se..." said there had no caption: the caption over it ran 4.6 s for 10
+# words. Decoded alone that stretch gives 28 words at log-probability -0.13.
+# Elsewhere a long word is said slowly ("sukoon", 2.0 s) or held over noise;
+# decoded alone those give the same words, a loop or the no-speech marker,
+# so the new words are kept only when they are clearly more and sure.
+SLOW_WORD_SECONDS = 1.2
+SLOW_VOICED_SHARE = 0.7
+SLOW_PAD_SECONDS = 0.3
+SLOW_MORE_WORDS = 1.5
+SLOW_EXTRA_WORDS = 3
+SLOW_MIN_LOGPROB = -0.5
+
+
+def _speech_stretches(audio_path: Path) -> list[tuple[float, float]]:
+    """
+    Where Silero VAD hears speech, in seconds, at its default threshold.
+
+    Not the speech-band envelope: on the vlog the skipped speech sat 20-25 dB
+    under the file's speaking level, which that counts as quiet. Under a
+    second for 15 minutes of audio. Fails open (no stretches: nothing is
+    decoded again).
+    """
+    try:
+        from faster_whisper.audio import decode_audio
+        from faster_whisper.vad import VadOptions, get_speech_timestamps
+
+        stamps = get_speech_timestamps(
+            decode_audio(str(audio_path)), VadOptions(threshold=0.5, min_silence_duration_ms=300, speech_pad_ms=100)
+        )
+    except Exception as exc:  # noqa: BLE001 - any failure just skips the check
+        logger.warning("Could not run VAD for the slow-caption check: %s", exc)
+        return []
+    return [(s["start"] / 16000, s["end"] / 16000) for s in stamps]
+
+
+def _voiced_share(start: float, end: float, stretches: list[tuple[float, float]]) -> float:
+    if end <= start:
+        return 0.0
+    return sum(max(0.0, min(end, b) - max(start, a)) for a, b in stretches) / (end - start)
+
+
+def _refill_slow(model, audio_path, segments, language, task, spans, levels) -> list[Segment]:
+    """
+    `segments` with each one that has a word stretched over speech decoded
+    again on its own, and replaced when that clearly finds more (above).
+    """
+    stretches = None
+    out: list[Segment] = []
+    for index, segment in enumerate(segments):
+        timed = [w for w in segment.speech if w[2]]
+        stretched = [
+            (a, b) for a, b, _ in timed if (b - a) / 1000 > SLOW_WORD_SECONDS
+        ] if not segment.non_speech else []
+        if stretched and stretches is None:
+            stretches = _speech_stretches(audio_path)
+        if not stretched or not any(
+            _voiced_share(a / 1000, b / 1000, stretches) >= SLOW_VOICED_SHARE for a, b in stretched
+        ):
+            out.append(segment)
+            continue
+        start, end = _said(segment)
+        # Padded, but never into a neighbour's words.
+        lo = max(start - SLOW_PAD_SECONDS, _said(out[-1])[1] if out else 0.0)
+        hi = min(end + SLOW_PAD_SECONDS, _said(segments[index + 1])[0] if index + 1 < len(segments) else end + SLOW_PAD_SECONDS)
+        found = [f for f in _decode_stretch(model, audio_path, lo, hi, language, task, spans, levels) if not f.non_speech]
+        # Said once: what the new words repeat of either neighbour goes.
+        if found and out:
+            repeat = _repeated(out[-1].text.split(), found[0].text.split())
+            trimmed = _without(found[0], repeat, from_start=True) if repeat else found[0]
+            found = ([trimmed] if trimmed else []) + found[1:]
+        if found and index + 1 < len(segments):
+            repeat = _repeated(found[-1].text.split(), segments[index + 1].text.split())
+            trimmed = _without(found[-1], repeat, from_start=False) if repeat else found[-1]
+            found = found[:-1] + ([trimmed] if trimmed else [])
+        before = len(timed)
+        after = sum(len(f.text.split()) for f in found)
+        sure = all(f.confidence is not None and f.confidence >= SLOW_MIN_LOGPROB for f in found)
+        if found and sure and after >= before * SLOW_MORE_WORDS and after >= before + SLOW_EXTRA_WORDS:
+            logger.info("A stretched word at %.1f-%.1fs hid speech: %d words, now %d", start, end, before, after)
+            out.extend(found)
+        else:
+            out.append(segment)
+    return out
 
 
 def _decode_stretch(model, audio_path, start, end, language, task, spans, levels) -> list[Segment]:
