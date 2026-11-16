@@ -21,7 +21,7 @@ MP4 with burned-in captions, or SRT/VTT/JSON.
 - **Current release:** the newest dated entry in [CHANGELOG.md](CHANGELOG.md)
   (v1.4.0, 2026-11-12, when this line was written). Progress, decisions and the
   backlog are in
-  [PROGRESS.md](PROGRESS.md); later work is in [docs/ROADMAP.md](docs/ROADMAP.md).
+  [docs/PROGRESS.md](docs/PROGRESS.md); later work is in [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ## Source of truth: `docs/`
 
@@ -94,7 +94,7 @@ anything.**
     
     For pipeline or installer changes, also run `scripts/e2e.py` against a
     running install (docs/TESTING.md).
-12. **Update the affected docs and PROGRESS.md** in the same piece of work:
+12. **Update the affected docs and docs/PROGRESS.md** in the same piece of work:
     - a new env var → ENVIRONMENT.md;
     - a new route → API.md;
     - a migration → DATABASE.md;

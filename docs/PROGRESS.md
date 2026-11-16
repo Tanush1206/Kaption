@@ -892,7 +892,7 @@ private security reporting), no email.
 
 ### v1.1.1 released and measured (2026-10-28)
 - Backup before `vcm update` (DATABASE.md §7, file ownership changes):
-  `C:\Users\Admin\vcm-backup-pre-1.1.1-2026-10-28` (dump, media 28 files,
+  `%USERPROFILE%\vcm-backup-pre-1.1.1-2026-10-28` (dump, media 28 files,
   `.env` copied unread). Kept until Tanush confirms.
 - Update download: new layers 0.6 MB per backend variant, 7.1 MB frontend
   (manifest diff 1.1.0 → 1.1.1). `vcm update` took 25 s.
@@ -1074,7 +1074,7 @@ Tanush's testing first (2026-10-28).
       each matching `SHA256SUMS` and the tag; all six GHCR tags pull
       anonymously.
       - Backup before the update (DATABASE.md §7, tar by the install's own
-        image): `C:\Users\Admin\AppData\Local\VideoCaptionMaker-backup-1.1.1`,
+        image): `%LOCALAPPDATA%\VideoCaptionMaker-backup-1.1.1`,
         `vcm.dump` (all 7 tables), `vcm-media.tgz` (9 of 9 files), `.env`
         copied unread; 14 s down. Kept until Tanush confirms.
       - `vcm update` in 47 s: backend 9/19 layers, 0.5 MB; frontend 7/13,
@@ -2521,7 +2521,7 @@ Process:
   SHA256SUMS; 1.1.0-cuda, 1.1.0-cpu, latest-cuda, latest-cpu and frontend
   1.1.0/latest fetch anonymously (200).
 - Backup per DATABASE.md §7 (24 s downtime):
-  `C:\Users\Admin\VideoCaptionMaker-backups\pre-1.1.0` (vcm.dump 32 KB,
+  `%USERPROFILE%\VideoCaptionMaker-backups\pre-1.1.0` (vcm.dump 32 KB,
   all 7 tables; vcm-media.tgz 284 MB, 28 files as on the volume; .env copy;
   rowcounts 1 video, 159 captions, 5 exports, 1 style, caption md5).
   `pre-1.0.11` kept (Tanush hasn't asked to delete it).
@@ -2666,7 +2666,7 @@ PRD, CHANGELOG, ROADMAP and eval docs; tests.
   match SHA256SUMS; 1.0.11-cuda, 1.0.11-cpu, latest-cuda and frontend
   1.0.11/latest fetch anonymously (200).
 - Backup per DATABASE.md §7 (29 s downtime; busybox:1.37 already present):
-  `C:\Users\Admin\VideoCaptionMaker-backups\pre-1.0.11` (vcm.dump 32 KB,
+  `%USERPROFILE%\VideoCaptionMaker-backups\pre-1.0.11` (vcm.dump 32 KB,
   all 7 tables; vcm-media.tgz 284 MB, 28 files as on the volume; .env
   copy; rowcounts 1 video, 159 captions, 5 exports, 1 style, caption md5).
   `pre-1.0.10` deleted after the update was verified, as Tanush asked.
@@ -2699,7 +2699,7 @@ PRD, CHANGELOG, ROADMAP and eval docs; tests.
 Resumed 2026-10-23: the CPU runs finished (kept languages only, 38 min),
 the pipeline ran (videos 7590-7599, all deleted by id; the dev stack holds
 only 7426, not ours), and the report is
-[docs/LANGUAGE_QUALITY.md](docs/LANGUAGE_QUALITY.md), summarised in
+[LANGUAGE_QUALITY.md](LANGUAGE_QUALITY.md), summarised in
 TESTING.md ("Language quality") and the PRD's known limitations. Found
 besides the quiet-recording bug, not changed: 8 captions under 0.8 s
 across 6 of 10 pipeline runs (clips with 0.6 s pauses), and words heard
@@ -2731,7 +2731,7 @@ Data in `test-assets/fleurs/` (gitignored, never commit); results per run in
      results into TESTING.md and the PRD's known limitations, eval commit.
   3. v1.0.10 release checklist (release workflow and 8 assets already
      verified green on a1b822a), back up the install to
-     `C:\Users\Admin\VideoCaptionMaker-backups\pre-1.0.10`, `vcm update`,
+     `%USERPROFILE%\VideoCaptionMaker-backups\pre-1.0.10`, `vcm update`,
      verify, then delete the `pre-1.0.9` backup.
   4. A Tamil test video uploaded on the current (v1.0.10) code, to check
      after v1.0.11 that an existing video in a removed language opens and
@@ -2829,7 +2829,7 @@ pass after, release as v1.0.10.
   match SHA256SUMS; 1.0.10-cuda, 1.0.10-cpu and frontend 1.0.10 fetch
   anonymously (200).
 - Backup per DATABASE.md §7 (31 s downtime, including a busybox pull):
-  `C:\Users\Admin\VideoCaptionMaker-backups\pre-1.0.10` (vcm.dump 32 KB,
+  `%USERPROFILE%\VideoCaptionMaker-backups\pre-1.0.10` (vcm.dump 32 KB,
   all 7 tables; vcm-media.tgz 284 MB, 28 files as on the volume; .env copy;
   rowcounts: 1 video, 159 captions, 5 exports, 1 style, caption-text md5).
   The `pre-1.0.9` backup deleted, as Tanush asked.
@@ -3097,7 +3097,7 @@ Done (2026-10-21), all committed:
 - Tag v1.0.9 on 1a5cf30; CI green on it; `release.yml` green; 8 assets,
   all 7 match SHA256SUMS; the 1.0.9 images fetch anonymously (200).
 - Backup per DATABASE.md §7 before the update (23 s downtime):
-  `C:\Users\Admin\VideoCaptionMaker-backups\pre-1.0.9` (vcm.dump 30 KB,
+  `%USERPROFILE%\VideoCaptionMaker-backups\pre-1.0.9` (vcm.dump 30 KB,
   vcm-media.tgz 284 MB, .env copy, rowcounts: 1 video, 121 captions, 5
   exports, 1 style, caption-text md5). Kept until Tanush confirms.
 - `vcm update` (Windows GPU) in 118 s: VCM_VERSION 1.0.9, alembic
@@ -3359,7 +3359,7 @@ Decisions:
 - CI green on 236b9ce; `release.yml` 4/4 green; 8 assets, all 7 match
   SHA256SUMS; 1.0.8 images fetch anonymously (200).
 - Backup per DATABASE.md §7 before the update (31 s downtime):
-  `C:\Users\Admin\VideoCaptionMaker-backups\pre-1.0.8` (vcm.dump, vcm-media.tgz
+  `%USERPROFILE%\VideoCaptionMaker-backups\pre-1.0.8` (vcm.dump, vcm-media.tgz
   284 MB, .env copy, rowcounts: 1 video, 76 captions, 5 exports, 1 style,
   caption-text md5). Kept until Tanush confirms.
 - `vcm update` (Windows GPU) in 27 s: VCM_VERSION 1.0.8, alembic
@@ -3746,7 +3746,7 @@ Measured:
   all 7 files match SHA256SUMS; backend 1.0.7-cpu/-cuda and frontend 1.0.7
   manifests fetch anonymously (200).
 - Backup before the update, per DATABASE.md §7 (11 s downtime):
-  `C:\Users\Admin\VideoCaptionMaker-backups\pre-1.0.7` (vcm.dump, vcm-media.tgz,
+  `%USERPROFILE%\VideoCaptionMaker-backups\pre-1.0.7` (vcm.dump, vcm-media.tgz,
   .env copy, rowcounts-before.txt). Kept until Tanush confirms the update.
   The install held 0 videos at that point: video 79 was deleted from the
   dashboard in Tanush's browser at 14:26:41 (audit log), and its re-upload

@@ -3,7 +3,7 @@
 Audit of the released **v1.4.0** (tag on `3f4faef`, published 2026-11-12) as
 a new user would meet it: the install, the core flows, security, legal,
 quality, the docs and the release itself. Started 2026-11-13, item 3 of the
-finishing plan in [PROGRESS.md](../PROGRESS.md). It follows up every finding
+finishing plan in [PROGRESS.md](PROGRESS.md). It follows up every finding
 of the [launch audit](LAUNCH_AUDIT.md) of v1.1.0.
 
 **Scope of fixes:** blockers and clear bugs only, released as v1.4.1.

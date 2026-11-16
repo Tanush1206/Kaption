@@ -38,7 +38,7 @@ underneath), runs as a single-user app with no login, and serves its UI on
   the GPU and the CPU, axe at 0 and 212 UI checks on the dev stack; then
   on the updated install: E2E, 202 UI checks at `localhost` and at
   `127.0.0.1`, the request guard, `vcm doctor`, and the data before and
-  after the update (identical). The record is in [PROGRESS.md](../PROGRESS.md).
+  after the update (identical). The record is in [PROGRESS.md](PROGRESS.md).
 - **Open work:** none in progress. Everything decided for later is in
   [ROADMAP.md](ROADMAP.md).
 
@@ -168,4 +168,4 @@ alignment, and a native macOS app that uses Apple's GPU.
 | `.github/workflows/` | `ci`, `arm64`, `release`, `pages`, `weekly-check` |
 | `site/` | the website |
 | `docs/` | the source of truth; [AGENTS.md](../AGENTS.md) lists which doc to read before touching what |
-| [PROGRESS.md](../PROGRESS.md) | the working log: every release's plan, measurements and checks |
+| [PROGRESS.md](PROGRESS.md) | the working log: every release's plan, measurements and checks |
