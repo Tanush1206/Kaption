@@ -3911,3 +3911,16 @@ captions + VAD/decode of the gaps. Outputs test-assets/results/v1.4.4/.
 split; one-word rule must spare spelled letters; part-2 only removes 6) before
 writing any fix. No fix yet. tests-first; music_check + both truth files not
 worse; full checks once on final.
+
+**v1.4.4 fixes built (16 Nov), tests-first, each failing before:** 4aa449f
+glued "nan" is the same marker (_is_marker); cbc6968 a lone word timed to
+itself not held for seconds (_spelled spares R-A-D; SINGLE_WORD_MAX_MS 1800);
+30cf677 _drop_stock — credits unconditional, sign-offs gated by nsp>=0.5,
+generics gated by nsp>=0.6 AND VAD voiced<0.30 (no_speech_prob now carried on
+Segment through _iter). Decisions from Tanush: part2 conservative, part1
+credits-always+rest-gated. Suites green per fix (152 incl phrasing+hindi).
+**Resume here:** re-measuring with the fix — latent full pipeline (bg3pnwx8j)
+for after-counts; then IMG_1551 (nan + one-word); then music_check new.mp4
+(must be 0), both truth files + hinglish.mp4 not worse; report before/after;
+then full checks once on the final commit; then push step. Dev worker
+restarted to load the new code. 6 commits unpushed.
