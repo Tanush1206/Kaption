@@ -36,6 +36,25 @@ project is here, and none is in progress. The project's state is in
 - **Notes:** reuse `reindex_captions` per video. Exposed as a `vcm` command or
   a Settings action (not decided).
 
+### A profanity setting for captions and exports
+- **What:** a Settings choice, applied to the caption text and every export
+  (SRT/VTT/JSON and the burn):
+  - **Show** — as transcribed (today's behaviour);
+  - **Mask** — keep the first letter, star the rest (`f**k`, `b******d`);
+  - **Hide** — replace the whole word with `[bleep]`.
+  A fixed word list, **English and Hinglish (Roman)**, maintained in the repo
+  (not user-editable), matched whole-word and case-insensitively, after the
+  everyday-spelling pass so variants are caught.
+- **Why:** today English swear words are masked by the speech model
+  unpredictably (sometimes `f***`, sometimes in full), and Hinglish mode
+  writes Hindi abuse as spoken, so a user who wants clean captions has no
+  control. Asked for by Tanush, 2026-11-16.
+- **Must:** change only the displayed/exported text, never what the model
+  hears or the timings; the list lives in one place used by both the sidecar
+  formats and the burn; off (Show) by default; tests on known English and
+  Roman-Hindi words, and that a word containing a listed substring is not
+  masked (whole-word only). A later version could let the user edit the list.
+
 ### Image digest pinning and signing
 - **What:**
   - releases record image **digests**, and the compose files pull by digest

@@ -3855,3 +3855,59 @@ assets; Gemini key not returned); data identical before/after (videos,
 captions, table counts, alembic f6b1d8e3a925). Test videos 250-253 deleted
 (flow 250/252, I 251/253); install back to 84/220/221, 2 exports; dev keeps
 7426. Outputs test-assets/results/v1.4.3/release/. **v1.4.3 done.**
+
+## v1.4.4 (investigation, 16 Nov 2026) — Whisper stock hallucinations
+Brief (Tanush, 16 Nov): a 50-min Hinglish show (India's Got Latent S2 EP8,
+install video 256) captioned in ENGLISH mode has Whisper stock hallucinations
+over applause/laughter/music: "Thanks for watching" x4, "Subtitles by…" x2,
+"subscribe", "have a great weekend", and many likely-fake "Thank you." (75) and
+"I don't know." (54); 0:47 "Thank you very much," 6.6 s. Fix (if measurable,
+v1.4.4, else ROADMAP): 1. drop known stock phrases when a whole segment AND
+Whisper's scores say not-speech, every language/mode; 2. short generics
+("Thank you.","I don't know.","Okay.") dropped only when no_speech_prob high
+AND VAD finds little voice; keep real ones. Tests: applause/laughter clip;
+music_check on new.mp4 still 0; truth files + hinglish.mp4 not worse. **Report
+counts before/after on the video BEFORE fixing.** full checks once on final.
+
+**Resume here:** install video 256 is caplang=same (Thank you x19, I don't
+know x6 there). English-mode counts (75/54) need an English-mode re-run.
+Plan: dev stack (GPU) up; copy 256's file from the install media volume (read
+only); run the pipeline in English mode with a dump of each segment's text +
+no_speech_prob + avg_logprob + Silero VAD voiced-share; count stock phrases
+and generics, cross-tab with the scores; check the proposed rules don't drop
+real speech. Measure only; no fix yet. Outputs test-assets/results/v1.4.4/.
+
+**v1.4.4 measured (16 Nov), before any fix.** Reproduced the install's
+English-mode captions for latent (256) via the full pipeline on the dev GPU
+(1453 segs, raw no_speech_prob logged); IMG_1551 (259) analysed from its
+captions + VAD/decode of the gaps. Outputs test-assets/results/v1.4.4/.
+- **256 stock phrases (part 1):** 11 whole-segment. 6 are subtitle-credit
+  ("Subtitles by Subtitle Workshop", "…Amara.org community" x4, "Subtitle
+  Workshop") — unambiguous, always fake. 5 others ("Thanks for watching!" x3,
+  "Thank you for watching.", "subscribe to our channel"). Rule "whole stock &
+  nsp>=0.5" drops 7/11; misses 2 Amara.org (nsp 0.41) + 1 unmatched ->
+  propose dropping the subtitle-credit family unconditionally + the rest
+  gated by nsp. Safe drop ~9-11.
+- **256 generics (part 2):** 155 ("thank you"/"i don't know"/"okay"…). Only
+  **6** are clearly over non-speech (nsp>=0.6 AND VAD voiced<0.30); the other
+  149 have voice under them (real or misheard-over-voice). Conservative rule
+  removes 6, keeps the rest. (Substring counts: "thank you" in 68 caps, "i
+  don't know" in 49 — Tanush's 75/54 — but most have voice.)
+- **Risk:** real outro Hindi song lyrics have VAD voiced=0.00 & nsp=0.88 — a
+  broad VAD drop would delete singing; part 2 is safe only because it is
+  whitelist-only.
+- **259 item 1 (nan glued):** 1 — "Aise ho. nannannannannan." @0:38.6 (the
+  word is nan x5 with no spaces, past the spaced-"nan" filter).
+- **259 item 2 (one-word held >=2s):** 2 — "to" 2.9s, "koi" 2.6s. Also 5 on
+  256 ("Praji!" 2.9s, "R-A-D"/"-D-E-M-A-G" spelled letters, "Minus.", ".").
+  NOTE: spelled-letter captions (R-A-D) are intentional slow spelling — the
+  retime/merge must not mangle them.
+- **259 item 3 (gaps, no change per Tanush):** 0:51-1:22 VAD voiced 0.76 but a
+  raw decode is low-confidence repetitive/stock ("chuk wai…","subscribe
+  karein", nsp~0.77, lp-0.90) = rap/beatbox over a beat, skipped (not cleanly
+  recoverable). 2:26-2:39 VAD voiced 0.11, decode empty = correctly skipped.
+- ROADMAP: profanity setting (Show/Mask/Hide, English+Roman list) added.
+**Next:** reported counts to Tanush; awaiting go-ahead + decisions (stock
+split; one-word rule must spare spelled letters; part-2 only removes 6) before
+writing any fix. No fix yet. tests-first; music_check + both truth files not
+worse; full checks once on final.
