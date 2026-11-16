@@ -1259,6 +1259,43 @@ def test_glued_nan_is_the_same_marker_and_is_dropped(monkeypatch, tmp_path):
     assert caption.text == "Aise ho."
 
 
+def _seg_nsp(words, no_speech_prob):
+    seg = _segment(words)
+    seg.no_speech_prob = no_speech_prob
+    return seg
+
+
+def test_a_subtitle_credit_is_dropped_whatever_the_score(monkeypatch, tmp_path):
+    """
+    "Subtitles by the Amara.org community", "Subtitles by Subtitle Workshop":
+    credits Whisper learned from training subtitles, never spoken. Dropped
+    whole, in any language, whatever the no-speech score.
+    """
+    words = [(" Subtitles", 1.0, 1.4), (" by", 1.4, 1.6), (" the", 1.6, 1.8),
+             (" Amara.org", 1.8, 2.3), (" community", 2.3, 2.8)]
+    found = _run(monkeypatch, tmp_path, "large-v3", [_seg_nsp(words, 0.10)], language="en")
+    assert found == []
+
+
+def test_a_sign_off_is_dropped_only_when_the_model_doubts_it(monkeypatch, tmp_path):
+    """"Thanks for watching." over applause (no-speech 0.7) goes; really said
+    (0.1) it stays."""
+    over = _seg_nsp([(" Thanks", 1.0, 1.3), (" for", 1.3, 1.5), (" watching.", 1.5, 2.0)], 0.7)
+    real = _seg_nsp([(" Thanks", 10.0, 10.3), (" for", 10.3, 10.5), (" watching.", 10.5, 11.0)], 0.1)
+    found = _run(monkeypatch, tmp_path, "large-v3", [over, real], language="en")
+    assert [c.text for c in found] == ["Thanks for watching."]
+
+
+def test_a_generic_phrase_goes_only_over_non_speech(monkeypatch, tmp_path):
+    """"Thank you." with a high no-speech score and little VAD voice is a
+    hallucination; over real voice it is kept."""
+    monkeypatch.setattr(transcription, "_speech_stretches", lambda audio: [(10.0, 12.0)])
+    fake = _seg_nsp([(" Thank", 1.0, 1.3), (" you.", 1.3, 1.8)], 0.8)
+    real = _seg_nsp([(" Thank", 10.2, 10.5), (" you.", 10.5, 11.0)], 0.8)
+    found = _run(monkeypatch, tmp_path, "large-v3", [fake, real], language="en")
+    assert [c.text for c in found] == ["Thank you."]
+
+
 def test_repetition_that_was_said_is_kept(monkeypatch, tmp_path):
     """About 1:52 of the vlog: real speech, four times over."""
     phrase = []

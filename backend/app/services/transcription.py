@@ -72,6 +72,10 @@ class Segment:
     # The model's word for "no speech" (NON_SPEECH_WORDS), kept until the
     # gaps are filled and never captioned (v1.2.1).
     non_speech: bool = False
+    # Whisper's own "probably not speech" score for the segment this came from,
+    # carried so the stock-hallucination drop (v1.4.4, `_drop_stock`) can use
+    # it after the gaps are filled.
+    no_speech_prob: float | None = None
 
 
 def _repo_for(model: str) -> str:
@@ -777,6 +781,9 @@ def transcribe(
         if segments:
             low_confidence_note = LOW_CONFIDENCE_NOTE
 
+    # Stock phrases Whisper writes over applause and music, now that the gaps
+    # are filled and the re-decode's inventions are here too (v1.4.4).
+    segments = _drop_stock(segments, audio_path)
     # The model's non-speech runs have done their part (splitting music for
     # `_fill_skipped`) and are never captions.
     segments = _collapse_loops([s for s in segments if not s.non_speech])
@@ -1253,6 +1260,7 @@ def _decode(model, audio_path, language, task, spans, levels, on_progress, offse
                         confidence=getattr(segment, "avg_logprob", None),
                         speech=words,
                         non_speech=getattr(segment, "non_speech", False),
+                        no_speech_prob=getattr(segment, "no_speech_prob", None),
                     )
                 )
 
@@ -1274,12 +1282,14 @@ def _decode(model, audio_path, language, task, spans, levels, on_progress, offse
 def _iter(segments, markers: frozenset[str] = frozenset(), phrases: tuple[tuple[str, ...], ...] = ()) -> Iterator:
     """Consuming the generator is what actually performs the decoding."""
     for segment in segments:
+        nsp = getattr(segment, "no_speech_prob", None)
         for part in _speech_runs(segment, markers, phrases):
             non_speech = getattr(part, "non_speech", False)
             for piece in _split_long(_with_plausible_words(part)):
                 if non_speech:
                     # Always a namespace of ours here, never Whisper's own.
                     piece.non_speech = True
+                piece.no_speech_prob = nsp
                 yield piece
 
 
@@ -1325,6 +1335,57 @@ NON_SPEECH_PHRASES: dict[str, tuple[tuple[str, ...], ...]] = {
     "hi": (("कर", "दो"), ("करते", "हैं"), ("हुआ", "है"), ("कि",), ("अ",), ("अजय", "को")),
 }
 NON_SPEECH_MIN_PROBABILITY = 0.5
+
+# Stock captions Whisper writes over applause, laughter and music, learned
+# from its training subtitles (v1.4.4). Matched on the whole caption, bare and
+# lower-cased, in every language and mode.
+#  - credits are never spoken, so dropped whole whatever the score;
+#  - sign-offs could be said, so dropped only when Whisper also doubts the
+#    segment (no_speech_prob >= NON_SPEECH_MIN_PROBABILITY);
+#  - short generic phrases are often real, so dropped only when Whisper doubts
+#    them AND VAD hears little voice (GENERIC_MIN_PROBABILITY/MAX_VOICED).
+STOCK_CREDITS = (
+    "subtitles by", "subtitled by", "subtitles provided by", "amara.org", "subtitle workshop",
+)
+STOCK_SIGNOFFS = frozenset({
+    "thanks for watching", "thank you for watching", "thanks for watching everyone",
+    "please subscribe", "subscribe to our channel", "like and subscribe",
+    "please like and subscribe", "don't forget to subscribe", "have a great weekend",
+    "see you next time", "see you in the next video", "see you in the next one",
+})
+GENERIC_PHRASES = frozenset({
+    "thank you", "thank you very much", "thank you so much", "thanks",
+    "i don't know", "okay", "ok", "yeah", "bye",
+})
+GENERIC_MIN_PROBABILITY = 0.6
+GENERIC_MAX_VOICED = 0.30
+
+
+def _drop_stock(segments: list[Segment], audio_path) -> list[Segment]:
+    """
+    Whole-caption stock hallucinations removed (v1.4.4): subtitle credits
+    always, channel sign-offs when Whisper doubts them, and short generic
+    phrases when it doubts them and VAD hears little voice. Runs after the
+    gaps are filled, so it also catches what the re-decode invented. VAD is
+    computed once, and only if a generic phrase is in the running.
+    """
+    stretches: list[tuple[float, float]] | None = None
+    kept: list[Segment] = []
+    for segment in segments:
+        bare = " ".join(w for w in (_bare(x) for x in segment.text.split()) if w)
+        nsp = segment.no_speech_prob or 0.0
+        if bare:
+            if any(credit in bare for credit in STOCK_CREDITS):
+                continue
+            if bare in STOCK_SIGNOFFS and nsp >= NON_SPEECH_MIN_PROBABILITY:
+                continue
+            if bare in GENERIC_PHRASES and nsp >= GENERIC_MIN_PROBABILITY:
+                if stretches is None:
+                    stretches = _speech_stretches(audio_path)
+                if _voiced_share(segment.start_ms / 1000, segment.end_ms / 1000, stretches) < GENERIC_MAX_VOICED:
+                    continue
+        kept.append(segment)
+    return kept
 
 
 def _only_phrases(text: str, phrases: tuple[tuple[str, ...], ...]) -> bool:
