@@ -839,6 +839,23 @@ def _bare(word: str) -> str:
     return word.strip(".,;:!?…।॥\"'“”‘’()[]—–-").lower()
 
 
+def _is_marker(word: str, markers: frozenset[str]) -> bool:
+    """
+    Whether `word` is one of `markers`, counting a marker run together with
+    itself as that marker. Apex writes its "no speech" word "nan" both spaced
+    ("nan nan nan") and glued ("nannannannan"); the glued form is one token
+    the plain test missed, so it survived appended to real speech ("Aise ho.
+    nannannannannan.").
+    """
+    bare = _bare(word)
+    if bare in markers:
+        return True
+    return any(
+        len(m) >= 2 and len(bare) >= 2 * len(m) and bare == m * (len(bare) // len(m))
+        for m in markers
+    )
+
+
 def _repeated(tail: list[str], head: list[str]) -> int:
     """
     How many words at the end of `tail` the start of `head` says again.
@@ -1352,7 +1369,7 @@ def _speech_runs(segment, markers: frozenset[str], phrases: tuple[tuple[str, ...
         )
         return
     if not markers or not words:
-        if markers and all(_bare(w) in markers for w in segment.text.split()):
+        if markers and all(_is_marker(w, markers) for w in segment.text.split()):
             yield SimpleNamespace(
                 text=segment.text, start=segment.start, end=segment.end, words=words,
                 avg_logprob=getattr(segment, "avg_logprob", None), non_speech=True,
@@ -1360,7 +1377,7 @@ def _speech_runs(segment, markers: frozenset[str], phrases: tuple[tuple[str, ...
         else:
             yield segment
         return
-    if not any(_bare(w.word.strip()) in markers for w in words):
+    if not any(_is_marker(w.word.strip(), markers) for w in words):
         yield segment
         return
 
@@ -1378,7 +1395,7 @@ def _speech_runs(segment, markers: frozenset[str], phrases: tuple[tuple[str, ...
     chunk: list = []
     marker = False
     for word in words:
-        is_marker = _bare(word.word.strip()) in markers
+        is_marker = _is_marker(word.word.strip(), markers)
         if chunk and is_marker != marker:
             yield run(chunk, marker)
             chunk = []

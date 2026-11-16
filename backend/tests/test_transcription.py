@@ -1246,6 +1246,19 @@ def test_a_marker_inside_a_sentence_goes_and_the_rest_stays(monkeypatch, tmp_pat
     assert found[1].start_ms == 2600
 
 
+def test_glued_nan_is_the_same_marker_and_is_dropped(monkeypatch, tmp_path):
+    """
+    Apex sometimes writes "nan" with no spaces between the repeats
+    ("nannannannannan"), one token, which the spaced-marker test missed — so
+    it survived appended to real speech: "Aise ho. nannannannannan." A word
+    that is only "nan" repeated is the same marker; it is split off and
+    dropped, keeping the speech.
+    """
+    words = [(" Aise", 38.0, 38.3), (" ho.", 38.3, 38.6), (" nannannannannan.", 38.6, 40.1)]
+    [caption] = _run(monkeypatch, tmp_path, transcription.HINGLISH, [_segment(words)])
+    assert caption.text == "Aise ho."
+
+
 def test_repetition_that_was_said_is_kept(monkeypatch, tmp_path):
     """About 1:52 of the vlog: real speech, four times over."""
     phrase = []
