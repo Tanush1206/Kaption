@@ -51,6 +51,10 @@ SEPARATION_MS = 80
 TAIL_MS = 500
 MIN_MS = 800
 MAX_MS = 7000
+# A lone word must not sit on screen for seconds, even when alignment stretched
+# it over the pause after it (so "to" at 1:22.6 doesn't hold for 2.9 s). A
+# spelled-out sequence ("R-A-D") is read letter by letter and keeps its length.
+SINGLE_WORD_MAX_MS = 1800
 # Without word timings, the fastest believable speech for capping a span by
 # its text: 8 characters a second. Ordinary speech is 12-20.
 CHARS_PER_SECOND = 8.0
@@ -93,6 +97,16 @@ CONJUNCTIONS = frozenset(
 def _bare(word: str) -> str:
     """A word without the punctuation around it, in lower case."""
     return word.strip(".,;:!?…।॥\"'“”‘’()[]—–-").lower()
+
+
+def _spelled(word: str) -> bool:
+    """
+    A spelled-out sequence ("R-A-D", "-D-E-M-A-G") or an initialism ("U.S.A."):
+    letters joined by hyphens or dots. These are read slowly on purpose, so a
+    single one of them is not timed down.
+    """
+    parts = [p for p in word.replace(".", "-").split("-") if p]
+    return len(parts) >= 2 and all(len(p) == 1 and p.isalpha() for p in parts)
 
 
 @dataclass
@@ -575,3 +589,16 @@ def _settle(out: list[Phrase]) -> None:
     for a, b in zip(out, out[1:]):
         if a.end_ms > b.start_ms - SEPARATION_MS:
             a.end_ms = max(a.start_ms + 1, b.start_ms - SEPARATION_MS)
+    # A single word is timed to itself: it ends a tail after it was said, and
+    # never sits for more than SINGLE_WORD_MAX_MS, so a word aligned over the
+    # pause after it ("to", "koi") doesn't linger for seconds. Still at least
+    # MIN_MS to be readable; a spelled-out sequence is left as it is.
+    for phrase in out:
+        words = phrase.text.split()
+        if len(words) == 1 and not _spelled(words[0]):
+            cap = max(
+                phrase.start_ms + MIN_MS,
+                min(phrase.spoken_end_ms + TAIL_MS, phrase.start_ms + SINGLE_WORD_MAX_MS),
+            )
+            if phrase.end_ms > cap:
+                phrase.end_ms = cap

@@ -227,6 +227,23 @@ def test_a_short_word_alone_lasts_at_least_0_8_s():
     assert phrases[0].end_ms <= 3250 + phrasing.TAIL_MS
 
 
+def test_a_lone_word_is_timed_down_but_a_spelled_sequence_is_not():
+    """
+    A single word aligned over the pause after it ("to", said briefly but
+    timed 82.6-85.5 s) must not sit on screen for seconds. A slowly spelled
+    sequence ("R-A-D") is meant to be read letter by letter and keeps its
+    length.
+    """
+    to = _timed("to", [(82.6, 85.5, "to")])
+    spelled = _timed("R-A-D", [(88.0, 91.0, "R-A-D")])
+    tail = _timed("ho gaya.", [(94.0, 94.4, "ho"), (94.4, 94.9, "gaya.")])
+    first, second, _ = phrasing.rephrase([to, spelled, tail])
+    assert first.text == "to"
+    assert first.end_ms - first.start_ms < 2000, first.end_ms - first.start_ms
+    assert second.text == "R-A-D"
+    assert second.end_ms - second.start_ms >= 2500, second.end_ms - second.start_ms
+
+
 def test_a_long_stretch_of_speech_is_cut_into_captions_of_at_most_7_s():
     words = [(i * 0.5, i * 0.5 + 0.45, f"word{i}") for i in range(40)]
     caption = _timed(" ".join(w for _, _, w in words), words)
