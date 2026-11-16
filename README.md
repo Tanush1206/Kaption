@@ -4,6 +4,8 @@
 
 Website: **https://tanush1206.github.io/Video-Caption-Maker/**
 
+![The VideoCaptionMaker editor: a video with its captions listed beside it and laid out on a timeline](docs/images/Editor-Captions.png)
+
 Captions for your videos, made on your own computer. Upload a video, choose
 the caption language, export it with the captions burned in, or as subtitle
 files. Speech recognition (Whisper) and translation (M2M100) run locally on
