@@ -3919,8 +3919,24 @@ itself not held for seconds (_spelled spares R-A-D; SINGLE_WORD_MAX_MS 1800);
 generics gated by nsp>=0.6 AND VAD voiced<0.30 (no_speech_prob now carried on
 Segment through _iter). Decisions from Tanush: part2 conservative, part1
 credits-always+rest-gated. Suites green per fix (152 incl phrasing+hindi).
-**Resume here:** re-measuring with the fix — latent full pipeline (bg3pnwx8j)
-for after-counts; then IMG_1551 (nan + one-word); then music_check new.mp4
-(must be 0), both truth files + hinglish.mp4 not worse; report before/after;
-then full checks once on the final commit; then push step. Dev worker
-restarted to load the new code. 6 commits unpushed.
+**v1.4.4 after-fix measured (17 Nov), full pipeline on the dev GPU.** Whisper
+decodes non-deterministically, so raw counts differ run to run; the fix is
+whitelist-only, so what matters is that credits/sign-offs never survive and
+real speech (song lyrics, voiced generics) always does.
+- **256 (latent), after:** 1420 final segs. `_drop_stock` dropped **54**
+  stock/generic hallucinations over non-speech (this decode had 212 generic +
+  6 sign-off + 4 credit raw; before-run kept all of them). In the kept final:
+  **0** subtitle-credits, **0** sign-offs survive; **125** generics kept (each
+  has voice or nsp<0.6). Real outro song lyrics all KEPT though voiced=0.00 &
+  nsp=0.88 ("Naino se tu signal de", "Tika tika dil dhadke", "Make some noise
+  …") — not in the whitelist, so untouched. Safe. (latent_after2.json)
+- **259 (IMG_1551), after:** 52 phrases. Glued-"nan" captions **1 -> 0**
+  (the nan run is now the marker and dropped). One-word captions held >=2s
+  **2 -> 0**: "to" 2.9s -> 1.8s, "koi" 2.6s -> 1.8s (capped to
+  SINGLE_WORD_MAX_MS); "Vahi."/"hain." at 0.8s (MIN_MS). Spelled R-A-D spared
+  is covered by the phrasing unit test (259 has no spelled run). (img1551_after.json)
+**Resume here:** before/after measured for both videos (above). Running:
+music_check on new.mp4 (must be 0) + both truth files via new.mp4 (0-91.95s
+vs truth-new-5min) and hinglish.mp4 (0-62.8s vs truth-hi), not worse. Then
+report before/after to Tanush; full checks once on the final commit; push
+step. 7 commits unpushed (incl b25d374 drop-count log).
