@@ -3966,7 +3966,17 @@ restored (cuda=True, RTX 5080, large-v3) and verified. music_check new.mp4 0;
 truth files unchanged (16.7/14.0). Test videos deleted through the API: 7809,
 7810 (regression), 7811-7816 (E2E); dev keeps only 7426. NOTE: the install on
 3000 is the CUDA build (RTX 5080, large-v3), not CPU.
-**Next:** Tanush pushes main; ci green (arm64 won't run — no compose/installer/
-Dockerfile/deps change); then tag v1.4.4 on that hash (date the CHANGELOG
-2026-11-17); then release checks + backup + update + after-release checklist.
-All v1.4.4 commits pending push.
+**v1.4.4 PUSHED and TAGGED (17 Nov).** Tanush pushed main and tagged v1.4.4
+(annotated) on 886cdf1. ci on main green (run 44068582341); release run
+44070998492 on the tag is building (arm64 skipped per Tanush, the rest run).
+**Backup made before update:** %LOCALAPPDATA%\VideoCaptionMaker-backup-1.4.3 =
+vcm.dump (162 KB, 9 tables, pg_restore -l valid), vcm-media.tgz (3.03 GB, 22
+files — bigger than before: videos 257-260 added), .env copied unread.
+**Install pre-update state (1.4.3):** 6 videos [220,221,257,258,259,260] all
+completed (these are Tanush's real videos — never delete), captions 2239,
+exports 3, alembic f6b1d8e3a925. The install is the CUDA build (RTX 5080).
+**Resume here:** wait for the release run green; release checks (8 assets vs
+SHA256SUMS + tag, notes=CHANGELOG, latest digests, anon 200); then vcm update
+the install; report layers/bytes; after-release checklist (version/alembic/
+videos unchanged, guard 403/pass, UI flow both addresses, E2E, image
+hardening, secrets, delete only test videos). PROGRESS+CHANGELOG at the end.
