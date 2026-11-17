@@ -1371,20 +1371,26 @@ def _drop_stock(segments: list[Segment], audio_path) -> list[Segment]:
     """
     stretches: list[tuple[float, float]] | None = None
     kept: list[Segment] = []
+    dropped = 0
     for segment in segments:
         bare = " ".join(w for w in (_bare(x) for x in segment.text.split()) if w)
         nsp = segment.no_speech_prob or 0.0
         if bare:
             if any(credit in bare for credit in STOCK_CREDITS):
+                dropped += 1
                 continue
             if bare in STOCK_SIGNOFFS and nsp >= NON_SPEECH_MIN_PROBABILITY:
+                dropped += 1
                 continue
             if bare in GENERIC_PHRASES and nsp >= GENERIC_MIN_PROBABILITY:
                 if stretches is None:
                     stretches = _speech_stretches(audio_path)
                 if _voiced_share(segment.start_ms / 1000, segment.end_ms / 1000, stretches) < GENERIC_MAX_VOICED:
+                    dropped += 1
                     continue
         kept.append(segment)
+    if dropped:
+        logger.info("Dropped %d stock hallucination(s) over non-speech", dropped)
     return kept
 
 
