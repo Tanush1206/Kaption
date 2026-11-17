@@ -3953,9 +3953,20 @@ GREEN so far: ruff clean; backend pytest 801 passed, 2 skipped (208s);
 frontend lint + type-check + 10 tests + production build (exit 0); music_check
 new.mp4 0; truth files unchanged (16.7/14.0). Re-running UI (shoot/axe/checks)
 with MSYS_NO_PATHCONV (path mangling hit the route args first time).
-**Resume here:** then E2E GPU on the dev stack (3001, large-v3, hinglish.mp4
-same/en/hi/fr); then toggle the dev worker to CPU (CUDA disabled,
-large-v3-turbo) for E2E CPU (same/en) and RESTORE the GPU worker; delete every
-E2E video by id (dev keeps only 7426). NOTE: the install on 3000 is the CUDA
-build (RTX 5080, large-v3), not CPU. Then push step; tag after CI green.
-12 commits unpushed.
+**v1.4.4 full checks PASSED (17 Nov) on the final commit.** ruff clean;
+backend 801 passed, 2 skipped (208s); frontend lint + type-check + 10 tests +
+production build (exit 0); shoot 3x2x2 ok; axe 0; checks.js all pass except
+`cls /dashboard@375` 0.065 — a dev-stack sparse-data artifact (one video, the
+mt-auto footer reflows at mobile width): the install on 3000 with real data
+passes 0.000, and the frontend is byte-identical to origin/main (no FE change
+in v1.4.4), so not a regression. E2E GPU (dev 3001, large-v3, hinglish.mp4
+same/en/hi/fr, SRT/VTT/MP4): ALL PASSED. E2E CPU (dev worker toggled to CPU via
+CUDA_VISIBLE_DEVICES=-1, large-v3-turbo int8, same/en): ALL PASSED; GPU worker
+restored (cuda=True, RTX 5080, large-v3) and verified. music_check new.mp4 0;
+truth files unchanged (16.7/14.0). Test videos deleted through the API: 7809,
+7810 (regression), 7811-7816 (E2E); dev keeps only 7426. NOTE: the install on
+3000 is the CUDA build (RTX 5080, large-v3), not CPU.
+**Next:** Tanush pushes main; ci green (arm64 won't run — no compose/installer/
+Dockerfile/deps change); then tag v1.4.4 on that hash (date the CHANGELOG
+2026-11-17); then release checks + backup + update + after-release checklist.
+All v1.4.4 commits pending push.
