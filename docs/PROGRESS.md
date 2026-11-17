@@ -3946,8 +3946,16 @@ real speech (song lyrics, voiced generics) always does.
   the recorded everyday baseline (24.0->16.7, 28.8->14.0) to the decimal —
   the fixes are text-neutral on these clips. Test videos 7809, 7810 deleted
   (204 each); 1 pre-existing video (7426) left.
-**Resume here:** all before/after + guards done and reported to Tanush.
-Left: full checks once on the final commit (ruff, backend pytest, frontend
-lint/type-check/test/build, UI shoot/axe/checks, E2E GPU+CPU), update
-CHANGELOG [1.4.4]/ARCHITECTURE/TESTING count, then the push step (trailer
-check + push), tag after CI green. 9 commits unpushed.
+**v1.4.4 full checks (17 Nov) on 5880d93.** Docs done: CHANGELOG [1.4.4],
+ARCHITECTURE (_drop_stock, _is_marker, SINGLE_WORD_MAX_MS), TESTING count
+803/801/2 and test_transcription.py (99); ROADMAP profanity already present.
+GREEN so far: ruff clean; backend pytest 801 passed, 2 skipped (208s);
+frontend lint + type-check + 10 tests + production build (exit 0); music_check
+new.mp4 0; truth files unchanged (16.7/14.0). Re-running UI (shoot/axe/checks)
+with MSYS_NO_PATHCONV (path mangling hit the route args first time).
+**Resume here:** then E2E GPU on the dev stack (3001, large-v3, hinglish.mp4
+same/en/hi/fr); then toggle the dev worker to CPU (CUDA disabled,
+large-v3-turbo) for E2E CPU (same/en) and RESTORE the GPU worker; delete every
+E2E video by id (dev keeps only 7426). NOTE: the install on 3000 is the CUDA
+build (RTX 5080, large-v3), not CPU. Then push step; tag after CI green.
+12 commits unpushed.
