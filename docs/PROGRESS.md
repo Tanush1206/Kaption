@@ -3935,8 +3935,19 @@ real speech (song lyrics, voiced generics) always does.
   **2 -> 0**: "to" 2.9s -> 1.8s, "koi" 2.6s -> 1.8s (capped to
   SINGLE_WORD_MAX_MS); "Vahi."/"hain." at 0.8s (MIN_MS). Spelled R-A-D spared
   is covered by the phrasing unit test (259 has no spelled run). (img1551_after.json)
-**Resume here:** before/after measured for both videos (above). Running:
-music_check on new.mp4 (must be 0) + both truth files via new.mp4 (0-91.95s
-vs truth-new-5min) and hinglish.mp4 (0-62.8s vs truth-hi), not worse. Then
-report before/after to Tanush; full checks once on the final commit; push
-step. 7 commits unpushed (incl b25d374 drop-count log).
+**v1.4.4 regression guards (17 Nov), dev GPU, default (everyday) spelling:**
+- **music_check new.mp4** (id 7809, 476 captions): **0 failures**. Both real
+  repeats kept: "khelta jaoon x4" and the 2:47 line (model spells it now
+  "nahi. Nahi. Nahi.", not "nahin" — spelling drift, not from this fix; the
+  --keep phrase was updated to match).
+- **truth files, not worse (identical to baseline):** new.mp4 0-91.95s vs
+  truth-new-5min strict **16.7%** / loose 13.5% / CER 7.7%; hinglish.mp4
+  0-62.8s vs truth-hi strict **14.0%** / loose 13.3% / CER 6.6%. Both equal
+  the recorded everyday baseline (24.0->16.7, 28.8->14.0) to the decimal —
+  the fixes are text-neutral on these clips. Test videos 7809, 7810 deleted
+  (204 each); 1 pre-existing video (7426) left.
+**Resume here:** all before/after + guards done and reported to Tanush.
+Left: full checks once on the final commit (ruff, backend pytest, frontend
+lint/type-check/test/build, UI shoot/axe/checks, E2E GPU+CPU), update
+CHANGELOG [1.4.4]/ARCHITECTURE/TESTING count, then the push step (trailer
+check + push), tag after CI green. 9 commits unpushed.
