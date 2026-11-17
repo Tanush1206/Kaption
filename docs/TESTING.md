@@ -9,7 +9,7 @@ automated tests can't reach (GPU, installers, updates).
 | Layer | Tool | Where | Runs in CI |
 |---|---|---|---|
 | Backend lint | ruff (`backend/ruff.toml`) | `backend/` | **yes** (`ci.yml`, job `backend`) |
-| Backend unit and integration | pytest 8 + pytest-asyncio (`asyncio_mode = auto`, **one session-wide event loop**) + httpx `ASGITransport` | `backend/tests/` (798 collected on v1.4.3: 796 pass, 2 skipped) | **yes** (`ci.yml`, job `backend`): the CPU dev image runs against Postgres, Redis and ChromaDB service containers |
+| Backend unit and integration | pytest 8 + pytest-asyncio (`asyncio_mode = auto`, **one session-wide event loop**) + httpx `ASGITransport` | `backend/tests/` (803 collected on v1.4.4: 801 pass, 2 skipped) | **yes** (`ci.yml`, job `backend`): the CPU dev image runs against Postgres, Redis and ChromaDB service containers |
 | Frontend static checks | `next lint` (`next/core-web-vitals`), `tsc --noEmit`, `next build` | `frontend/` | yes (`ci.yml`, job `frontend`) |
 | Installer scripts | `bash -n`, `shellcheck -S warning`, `docker compose config -q` for both compose files; `install/tests/` (`vcm pull`, `update`, `doctor`, in bash and PowerShell 7, against `fake_docker.py`; `test_install_stop.ps1`); `scripts/release_notes.sh` against the CHANGELOG | `install/`, compose files | yes (`ci.yml`, job `scripts`) |
 | Both architectures (v1.4.0) | `scripts/ci_arch_check.sh` (build, a local registry, the real `install.sh`, containers' architecture) and `scripts/ci_smoke.py` (an English and a Hinglish-to-Spanish transcription and a burn, timed) | `ubuntu-24.04` and `ubuntu-24.04-arm` | yes (`arm64.yml`, every push; the times as a notice) |
@@ -509,7 +509,7 @@ Full layer digests are in PROGRESS.md.
 | The caption accuracy (i) (v1.2.1): beside the caption count and "Spoken audio"; one button named "About caption accuracy", 44 px on a phone; not shown until clicked; opens on click, tap and keyboard as a labelled dialog that takes the focus and is described by the note; Escape and a click outside close it, focus returns; the panel stays inside the window | | `checks.js caption-accuracy` (1440 and 375, editor and language step); axe 0 with it open, light and dark |
 | Request guard and audit log | `test_request_guard.py` (8 tests; 6 fail with the guard removed) | live probes on both installs at `localhost` and `127.0.0.1` |
 | Restart recovery and the 3-requeue limit | `test_recovery.py` (5 tests) | live OOM test: worker capped at 1 GB, 3 kills → failed (PROGRESS.md) |
-| Transcription: segment splitting, silence filtering, no-speech retry, friendly errors | `test_transcription.py` (48) | |
+| Transcription: segment splitting, silence filtering, no-speech retry, stock-phrase and glued-marker drops over non-speech, friendly errors | `test_transcription.py` (99) | `backend/scripts/music_check.py` on new.mp4 (0 failures) |
 | Search scoping and refusal | `test_search.py` | "not found" question (M9) |
 | Font catalogue and downloads | `test_font_library.py` | |
 | Translation, all 20 pairs (M2M100) | | GPU E2E 5 spoken × 6 targets = 30 jobs; CPU E2E 3 × 6 = 18 jobs; M2M100 service level 20/20 pairs; bad Gemini key falls back (R3) |

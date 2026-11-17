@@ -299,6 +299,25 @@ Rules the code enforces:
   the same words, one held over noise to a loop or the marker. VAD, not the
   speech-band envelope, because the skipped speech sat 20-25 dB under the
   file's speaking level; it takes under a second for 15 minutes.
+- **Stock phrases over applause and music are dropped** (v1.4.4,
+  `_drop_stock`, after the gaps are filled so the re-decode's inventions are
+  here too). A whole caption whose text (bare-folded) is a known subtitle
+  hallucination goes: subtitle-credit lines (`STOCK_CREDITS`, e.g. "Subtitles
+  by the Amara.org community") unconditionally; sign-offs (`STOCK_SIGNOFFS`,
+  "Thanks for watching!") when its `no_speech_prob` is at least 0.5; short
+  generics (`GENERIC_PHRASES`, "Thank you.", "I don't know.", "Okay.") only
+  when `no_speech_prob` is at least 0.6 **and** Silero VAD finds under 30% of
+  the span voiced. The list is closed, so real speech is never matched by
+  shape: on a 50-minute Hinglish show it removed 54 hallucinations and kept
+  every voiced generic and every sung outro line (voiced 0.00, no_speech 0.88).
+  `no_speech_prob` is carried on each `Segment` from faster-whisper through
+  `_iter` for this.
+- **A glued run of the non-speech marker is still the marker** (v1.4.4,
+  `_is_marker`). The Hinglish model writes "nan" over music; a spaced run was
+  already caught, but a glued one ("nannannannan") was not. A word that is a
+  marker repeated with no spaces (`m` × k, `m` at least two letters) now
+  counts as that marker in `_collapse_loops`, `_drop_stock` and the music
+  check.
 - **Silence that would swallow the speech is re-measured** (v1.0.11,
   `silence_for`): FFmpeg's `silencedetect` under -40 dB as before, unless
   more than half of the file's voiced envelope windows (speech band within
@@ -347,6 +366,11 @@ Rules the code enforces:
   - then: a breath under 0.5 s closes to 2 frames (80 ms), a pause stays at
     least 0.5 s, a caption ends at most 0.5 s after its last word and lasts
     0.8-7 s (a squeezed one joins the neighbour the speech runs into);
+  - a caption of a single word is timed to the word, not held over the gap
+    after it (v1.4.4, `SINGLE_WORD_MAX_MS` 1.8 s): "to" sat 2.9 s and "koi"
+    2.6 s on a phone clip. A deliberately spelled word ("R-A-D", two or more
+    single-letter parts split on `.`/`-`, `_spelled`) is exempt and keeps its
+    length;
   - the words are checked unchanged and in order;
   - the splitter (v1.4.0) scores each split with prefix sums of the word
     lengths rather than re-joining the phrase, 4.6x faster on 60 minutes of

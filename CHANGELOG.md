@@ -6,6 +6,32 @@ commits between tags; hashes are given for reference.
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.4.4] - 2026-11-17
+
+Caption-quality fixes for noisy, music-heavy videos. No migration; the update
+downloads the app layers only. Videos already captioned change only with Redo.
+
+### Fixed
+- **Stock phrases a speech model writes over applause and music are dropped.**
+  On a 50-minute Hinglish show captioned in English, Whisper filled the gaps
+  over clapping and music with "Thanks for watching!", "Subtitles by the
+  Amara.org community", "subscribe to our channel" and the like. A whole
+  caption that is one of these is now removed: subtitle-credit lines always
+  (they are never real speech), and sign-offs and short generics ("Thank
+  you.", "I don't know.") only when the model itself marks the span as
+  non-speech and the voice detector finds little or no voice under it. Real
+  speech — including sung outro lyrics with no clear voiced signal — is kept,
+  because only this fixed list of phrases is ever considered.
+- **A run of "nan" glued into one word is recognised as the same non-speech
+  marker.** The Hinglish model writes "nan" over music; a spaced run
+  ("nan nan nan") was already dropped, but a glued one
+  ("Aise ho. nannannannan.") slipped through. Any word that is just "nan"
+  repeated is now treated as that marker and removed.
+- **A lone word is timed to itself, not held on screen for seconds.** When a
+  single short word ("to", "koi") carried a long gap, its caption lingered up
+  to several seconds; it is now capped near the word's own length. Deliberate
+  slow spelling (a caption like "R-A-D") is left alone.
+
 ## [1.4.3] - 2026-11-16
 
 A security hardening fix after a full penetration test (no serious issue was
