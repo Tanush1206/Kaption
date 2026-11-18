@@ -2,6 +2,7 @@
 
 import { Check, ChevronDown, Info, Loader2, Search } from "lucide-react";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 import { fontFileUrl, useFontSearch } from "@/hooks/use-fonts";
 import { cn } from "@/lib/utils";
@@ -51,18 +52,61 @@ export function FontPicker({ builtins, value, onChange }: FontPickerProps) {
   const [info, setInfo] = useState(false);
   const [query, setQuery] = useState("");
   const container = useRef<HTMLDivElement>(null);
+  const trigger = useRef<HTMLButtonElement>(null);
+  const panel = useRef<HTMLDivElement>(null);
   const scroller = useRef<HTMLDivElement>(null);
   const [scrollTop, setScrollTop] = useState(0);
   const [viewport, setViewport] = useState(288);
+  // Anchors the portalled panel to the trigger; `null` until first measured.
+  const [pos, setPos] = useState<{
+    left: number;
+    width: number;
+    top?: number;
+    bottom?: number;
+    maxHeight: number;
+  } | null>(null);
 
   const { data, isFetching } = useFontSearch(query, open);
 
+  // Anchored to the trigger in a portal, so an overflow ancestor (the
+  // inspector's scroll area, the phone's bottom sheet) can't clip it. Below
+  // the trigger, or above when there is more room; never taller than its
+  // space. Kept in step while open.
+  useLayoutEffect(() => {
+    if (!open) return;
+    function place() {
+      const t = trigger.current;
+      if (!t) return;
+      const r = t.getBoundingClientRect();
+      const margin = 8;
+      const width = r.width;
+      const left = Math.min(Math.max(margin, r.left), window.innerWidth - margin - width);
+      const below = window.innerHeight - r.bottom - margin;
+      const above = r.top - margin;
+      const down = below >= Math.min(320, above) || below >= above;
+      setPos(
+        down
+          ? { left, width, top: r.bottom + 4, maxHeight: below - 4 }
+          : { left, width, bottom: window.innerHeight - r.top + 4, maxHeight: above - 4 }
+      );
+    }
+    place();
+    window.addEventListener("resize", place);
+    window.addEventListener("scroll", place, true);
+    return () => {
+      window.removeEventListener("resize", place);
+      window.removeEventListener("scroll", place, true);
+    };
+  }, [open]);
+
   // Close on an outside click or Escape. Pointerdown rather than click, so a
-  // press that starts outside and releases inside does not reopen it.
+  // press that starts outside and releases inside does not reopen it. The
+  // panel is portalled, so it counts as inside alongside the trigger.
   useEffect(() => {
     if (!open) return;
     const away = (event: PointerEvent) => {
-      if (!container.current?.contains(event.target as Node)) setOpen(false);
+      const target = event.target as Node;
+      if (!container.current?.contains(target) && !panel.current?.contains(target)) setOpen(false);
     };
     const escape = (event: KeyboardEvent) => {
       if (event.key === "Escape") setOpen(false);
@@ -160,7 +204,8 @@ export function FontPicker({ builtins, value, onChange }: FontPickerProps) {
   // as results arrive.
   useLayoutEffect(() => {
     if (open && scroller.current) setViewport(scroller.current.clientHeight);
-  }, [open, total]);
+    // `pos`: the scroller only exists once the portal is placed and mounted.
+  }, [open, total, pos]);
 
   const { start, end } = visibleRange(tops, scrollTop, viewport, items.length);
 
@@ -178,6 +223,7 @@ export function FontPicker({ builtins, value, onChange }: FontPickerProps) {
   return (
     <div ref={container} className="relative">
       <button
+        ref={trigger}
         type="button"
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
@@ -188,8 +234,19 @@ export function FontPicker({ builtins, value, onChange }: FontPickerProps) {
         <ChevronDown className={cn("size-4 shrink-0 transition-transform", open && "rotate-180")} />
       </button>
 
-      {open && (
-        <div className="absolute z-30 mt-1 w-full overflow-hidden rounded-xl border border-border/60 bg-background shadow-overlay dark:bg-surface-3">
+      {open && pos && createPortal(
+        <div
+          ref={panel}
+          style={{
+            position: "fixed",
+            left: pos.left,
+            top: pos.top,
+            bottom: pos.bottom,
+            width: pos.width,
+            maxHeight: pos.maxHeight,
+          }}
+          className="z-50 flex flex-col overflow-hidden rounded-xl border border-border/60 bg-background shadow-overlay dark:bg-surface-3"
+        >
           <div className="flex items-center gap-2 border-b border-border px-2">
             <Search className="size-3.5 shrink-0 text-muted-foreground" />
             <input
@@ -229,11 +286,11 @@ export function FontPicker({ builtins, value, onChange }: FontPickerProps) {
           <div
             ref={scroller}
             onScroll={(event) => setScrollTop(event.currentTarget.scrollTop)}
-            className="max-h-72 overflow-y-auto"
+            className="max-h-72 min-h-0 flex-1 overflow-y-auto"
           >
             {/* The full height is real, so the scrollbar reports the whole
                 catalogue rather than the handful of rows that exist in the DOM. */}
-            <ul role="listbox" className="relative" style={{ height: total }}>
+            <ul role="listbox" aria-label="Fonts" className="relative" style={{ height: total }}>
               {items.slice(start, end).map((item, offset) => {
                 const index = start + offset;
                 const position = {
@@ -293,7 +350,8 @@ export function FontPicker({ builtins, value, onChange }: FontPickerProps) {
               </p>
             )}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
