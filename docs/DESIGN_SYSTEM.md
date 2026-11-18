@@ -190,7 +190,12 @@ spinner and disables; disabled is 40 % opacity.
 - **Searchable pickers** (`styles/font-picker.tsx`,
   `videos/language-picker.tsx`): a button over a search box and a listbox
   (ARIA combobox), because a native select can't search 1,301 fonts or
-  languages named in their own scripts.
+  languages named in their own scripts. Their panel is rendered in a **portal
+  to `document.body`** and placed against the button by hand (below it, or
+  above when there is more room), so an `overflow-hidden` ancestor — the inset
+  group it sits in, the inspector's scroll area, the phone's bottom sheet —
+  can't clip the list away (v1.4.5). `ui/popover.tsx` is absolutely positioned
+  and is only for small panels with no such ancestor.
 - **Dependent controls stay put:** a control with no effect in the current
   state is disabled, not removed, so nothing after it moves.
 

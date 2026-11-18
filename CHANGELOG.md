@@ -6,6 +6,25 @@ commits between tags; hashes are given for reference.
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.4.5] - 2026-11-18
+
+A UI fix in the caption editor. No migration; the update downloads the app
+layers only.
+
+### Fixed
+- **The caption-language menu shows its list again.** Opening the "Caption
+  language" menu in the editor showed the search box with nothing under it —
+  the languages were there but drawn outside the panel that holds them, so
+  they were clipped away, on the desktop inspector and the phone's bottom
+  sheet alike. The menu now floats above everything and is placed against its
+  button (above it when there is more room there), so the whole list shows and
+  scrolls. The font picker, which opened the same way, is fixed with it.
+
+### Added
+- **A clearer route to Hinglish.** When the audio is Hindi, a line under the
+  caption-language rows spells out that Hinglish is Hindi in Roman script:
+  set Captions to Hindi, then "Hindi in" to Hinglish (Roman).
+
 ## [1.4.4] - 2026-11-17
 
 Caption-quality fixes for noisy, music-heavy videos. No migration; the update

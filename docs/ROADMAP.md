@@ -36,6 +36,28 @@ project is here, and none is in progress. The project's state is in
 - **Notes:** reuse `reindex_captions` per video. Exposed as a `vcm` command or
   a Settings action (not decided).
 
+### The font picker as a proper ARIA listbox
+- **What:** give the editor's font picker (`frontend/src/components/styles/font-picker.tsx`)
+  real listbox semantics and keyboard navigation: the `<ul role="listbox">`
+  holding `option` children directly (not a `<button role="option">` inside a
+  plain `<li>`), arrow-key movement with `aria-activedescendant`, Enter to
+  choose, and the active option scrolled into view — over the **windowed**
+  (virtualised) list, which is the hard part, since the active row may not be
+  in the DOM.
+- **Why:** with the font popover open, axe reports `aria-required-children`,
+  `aria-required-parent` and `listitem`: the listbox has no direct `option`
+  children, and the options are focusable buttons rather than
+  activedescendant targets. Pre-existing (the picker has always been built
+  this way); surfaced in v1.4.5 when the popover was scanned open for the
+  first time. The caption-language picker already follows the correct pattern
+  and is axe-clean — the font picker should match it, but doing so needs the
+  windowed-list keyboard handling above, too large for the v1.4.5 clipping
+  fix. Found 2026-11-18; Tanush chose to defer it here.
+- **Must:** keep the preview windowing (a face loads only when its row is on
+  screen); keyboard users can reach and choose any font without a mouse;
+  axe 0 with the popover open, light and dark; the existing font checks
+  (`checks.js` style-sliders and the burn-font checks) still pass.
+
 ### A profanity setting for captions and exports
 - **What:** a Settings choice, applied to the caption text and every export
   (SRT/VTT/JSON and the burn):
