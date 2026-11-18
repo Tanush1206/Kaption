@@ -3975,8 +3975,32 @@ files — bigger than before: videos 257-260 added), .env copied unread.
 **Install pre-update state (1.4.3):** 6 videos [220,221,257,258,259,260] all
 completed (these are Tanush's real videos — never delete), captions 2239,
 exports 3, alembic f6b1d8e3a925. The install is the CUDA build (RTX 5080).
-**Resume here:** wait for the release run green; release checks (8 assets vs
-SHA256SUMS + tag, notes=CHANGELOG, latest digests, anon 200); then vcm update
-the install; report layers/bytes; after-release checklist (version/alembic/
-videos unchanged, guard 403/pass, UI flow both addresses, E2E, image
-hardening, secrets, delete only test videos). PROGRESS+CHANGELOG at the end.
+**v1.4.4 RELEASED and the install updated (17-18 Nov).** release run
+44070998492 green — all image jobs (backend cpu amd64+arm64, backend cuda
+amd64, frontend amd64+arm64), both manifests, release (arm64 ran this time,
+not skipped). Release checks: 8 assets match SHA256SUMS and the tag 886cdf1
+(the 7 files byte-identical ignoring CRLF; .ps1 differ by line endings only);
+notes = CHANGELOG [1.4.4]; latest-cuda/latest-cpu/frontend:latest digests =
+the 1.4.4 digests; anonymous imagetools inspect 200. Backup
+%LOCALAPPDATA%\VideoCaptionMaker-backup-1.4.3 (vcm.dump 162 KB/9 tables valid,
+vcm-media.tgz 3.03 GB/22 files, .env unread). vcm update exit 0 in 53 s: one
+Quick Heal TLS glitch, built-in retry (2 of 3) recovered; backend pulled 3 app
+layers (0.2 MB of 2295), frontend 0 of 72.4. After-release checklist: version
+1.4.4; alembic f6b1d8e3a925 (head, no migration); videos unchanged
+[220,221,257,258,259,260], captions 2239, exports 3; the v1.4.4 fixes present
+in the shipped image (_drop_stock/STOCK_CREDITS/_is_marker, SINGLE_WORD_MAX_MS);
+app procs uid 10001 CapEff 0 NoNewPrivs 1 (backend+worker); /licenses has
+LICENSE, SOURCES-debian.txt, THIRD_PARTY_NOTICES.md. Guard: POST foreign
+Origin 403, Host-rebind 403, own-origin writes pass; safe-method reads are
+allowed by design (SAFE_METHODS returns before the Origin/Sec-Fetch checks, so
+a foreign-Origin GET is 200 — not a regression). UI flow at both localhost and
+127.0.0.1: checks.js 174 passed 0 failed each; flow.js PASS at both (delete,
+settings toggle+restore, SRT+MP4 export, no request refused). E2E on the
+install (same/en/hi/fr, SRT/VTT/MP4): ALL PASSED. Secrets clean (git history,
+tracked files, shipped image). Test videos deleted through the API: install
+261-264 (install E2E), 265-267 (flow.js prep; 265/267 by flow.js, 266 by hand);
+install back to the 6 real videos; dev keeps only 7426. The CUDA-image dev
+worker was toggled to CPU for E2E CPU earlier and restored. NOTE: the install
+on 3000 is the CUDA build (RTX 5080, large-v3), not CPU. Settings restored to
+default. **v1.4.4 done.** The post-release PROGRESS commits are pending
+Tanush's push.
