@@ -4004,3 +4004,54 @@ worker was toggled to CPU for E2E CPU earlier and restored. NOTE: the install
 on 3000 is the CUDA build (RTX 5080, large-v3), not CPU. Settings restored to
 default. **v1.4.4 done.** The post-release PROGRESS commits are pending
 Tanush's push.
+
+## v1.4.5 (18 Nov 2026) — the caption-language menu showed a blank list
+Bug (Tanush, 18 Nov): the editor's "Caption language" menu opened with only the
+search box; the 10 options were in the DOM but not visible. Cause (reproduced
+with playwright-cli at 1440 and 375, light and dark): the popover was
+`position:absolute` inside `.group-inset`, whose `overflow-hidden` (and the
+inspector's scroll area on desktop, the bottom sheet on a phone) clipped
+everything below the search box — the listbox sat at y 322-578 while the group
+clipped at 366. `isVisible()`/`getByRole` saw it (it is in the DOM), which is
+why the old `editor-languages` check stayed green.
+
+**Fix (tests-first, the check fails before):**
+- `videos/language-picker.tsx` and `styles/font-picker.tsx`: the panel now
+  renders in a **portal to `document.body`**, placed against the trigger
+  (below, or above when there is more room) and clamped to the viewport, so no
+  overflow ancestor can clip it. Focus moves by `autoFocus` (the portal mounts
+  a render after `pos` is measured, so the old synchronous focus missed it).
+  The font picker's listbox also gained an accessible name.
+- `captions/caption-editor.tsx`: when the audio is Hindi (`maybeHindi`), a line
+  names the route to Hinglish (Captions → Hindi, then "Hindi in" → Hinglish
+  (Roman)).
+- `checks.js editor-language-visible`: asserts the open list is painted
+  (`elementFromPoint` at the listbox edges hits the list, not an ancestor
+  showing through) and in the viewport, at 1440 and 375, light and dark, and
+  that typing "hindi" leaves Hindi visible. FAILS before the fix (1440 desktop
+  clip + 375 off-sheet), passes after. The helper's painted() must reject a hit
+  that is an *ancestor* of the list (clipped-through), not accept it.
+
+**Other dropdowns checked:** the Redo panel's "Hindi in"/"Spelling" are native
+`<select>` (never clipped). The font picker had the same clipping (off the
+phone sheet) — fixed. With the font popover open, axe also reports 3
+*pre-existing* listbox-semantics violations (options are `<button role=option>`
+in a plain `<li>`, no activedescendant over the windowed list); fixing them
+needs real listbox keyboard nav, too large for this fix — Tanush chose to put
+it on the ROADMAP ("The font picker as a proper ARIA listbox"). The
+caption-language picker (the actual bug) is axe 0.
+
+**Full checks (dev stack, frontend-only change — no backend/pipeline/installer
+change, so no E2E/installer run; CI runs backend on push):** frontend lint +
+type-check + 10 tests + production build (exit 0); shoot 3x2x2 ok; axe 0 on
+dashboard/search/settings AND with the caption-language popover open (light +
+dark); checks.js 192 passed, 2 failed — both the dashboard@375 `cls` sparse-
+data artifact (one dev video, the mt-auto footer reflows at phone width; the
+install with real data passes 0.000; the frontend dashboard is unchanged, so
+not a regression); `editor-language-visible` 12/12; `editor-languages`,
+`editor-targets`, `editor-cls` green; `style-sliders` 8/0; the font picker
+selects through the portal by hand (Poppins -> Sans, closes, value updates).
+Dev stack keeps only 7426 (its style reset to default).
+**Next:** push step (trailer check + push); CI green (arm64 won't run — no
+compose/installer/Dockerfile/deps change); then tag v1.4.5 on that hash (date
+the CHANGELOG 2026-11-18); release checks + backup + update + after-release.
