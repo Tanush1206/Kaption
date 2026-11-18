@@ -423,6 +423,15 @@ export function CaptionEditor({ video, playback }: CaptionEditorProps) {
             )}
           </div>
 
+          {/* Hinglish is not its own caption language: it is Hindi written in
+              Roman script, reached through the two rows above. Named here so
+              nobody has to guess where it went (v1.4.5). */}
+          {maybeHindi && (
+            <p className="mt-1.5 px-4 text-xs text-muted-foreground">
+              For Hinglish, set Captions to Hindi, then “Hindi in” to Hinglish (Roman).
+            </p>
+          )}
+
           {!captionOffered ? (
             <p className="mt-1.5 px-4 text-xs text-muted-foreground">
               {languageName(captionLanguage, languageOptions)} captions are no longer offered. Choose a
