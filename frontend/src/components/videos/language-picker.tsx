@@ -1,7 +1,8 @@
 "use client";
 
 import { Check, ChevronDown, Search } from "lucide-react";
-import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 import { cn } from "@/lib/utils";
 import type { LanguageOption } from "@/types/video";
@@ -52,8 +53,19 @@ export function LanguagePicker({
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [active, setActive] = useState(0);
+  // The panel is rendered in a portal (below), so it is anchored to the
+  // trigger by hand. `null` until the first measurement, so it never paints
+  // at 0,0 before it is placed.
+  const [pos, setPos] = useState<{
+    left: number;
+    width: number;
+    top?: number;
+    bottom?: number;
+    maxHeight: number;
+  } | null>(null);
   const container = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
+  const panel = useRef<HTMLDivElement>(null);
   const search = useRef<HTMLInputElement>(null);
   const id = useId();
   const listId = `${id}-list`;
@@ -64,19 +76,55 @@ export function LanguagePicker({
   );
   const selected = options.find((option) => option.code === value);
 
-  // Opening starts from the current choice, with an empty search.
+  // Opening starts from the current choice, with an empty search. The search
+  // box takes focus through `autoFocus` (below) rather than from here: it
+  // lives in a portal that mounts a render later, once `pos` is measured.
   useEffect(() => {
     if (!open) return;
     setQuery("");
     setActive(Math.max(0, options.findIndex((option) => option.code === value)));
-    search.current?.focus();
   }, [open, options, value]);
 
-  // A click anywhere else closes it, as a select would.
+  // Anchored to the trigger in a portal, so an overflow-hidden ancestor (the
+  // inset group it sits in, the inspector's scroll area, the phone's bottom
+  // sheet) can't clip it. Placed below the trigger, or above when there is
+  // more room there, and never taller than the space it has. Right-aligned,
+  // then nudged 8 px inside the window. Kept in step while open.
+  useLayoutEffect(() => {
+    if (!open) return;
+    function place() {
+      const t = trigger.current;
+      if (!t) return;
+      const r = t.getBoundingClientRect();
+      const margin = 8;
+      const width = Math.max(r.width, 240); // min-w-[15rem]
+      const left = Math.min(Math.max(margin, r.right - width), window.innerWidth - margin - width);
+      const below = window.innerHeight - r.bottom - margin;
+      const above = r.top - margin;
+      const down = below >= Math.min(320, above) || below >= above;
+      setPos(
+        down
+          ? { left, width, top: r.bottom + 4, maxHeight: below - 4 }
+          : { left, width, bottom: window.innerHeight - r.top + 4, maxHeight: above - 4 }
+      );
+    }
+    place();
+    window.addEventListener("resize", place);
+    // `true`: catch scrolls in any ancestor, not just the window.
+    window.addEventListener("scroll", place, true);
+    return () => {
+      window.removeEventListener("resize", place);
+      window.removeEventListener("scroll", place, true);
+    };
+  }, [open]);
+
+  // A click anywhere else closes it, as a select would. The panel lives in a
+  // portal, so it counts as "inside" alongside the trigger's container.
   useEffect(() => {
     if (!open) return;
     function outside(event: PointerEvent) {
-      if (!container.current?.contains(event.target as Node)) setOpen(false);
+      const target = event.target as Node;
+      if (!container.current?.contains(target) && !panel.current?.contains(target)) setOpen(false);
     }
     document.addEventListener("pointerdown", outside);
     return () => document.removeEventListener("pointerdown", outside);
@@ -167,12 +215,24 @@ export function LanguagePicker({
         <ChevronDown aria-hidden="true" className={cn("size-4 shrink-0 transition-transform", open && "rotate-180")} />
       </button>
 
-      {open && (
-        <div className="absolute right-0 z-30 mt-1 w-full min-w-[15rem] overflow-hidden rounded-xl border border-border/60 bg-background shadow-overlay dark:bg-surface-3">
+      {open && pos && createPortal(
+        <div
+          ref={panel}
+          style={{
+            position: "fixed",
+            left: pos.left,
+            top: pos.top,
+            bottom: pos.bottom,
+            width: pos.width,
+            maxHeight: pos.maxHeight,
+          }}
+          className="z-50 flex flex-col overflow-hidden rounded-xl border border-border/60 bg-background shadow-overlay dark:bg-surface-3"
+        >
           <div className="flex items-center gap-2 border-b border-border px-2">
             <Search aria-hidden="true" className="size-3.5 shrink-0 text-muted-foreground" />
             <input
               ref={search}
+              autoFocus
               role="combobox"
               aria-label={`Search ${label.toLowerCase()}s`}
               aria-expanded
@@ -189,7 +249,7 @@ export function LanguagePicker({
               className="w-full bg-transparent py-2 text-sm outline-none placeholder:text-muted-foreground/70 focus-visible:ring-0 focus-visible:ring-offset-0"
             />
           </div>
-          <ul id={listId} role="listbox" aria-label={label} className="max-h-64 overflow-y-auto py-1">
+          <ul id={listId} role="listbox" aria-label={label} className="min-h-0 flex-1 overflow-y-auto py-1">
             {matches.map((option, index) => {
               const isSelected = option.code === value;
               return (
@@ -225,7 +285,8 @@ export function LanguagePicker({
               </li>
             )}
           </ul>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

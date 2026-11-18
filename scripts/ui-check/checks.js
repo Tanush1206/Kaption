@@ -16,6 +16,48 @@ const stored = (page) => page.evaluate(() => localStorage.getItem("vcm-theme"));
 // change its caption style (reset to defaults before and after): run them on
 // the dev stack or a test install. VCM_CHECK_VIDEO picks the video; otherwise
 // the newest completed one is used.
+/**
+ * Is the open language listbox actually painted, or clipped away? A popover
+ * clipped by an overflow ancestor still has a bounding box and still reports
+ * `isVisible()`, so we sample `elementFromPoint` at the listbox's own top,
+ * middle and bottom: a clipped edge resolves to whatever is painted behind it,
+ * not the list. Also whether a named option is painted at its centre.
+ */
+async function listboxVisibility(page, optionText = null) {
+  return page.evaluate((text) => {
+    // Painted here means the point resolves to the element itself or something
+    // drawn inside it — NOT to an ancestor showing through where an overflow
+    // box clipped the element away.
+    const painted = (el, x, y) => {
+      const hit = document.elementFromPoint(Math.round(x), Math.round(y));
+      return !!hit && (el === hit || el.contains(hit));
+    };
+    const ul = document.querySelector('ul[role="listbox"]');
+    if (!ul) return { found: false };
+    const b = ul.getBoundingClientRect();
+    const cx = b.left + b.width / 2;
+    const inViewport =
+      b.height > 20 && b.top >= 0 && b.left >= 0 && b.bottom <= innerHeight + 1 && b.right <= innerWidth + 1;
+    const listPainted = [b.top + 4, (b.top + b.bottom) / 2, b.bottom - 4].every((y) => painted(ul, cx, y));
+    const result = { found: true, inViewport, listPainted, top: Math.round(b.top), bottom: Math.round(b.bottom), vh: innerHeight };
+    if (text) {
+      const option = [...ul.querySelectorAll('li[role="option"]')].find((o) =>
+        (o.textContent || "").includes(text)
+      );
+      if (!option) result.option = { shown: false };
+      else {
+        const ob = option.getBoundingClientRect();
+        result.option = {
+          shown: true,
+          inViewport: ob.top >= b.top - 1 && ob.bottom <= b.bottom + 1 && ob.bottom <= innerHeight + 1,
+          painted: painted(option, ob.left + ob.width / 2, ob.top + ob.height / 2),
+        };
+      }
+    }
+    return result;
+  }, optionText);
+}
+
 async function editorVideo(page, base) {
   if (process.env.VCM_CHECK_VIDEO) return Number(process.env.VCM_CHECK_VIDEO);
   const listing = await (await page.request.get(`${base}/api/videos?limit=50`)).json();
@@ -549,6 +591,63 @@ const CHECKS = {
     await page.mouse.click(5, 5);
     ok("editor-languages: a click outside closes", (await trigger.getAttribute("aria-expanded")) === "false");
     await page.close();
+  },
+
+  // The options must be VISIBLE, not merely in the DOM (v1.4.5). The popover
+  // was clipped by .group-inset's overflow-hidden on desktop and by the
+  // inspector sheet on a phone, so the list below the search box was blank.
+  // elementFromPoint catches that; getByRole/isVisible did not. Runs at the
+  // two widths, light and dark, and must fail before the portal fix.
+  async "editor-language-visible"(browser, base) {
+    for (const width of [1440, 375]) {
+      for (const dark of [false, true]) {
+        const page = await browser.newPage({
+          viewport: { width, height: width < 1024 ? 760 : 900 },
+          colorScheme: dark ? "dark" : "light",
+        });
+        const at = `editor-language-visible@${width} (${dark ? "dark" : "light"})`;
+        const listing = await (await page.request.get(`${base}/api/videos?limit=1`)).json();
+        const video = listing.items[0];
+        if (!video) throw new Error("needs at least one video");
+        await page.route(`**/api/videos/${video.id}`, async (route) => {
+          const body = await (await route.fetch()).json();
+          await route.fulfill({
+            json: { ...body, status: "completed", stage: null, error_message: null, caption_language: "same" },
+          });
+        });
+        await page.route(`**/api/videos/${video.id}/captions`, (route) =>
+          route.fulfill({
+            json: {
+              total: 1,
+              items: [{
+                id: 1, video_id: video.id, sequence: 0, start_ms: 0, end_ms: 1000, text: "Hello",
+                confidence: -0.2, override_color: null, override_bold: null, override_scale: null,
+              }],
+            },
+          })
+        );
+        await page.goto(`${base}/editor/${video.id}`, { waitUntil: "networkidle" });
+        // On a phone the inspector is a bottom sheet, closed until raised.
+        if (width < 1024) await page.getByRole("button", { name: "Raise the inspector" }).click();
+        const trigger = page.getByRole("button", { name: /^Caption language:/ });
+        await trigger.click();
+        await page.getByRole("listbox", { name: "Caption language" }).waitFor();
+
+        const full = await listboxVisibility(page);
+        ok(`${at}: listbox inside the viewport`, full.found && full.inViewport, JSON.stringify(full));
+        ok(`${at}: listbox painted, not clipped`, full.listPainted, JSON.stringify(full));
+
+        const search = page.getByRole("combobox", { name: "Search caption languages" });
+        await search.fill("hindi");
+        const hindi = await listboxVisibility(page, "Hindi");
+        ok(
+          `${at}: typing "hindi" leaves Hindi visible`,
+          !!hindi.option && hindi.option.shown && hindi.option.inViewport && hindi.option.painted,
+          JSON.stringify(hindi)
+        );
+        await page.close();
+      }
+    }
   },
 
   // The upload's language step: one card per served language, searchable by
