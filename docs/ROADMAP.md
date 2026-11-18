@@ -347,6 +347,23 @@ project is here, and none is in progress. The project's state is in
 (Custom vocabulary shipped in v1.3.1, applied to the caption text: D24.)
 
 ## Possible, not planned
+- **Emotion-aware caption styling.** Style captions from how a line is said,
+  not just the words: caps and a "!" for a shout, italics for an aside or an
+  under-the-breath remark, maybe a colour or size shift for emphasis. Likely
+  through optional Gemini (a key in Settings), reading the caption text and
+  perhaps the audio, since the local models give words and timings but no
+  tone. Off by default, never changing what was said or its timing — the same
+  rules the profanity setting keeps. An idea, not a plan; it needs a measure
+  of how often the cues are right before it is worth a setting. Tanush,
+  2026-11-18.
+- **Optional cloud transcription for hard audio.** For recordings the local
+  Whisper/Apex path handles badly — live comedy, heavy crosstalk, a noisy
+  room, strong accents — offer an optional cloud speech service (a key in
+  Settings) as an alternative engine, chosen per video or as a fallback when
+  confidence is low. Opt-in only: local, no-login, no-key stays the default
+  and the privacy promise, and nothing leaves the machine unless the user
+  turns it on for that video. Needs a cost/accuracy comparison against the
+  local models first. Tanush, 2026-11-18.
 - **More caption languages.** Nine are offered (v1.0.11). Telugu is not in
   M2M100; Kannada, Gujarati and Punjabi came out of it unusable (samples in
   PROGRESS.md, v1.0.7). Any of them needs a different local model, which is a

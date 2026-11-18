@@ -5,6 +5,11 @@ Resume rule: re-read this file, take the first open item in the backlog
 
 ## SCHEDULE AND HOW TO WORK (Tanush, 2026-11-14; scope frozen)
 
+**Code freeze after v1.4.5 (Tanush, 2026-11-18; target 20 Nov).** Once v1.4.5
+ships, only fixes for things that are *broken* go in; every other change,
+feature or idea goes to the ROADMAP, not the code. v1.4.4 (caption fixes) and
+v1.4.5 (the caption-language menu clip) are the last feature-ish releases.
+
 | What | By | Status |
 |---|---|---|
 | v1.4.1 items done and checked | Mon 16 Nov | done 14 Nov: release checks on 1586b66, one UI failure fixed in 68ea10d (results in "v1.4.1" below) |
