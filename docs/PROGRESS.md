@@ -4096,3 +4096,22 @@ jaraco). **None reachable in the shipped local-mode app; no patch/minor fix for
 any → nothing qualifies for v1.4.6.** Awaiting Tanush's confirmation of the
 actual 6 before recording zod (new) and the extra postcss advisories in
 FINAL_AUDIT.
+
+**v1.4.6 security triage closed (18 Nov) — docs only, no release.** The 6
+Dependabot alerts are all npm, all in `frontend/package-lock.json`, no Python:
+#14 zod (high, direct), #2/#3 postcss (high), #1/#4 postcss (moderate), #16
+minimatch (moderate, **dev**). Plus CodeQL #1 (Critical SSRF,
+`api/videos/route.ts`). Verdicts: **SSRF = false positive** (host/port/scheme
+from the fixed BACKEND_URL, only the query is request-controlled and stays in
+the query, Node follows no redirects; re-probed on :3001 — `//evil`, encoded
+host and `redirect=` all hit the real backend list, spoofed `Host` → 403,
+evidence in `test-assets/results/v1.4.6/ssrf/probes.txt`). **zod** = not
+reachable (accounts-only login/register, 307 in local mode), fix zod 4 (major).
+**postcss** = present in the runtime but build-time only, not reachable, fix
+Next 16 (major). **minimatch** = dev-only, not in the standalone, never
+shipped; the only alert with a non-breaking fix (`@typescript-eslint/*`
+8.66→8.73, minimatch→11) but not worth a release under the freeze. Nothing
+reachable/broken → no release. **Recorded:** FINAL_AUDIT.md (Dependabot alerts
+after v1.4.1), SECURITY_TEST.md (the SSRF analysis + probes), ROADMAP.md (zod 4
+/ Next 16 / minimatch bump / the optional SSRF origin assert). Tanush dismisses
+each GitHub alert.

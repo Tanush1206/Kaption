@@ -371,6 +371,63 @@ and source-map-js to their fixed versions. Left: zod (the fix is v4) and
 the postcss inside Next (the fix is Next 16), both found unreachable at the
 launch audit, both on the ROADMAP.
 
+### Dependabot alerts after v1.4.1 (triaged 2026-11-18)
+
+The v1.4.5 push reported six open Dependabot alerts, and CodeQL one. All are
+in the frontend (`frontend/package-lock.json`); there are no Python alerts.
+Triaged against the same test as the project freeze — fix only what is
+**reachable and broken in the shipped local-mode app**, everything else to
+the ROADMAP. **Nothing qualified**, so no release; this is the record.
+
+| # | Package | Sev | Ships in the runtime? | Reachable in local mode? | Fix | Outcome |
+|---|---|---|---|---|---|---|
+| CodeQL #1 | — (SSRF in `frontend/src/app/api/videos/route.ts`) | Critical | n/a | **No — false positive** | n/a | analysed in [SECURITY_TEST.md](SECURITY_TEST.md); no code change |
+| #14 | zod 3.25.76 (direct) | High | Yes (client bundle) | **No** | zod 4 (major) | ROADMAP |
+| #2, #3 | postcss (transitive) | High | Yes (`next/node_modules/postcss`), build-time only | **No** | Next 16 (major) | ROADMAP |
+| #1, #4 | postcss (transitive) | Moderate | same | **No** | Next 16 (major) | ROADMAP |
+| #16 | minimatch 10.2.6 (dev, transitive) | Moderate | **No** (dev-only) | **No** | non-breaking | ROADMAP |
+
+**The evidence:**
+
+- **CodeQL #1 — SSRF (false positive).** The one `http.request` target in the
+  upload route is `new URL("/api/videos" + new URL(request.url).search,
+  BACKEND_URL)`. The host, port and scheme come only from the fixed
+  `BACKEND_URL` env var; the path is the literal `/api/videos`; the only
+  request-controlled part is the query string, and it stays in the query
+  component (the string always begins `/api/videos`, so it can't become
+  `//evil` or change the authority). Node's `http.request` does not follow
+  redirects, so a `3xx` from the backend can't move the fetch either. Probed
+  on the dev stack (`:3001`): `?x=//evil.com`, a `redirect=` param, and a
+  URL-encoded host all returned the **real backend** list (target stayed
+  `backend:8000`); a spoofed `Host: evil.com` was refused 403 (not fetched
+  elsewhere); `X-Forwarded-Host` is overwritten by `forwarded-for.js` and
+  can't be forged. Full write-up and probe logs in
+  [SECURITY_TEST.md](SECURITY_TEST.md). (Tanush dismisses the GitHub alert.)
+
+- **#14 zod (high, direct) — not reachable in local mode.** zod ships in the
+  client bundle, but `lib/validation.ts` is imported only by the login and
+  register pages (`app/(auth)/login/page.tsx`,
+  `components/auth/register-flow.tsx`), which belong to **accounts** mode. In
+  the shipped default (`LOCAL_MODE`, `config.ts:19`) `/login` and `/register`
+  return 307 and the pages never render, so the vulnerable validation never
+  runs. The fix is zod 4, a major version. Already on the ROADMAP (and found
+  unreachable at the launch audit and in D2).
+
+- **#1–#4 postcss (high + moderate, transitive) — not reachable.** postcss is
+  present in the runtime standalone under `next/node_modules/postcss`, but it
+  only runs at **build** time; the served CSS is pre-compiled and the app
+  processes no attacker-supplied CSS at runtime. The fix is Next 16, a major
+  version. Already on the ROADMAP (D2).
+
+- **#16 minimatch 10.2.6 (moderate, dev-only) — not shipped.** Pulled by
+  `@typescript-eslint/typescript-estree` through `eslint-config-next`; it is a
+  lint/build tool and is **not in the runtime standalone** at all, so it is
+  never shipped or run by the installed app. It is the only alert with a
+  non-breaking fix (`npm audit fix` bumps `@typescript-eslint/*` 8.66 → 8.73
+  within 8.x and minimatch to 11, cleanest pinned as an `overrides` entry),
+  but under the freeze a dev-tool dep that never ships is not "broken", so it
+  is deferred to the ROADMAP rather than cut as a release.
+
 ### Not changed, noted
 
 - `Cache-Control: s-maxage=31536000` on pages is Next's default for static

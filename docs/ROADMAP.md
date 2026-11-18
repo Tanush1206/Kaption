@@ -98,13 +98,39 @@ project is here, and none is in progress. The project's state is in
     and not only when someone looks;
   - the packages whose fix is a major version: filelock, oauthlib, pip,
     and setuptools with the wheel and jaraco.context it carries
-    (setuptools is a CTranslate2 dependency); in the frontend, zod and the
-    postcss inside Next;
+    (setuptools is a CTranslate2 dependency); in the frontend, zod (fix is
+    zod 4) and the postcss inside Next (fix is Next 16) — both found
+    unreachable again in the v1.4.6 triage (zod runs only on the
+    accounts-mode login/register pages, which 307-redirect in local mode;
+    postcss runs only at build time) ([FINAL_AUDIT.md](FINAL_AUDIT.md),
+    Dependabot alerts after v1.4.1);
+  - **minimatch** (Dependabot #16, moderate, dev-only): reached only through
+    `@typescript-eslint/typescript-estree` via `eslint-config-next`, never in
+    the runtime standalone, so it is never shipped. Unlike the others it has
+    a non-breaking fix (`npm audit fix` bumps `@typescript-eslint/*`
+    8.66 → 8.73 within 8.x and minimatch to 11; cleanest pinned as an
+    `overrides` entry), but it isn't worth its own release during the freeze.
+    Fold it into the next refresh, or drop it in with any other frontend dep
+    work;
   - Authlib, installed and never imported: remove it;
   - chromadb's client package has no fixed version yet (its advisories
     are in the server): move to it when one exists.
 - **Cost of each refresh:** every user downloads the backend in full once
   (0.8 GB CPU, 2.3 GB CUDA), and the GPU stack needs a full regression.
+
+### A defence-in-depth origin assert on the upload proxy
+- **What:** in `frontend/src/app/api/videos/route.ts`, assert
+  `target.origin === new URL(BACKEND_URL).origin` before `http.request`, so
+  the proxy fails closed if the target is ever built from request data in
+  future.
+- **Why:** CodeQL flags this `http.request` as SSRF (alert #1, Critical). It
+  is a **false positive** today — the host/port/scheme come only from the
+  fixed `BACKEND_URL`, the path is the literal `/api/videos`, only the query
+  string is request-controlled (and stays in the query), and Node doesn't
+  follow redirects; verified by probes in
+  [SECURITY_TEST.md](SECURITY_TEST.md). The assert changes no behaviour now,
+  so it is not a freeze fix; it is cheap insurance for a later refactor and
+  would also satisfy the scanner. Found 2026-11-18; Tanush chose docs-only.
 
 ### An unnamed volume left after uninstalling twice
 - **What:** after `vcm uninstall` keeping the data, a reinstall, and then

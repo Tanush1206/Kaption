@@ -116,6 +116,56 @@ throwaway key (noted as a residual).
 | Find the key in logs or the audit log | Not in `audit.log` (no bodies) and not in the backend log | none | dummy-key test |
 | Find secrets in images / git history | Clean (verified in the v1.4.2 release checks: only CA bundles in images; only `.env.example` in history) | none | release checks |
 
+## CodeQL SSRF alert on the upload route (triaged 2026-11-18)
+
+A CodeQL run flagged a **Critical** server-side request forgery in
+`frontend/src/app/api/videos/route.ts` (alert #1): request data flows into the
+`http.request` target in `forward()`. Triaged for v1.4.6 — **false positive,
+no code change.**
+
+**The code.** `forward()` builds its target once:
+
+```ts
+const BACKEND_URL = process.env.BACKEND_URL ?? "http://backend:8000";
+const target = new URL(`/api/videos${new URL(request.url).search}`, BACKEND_URL);
+```
+
+- The **host, port and scheme** come only from `BACKEND_URL`, a fixed env var
+  the request cannot touch.
+- The **path** is the literal `/api/videos`.
+- The **only** request-controlled part is `new URL(request.url).search` — the
+  query string — and it is concatenated *after* `/api/videos`, so the string
+  parsed against `BACKEND_URL` always begins `/api/videos`. It can never start
+  with `//` (a network-path reference) or otherwise change the authority; a
+  query string stays in the query component.
+- Node's `http.request` **does not follow redirects**, so a `3xx` from the
+  backend cannot move the request to another host either (the reply is turned
+  straight into the Response, lines 47–53; there is no redirect handling).
+
+The flagged `headers` pass-through doesn't change the destination: `host` is in
+`HOP_BY_HOP` and dropped, and headers only travel to the already-fixed target.
+
+**Probes (dev stack, `127.0.0.1:3001`).** Each returned the real backend video
+list (target stayed `http://backend:8000/api/videos…`), or was refused — none
+reached any other host:
+
+| Probe | Result |
+|---|---|
+| `GET /api/videos?x=//evil.com/path` | 200, real backend list; `//evil.com` stayed in the query, authority unchanged |
+| `GET /api/videos?redirect=http://evil.com` | 200, real backend list; param ignored, no redirect followed |
+| URL-encoded host in the query (`%2f%2fevil.com`, `@evil.com`) | 200, real backend list; decoded inside the query only |
+| `Host: evil.com` (rebinding) | 403 from the API guard; not fetched elsewhere |
+| Forged `X-Forwarded-Host: evil.com` | overwritten by `forwarded-for.js` with the real Host; reaches the API as the real host |
+
+**Hardening considered, not applied.** A one-time defence-in-depth assertion
+(`target.origin === new URL(BACKEND_URL).origin` before the request) was
+weighed. Under the code freeze it is not a fix for anything broken — the target
+origin is already fixed by construction — so it is left on the ROADMAP rather
+than changed here. The GitHub alert is dismissed by Tanush.
+
+Evidence (probe request/response logs) is in the gitignored
+`test-assets/results/v1.4.6/ssrf/`.
+
 ## Findings
 
 **No critical or high finding.** Three low / defence-in-depth notes:
