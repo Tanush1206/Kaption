@@ -4060,3 +4060,39 @@ Dev stack keeps only 7426 (its style reset to default).
 **Next:** push step (trailer check + push); CI green (arm64 won't run — no
 compose/installer/Dockerfile/deps change); then tag v1.4.5 on that hash (date
 the CHANGELOG 2026-11-18); release checks + backup + update + after-release.
+
+**v1.4.5 RELEASED and the install updated (18 Nov).** Tanush tagged v1.4.5 on
+39c3316 (docs-only on top of the CI-green 67ccec4). release run 44272203541
+green (all image jobs incl arm64, both manifests, release). Release checks: 8
+assets match SHA256SUMS and the tag (the 7 files byte-identical ignoring CRLF);
+notes = CHANGELOG [1.4.5]; latest-cuda/latest-cpu/frontend:latest digests = the
+1.4.5 digests; anonymous imagetools inspect 200. Backup
+%LOCALAPPDATA%\VideoCaptionMaker-backup-1.4.4 (vcm.dump 161 KB, vcm-media.tgz
+3.4 GB, .env unread). Install pre-update (1.4.4): videos
+[220,221,257,258,259,268] (268 is Tanush's v1.4.5 repro video), captions 2221,
+exports 4, alembic f6b1d8e3a925. vcm update exit 0 in 62 s: frontend pulled 7
+layers (11 MB of 72.4), backend 0 of 2295 (frontend-only release). After-
+release: version 1.4.5, alembic head (no migration), data unchanged; the fix is
+in the shipped frontend image (createPortal in a .next chunk); the bug is gone
+on the install (`editor-language-visible` 12/12 at :3000, 1440+375, light+dark;
+axe 0 on /editor/268); guard POST-foreign 403, Host-rebind 403, own-origin 200;
+frontend uid 100 / backend uid 10001, both CapEff 0 NoNewPrivs 1; /licenses
+present; shipped frontend image has no secrets; checks.js 51/51 at localhost and
+127.0.0.1; flow.js PASS at both (delete, settings toggle+restore, SRT+MP4
+export, no request refused). No E2E (pipeline unchanged). Test videos deleted:
+install 269-271 (flow.js prep; 269/271 by flow.js, 270 by hand); install back to
+the 6 real videos; dev keeps only 7426; settings restored. **v1.4.5 done.**
+
+**Dependabot (push reported 6 alerts: 3 high, 3 moderate) — reported to Tanush,
+no code change yet (freeze: a fix only if reachable+small).** No token/gh here,
+so the exact list wasn't read from the Security tab; reconstructed from
+`npm audit` (frontend) + `pip-audit` (backend). npm prod: postcss (inside Next,
+4 advisories, build-time only — not in the shipped runtime; fix = Next 16,
+major) and **zod 3.25.76** (NEW vs FINAL_AUDIT; only used by
+`lib/validation.ts` = accounts-mode login/register, which local mode never
+serves; fix = zod 4, major). Python (all already in FINAL_AUDIT, all unreachable,
+all major-version fixes): chromadb, oauthlib, pip, setuptools (+filelock/wheel/
+jaraco). **None reachable in the shipped local-mode app; no patch/minor fix for
+any → nothing qualifies for v1.4.6.** Awaiting Tanush's confirmation of the
+actual 6 before recording zod (new) and the extra postcss advisories in
+FINAL_AUDIT.
