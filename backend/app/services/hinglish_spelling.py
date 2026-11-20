@@ -78,9 +78,16 @@ WORDS: dict[str, str] = {
     "pyaara": "pyara", "pyaari": "pyari", "shaayad": "shayad", "saamaan": "samaan",
     "dhyaan": "dhyan", "khyaal": "khayal", "maahaul": "mahaul", "gyaarah": "gyarah",
     "baarah": "barah",
-    # places and names Apex lengthens
+}
+
+# Places and names Apex lengthens. Kept apart from the common words above
+# because a custom-vocabulary entry legitimately respells these (a user's
+# "Ladakh" over the everyday "ladakh"), so vocabulary.py must NOT protect
+# them the way it protects ordinary Hindi words.
+PLACES: dict[str, str] = {
     "laddaakh": "ladakh", "haidraabaad": "hyderabad", "jammoo": "jammu", "paayal": "payal",
 }
+WORDS.update(PLACES)
 
 # Apex spellings that are English words too: changed only next to a word
 # that is clearly Hindi.

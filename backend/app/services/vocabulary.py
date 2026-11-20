@@ -16,6 +16,13 @@ A caption word takes a vocabulary word's spelling when it sounds the same
 twins follow in hinglish_spelling, so an English "block" stays. A word too
 short to compare by sound ("Leo") only gets its capitals. Only Latin
 letters are compared: Devanagari is never changed.
+
+A common Hindi/Hinglish word (COMMON) is never respelled by sound, only by an
+exact match: "ladki"/"ladka"/"ladke" sound exactly like the place "Ladakh"
+("ldk"), so a list holding "Ladakh" used to turn "ladki kisi aur ladke" into
+"Ladakh kisi aur Ladakh" (v1.4.6). A short word is also taken by sound only
+when its letters are close to the entry's, not merely its skeleton ("vellag"
+is not "vlog").
 """
 
 import copy
@@ -23,7 +30,7 @@ import re
 import unicodedata
 
 from app.services.caption_fix import sound
-from app.services.hinglish_spelling import HINDI
+from app.services.hinglish_spelling import HINDI, PLACES
 
 MAX_WORDS = 100
 MAX_LENGTH = 40
@@ -32,8 +39,22 @@ MAX_LENGTH = 40
 JOINERS = " '&.-"
 # Below this a sound skeleton matches too much ("l" for "Leo").
 MIN_SOUND = 3
+# At or below this a sound skeleton is "short": too many everyday words share
+# one ("ladki", "ladke", "ladka" and "Ladakh" are all "ldk"), so a short word
+# is only taken by sound when its letters are close too (_respelling).
+SHORT_SOUND = 4
 
 _WORD = re.compile(r"[A-Za-z0-9]+")
+
+# Common Hindi/Hinglish words a vocabulary entry must never rewrite by sound
+# (only an exact, case-insensitive match may). Built from the everyday-spelling
+# map and the three test clips. The gender/number family — ladki/ladka/ladke…
+# — sounds exactly like the place "Ladakh", so a list holding "Ladakh" used to
+# turn "ladki kisi aur ladke" into "Ladakh kisi aur Ladakh" (IMG_1343). The
+# places Apex lengthens are left OUT: those are exactly what a vocabulary entry
+# is meant to respell.
+_FAMILY = frozenset({"ladka", "ladki", "ladke", "ladkon", "ladkiyan", "ladkiyon", "ladke"})
+COMMON = (HINDI | _FAMILY) - frozenset(PLACES) - frozenset(PLACES.values())
 
 
 def clean(words: list[str]) -> list[str]:
@@ -90,11 +111,35 @@ def _twin_swap(have: str, want: str) -> bool:
     return len(differ) == 1 and frozenset(differ[0]) in VOICING
 
 
+def _distance(a: str, b: str) -> int:
+    previous = list(range(len(b) + 1))
+    for i, ca in enumerate(a, 1):
+        current = [i]
+        for j, cb in enumerate(b, 1):
+            current.append(min(previous[j] + 1, current[j - 1] + 1, previous[j - 1] + (ca != cb)))
+        previous = current
+    return previous[-1]
+
+
+def _respelling(found: str, entry: str) -> bool:
+    """
+    `found` is `entry` spelled a little differently, not a different word that
+    merely shares its skeleton: up to about a third of the letters may differ
+    ("laddaakh"/"Ladakh" yes, "vellag"/"vlog" no).
+    """
+    entry = entry.lower()
+    return _distance(found.lower(), entry) <= max(1, len(entry) // 3)
+
+
 def _target(entry: list[str], sounds: list[str], found: list[str], near_hindi: bool) -> bool:
     """Whether the caption tokens `found` are `entry` spelled another way."""
     if [f.lower() for f in found] == [e.lower() for e in entry] and found != entry:
         return True  # only the capitals differ
     if [f.lower() for f in found] == [e.lower() for e in entry]:
+        return False
+    # A common Hindi/Hinglish word is only taken by an exact match (above),
+    # never by sound: its skeleton collides with short brand names.
+    if any(f.lower() in COMMON for f in found):
         return False
     total = sum(len(s) for s in sounds if not s.isdigit())
     if total < MIN_SOUND and not any(s.isdigit() for s in sounds):
@@ -115,6 +160,11 @@ def _target(entry: list[str], sounds: list[str], found: list[str], near_hindi: b
             if len(want) < MIN_SOUND or not _twin_swap(have, want):
                 return False
             off += 1
+    # A short single word with the same skeleton must also be a near-respelling
+    # of the entry ("ladki"/"Ladakh" share "ldk" but are different words); a
+    # longer word's skeleton is distinctive enough on its own.
+    if off == 0 and len(entry) == 1 and total <= SHORT_SOUND and not sounds[0].isdigit():
+        return _respelling(found[0], entry[0])
     return off == 0 or (off == 1 and len(entry) == 1 and near_hindi)
 
 

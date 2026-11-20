@@ -48,6 +48,31 @@ def test_nothing_else_changes(caption):
     assert vocabulary.apply(caption, LEO) == caption
 
 
+@pytest.mark.parametrize(
+    "caption",
+    [
+        # IMG_1343 0:19 was said "Ladki kisi aur ladke ke saath hai"; the
+        # sound-alike rule used to rewrite ladki/ladke to the vocabulary's
+        # "Ladakh" — all three collapse to the skeleton "ldk". A common
+        # Hindi/Hinglish word is never respelled by sound, only by an exact
+        # (case-insensitive) match.
+        "Ladki kisi aur ladke ke saath hai",
+        "us ladke ne ladki se kaha",
+        "ek ladka aur do ladkiyan",
+        "bahut saare ladkon ke saath",
+        "meri ladki school gayi",
+    ],
+)
+def test_common_hindi_words_are_not_rewritten_as_vocabulary(caption):
+    assert vocabulary.apply(caption, LEO) == caption
+
+
+def test_a_short_word_needs_a_close_match_not_just_the_same_skeleton():
+    # "vellag" shares vlog's consonant skeleton ("blg") but is a different
+    # word; a short word must match closely, not merely by skeleton.
+    assert vocabulary.apply("vellag ka matlab", ["vlog"]) == "vellag ka matlab"
+
+
 def test_an_empty_list_changes_nothing():
     assert vocabulary.apply("poora laddaakh yaad aa gaya", []) == "poora laddaakh yaad aa gaya"
 
