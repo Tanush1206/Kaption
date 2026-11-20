@@ -103,8 +103,18 @@ anything.**
 ### Git
 13. **Commit in small groups** (about 5 files at most, one fix or one screen
     per commit), in Conventional Commits format (`type(scope): summary`).
-14. **No `Co-Authored-By` trailers** (or any other attribution trailer) in
-    commit messages.
+14. **End every commit message with the trailer
+    `Co-Authored-By: Claude <noreply@anthropic.com>`** — the only attribution
+    trailer allowed. Add no other: no `Generated with`, no `Signed-off-by`, no
+    second `Co-Authored-By`. Don't rewrite or amend existing commits to add it.
+    Before a push, check the commits going out with:
+    ```bash
+    git log origin/main..HEAD --format=%B \
+      | grep -Ei "generated with|signed-off-by|co-authored-by" \
+      | grep -viF "Co-Authored-By: Claude <noreply@anthropic.com>"
+    ```
+    The check is clean when it prints nothing; any line it prints is a
+    disallowed trailer.
 15. **Never push and never tag.** The maintainer does both. When a push or
     tag is needed, give the exact command and wait for confirmation.
 

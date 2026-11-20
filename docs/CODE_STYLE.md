@@ -214,7 +214,10 @@ The history follows **Conventional Commits**: `type(scope): summary`.
   - `fix(api): the allowed origin is the install's own address and port`;
   - `build: a new version no longer re-downloads the whole image`.
 - **Small commits:** about 5 files at most, one fix or one screen per commit.
-- **No `Co-Authored-By` trailers.**
+- **End every commit with the trailer `Co-Authored-By: Claude
+  <noreply@anthropic.com>`** — the only attribution trailer allowed; no
+  `Generated with`, `Signed-off-by` or any other (see [AGENTS.md](../AGENTS.md)
+  rule 14 for the pre-push check).
 - **Never commit** `.env`, certificates, storage, dumps, `design/stitch/` or
   `learning-guide.md` (all gitignored).
 
