@@ -4,15 +4,11 @@
 
 Website: **https://tanush1206.github.io/Video-Caption-Maker/**
 
-![The VideoCaptionMaker editor: a video playing with its caption burned onto it, and the player controls below](docs/images/Editor-Captions.png)
-
 Captions for your videos, made on your own computer. Upload a video, choose
 the caption language, export it with the captions burned in, or as subtitle
 files. Speech recognition (Whisper) and translation (M2M100) run locally on
 your CPU or NVIDIA GPU. There's no account and no cloud service, and your
 video never leaves the machine.
-
-![VideoCaptionMaker dashboard](docs/images/Dashboard.png)
 
 ## Install
 
@@ -98,14 +94,6 @@ below the export step.
 - **Light and dark themes**, responsive from phone to desktop.
 - **Small updates**: `vcm update` downloads only what changed, about 7 MB
   for a typical release.
-
-## Screenshots
-
-| Dashboard | Editor |
-|---|---|
-| ![Dashboard](docs/images/Dashboard.png) | ![Editor](docs/images/Editor.png) |
-| **Search** | **Settings** |
-| ![Search](docs/images/Search.png) | ![Settings](docs/images/Settings.png) |
 
 ## Requirements
 
