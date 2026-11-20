@@ -61,15 +61,28 @@ The installer:
 
 Running it again is safe. Your videos and settings are kept.
 
-## Use
+A short welcome guide opens the first time you run it, and the **Help** link in
+the top bar reopens it any time.
 
 1. **Upload**: drop a video (`.mp4 .mov .mkv .webm .avi .m4v`).
 2. **Language**: keep "Same as spoken", or pick one of 9 caption languages
    (search by its own name or in English). The spoken language is detected
    automatically; if it isn't one the app supports, it says so and asks
    you to choose the spoken language or try anyway.
+   - **Hindi mixed with English** → choose **Hindi**, then **Hinglish
+     (Roman)** to keep it in the Roman alphabet.
+   - **All Hindi** → choose **हिन्दी** for Devanagari script.
+   - Any **other language** is a translation of what was said.
 3. **Export**: download the video with captions burned in (MP4), or the
    subtitles as `.srt` / `.vtt`.
+
+Captions are made by AI speech recognition, so read through before exporting —
+names, brands, mixed Hindi and English, fast speech, crosstalk and music are
+the hard cases. Fix anything on the video's page: click a caption to edit it,
+**Find & Replace** for a repeated word, add names and brands to the custom
+**vocabulary** in Settings (then **Redo**), or **Improve** a line. Improve and
+better translations can use an optional Gemini key; only the caption text is
+sent to Google, never your video.
 
 Editing captions, retiming them on the waveform, styling them and searching
 the transcript by meaning are all optional. They're on each video's page,
@@ -102,8 +115,8 @@ Video thumbnails are hidden in these shots; the app shows your frames.
 | Dashboard | Search |
 |---|---|
 | ![The video library, with each video's thumbnail hidden](docs/images/Dashboard.png) | ![Search every transcript by meaning, with thumbnails hidden](docs/images/Search.png) |
-| **Settings** | |
-| ![What this install runs on: hardware, the speech models and translation](docs/images/Settings.png) | |
+| **Settings** | **Welcome guide** |
+| ![What this install runs on: hardware, the speech models and translation](docs/images/Settings.png) | ![The first-run welcome guide, which the Help link reopens](docs/images/Welcome.png) |
 
 ## Requirements
 

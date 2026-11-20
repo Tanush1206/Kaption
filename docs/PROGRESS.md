@@ -4267,10 +4267,26 @@ assert ✓) and add any missing.
   edit, Find & Replace, Vocabulary+Redo, Improve, Redo. `accuracy-info.tsx`
   stays (still used for "Spoken audio" in the language step). lint + type-check
   clean; smoke-tested in the editor on dev 3001 (opens, reads, Escape closes).
-- **Next — Commit 5:** README "Use" section guidance + one welcome-guide
-  screenshot in the README Screenshots table (no faces/frames). Then docs:
-  PRD.md (the guide feature), DESIGN_SYSTEM.md if needed, CHANGELOG [1.5.0] on
-  release day, PROGRESS. Part A code is then complete; final checks follow.
+- **Commit 5 ✅** — README + docs. README "Use" section now carries the guide's
+  guidance (welcome guide + Help, Hindi/Hinglish/translation bullets, read-
+  through + fix with editor/Find & Replace/vocabulary+Redo/Improve + optional
+  Gemini). README Screenshots table gained **Welcome guide**
+  (`docs/images/Welcome.png`, 1440×680, light theme, thumbnail grey-boxed — no
+  faces/frames, verified by eye). PRD.md: US13 + new **F10. First-run guidance**.
+- **Part A code + docs COMPLETE** (Commits 1–5: `23238a5`, `882fdcb`, `60a02a3`,
+  `9324033`, + this one). Nothing pushed (maintainer pushes).
+- **Still owed before the tag (22–23 Nov):**
+  - CHANGELOG `[1.5.0]` dated the release day (24 Nov) — not added yet, on
+    purpose.
+  - Full UI checks once: axe 0 at **375 and 1440**, light + dark, for the guide
+    (keyboard-only), the language-step tip (needs a Hindi upload — delete the
+    test video after), and the Tips popover; no layout shift.
+  - Full suites: backend pytest+ruff, frontend lint/types/tests/**build**
+    (`docker build --target build frontend` or CI), E2E GPU+CPU, music_check,
+    both truth files unchanged.
+  - PROJECT_SUMMARY updated with the guide; Part B ROADMAP docs (23 Nov).
+- Dev 3001 is back at first-run state (`guide_seen` false). Install 3000 is
+  still 1.4.6 (no guide until v1.5.0 is imaged).
 - **Checks still owed (once, final commit):** axe 0 at 375 & 1440, light+dark;
   keyboard-only guide; no layout shift; E2E GPU+CPU; music_check; truth files.
 - Both stacks running (dev 3001 local mode, install 3000 = shipped 1.4.6, so the

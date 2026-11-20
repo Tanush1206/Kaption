@@ -69,6 +69,7 @@ future hosted mode ([ROADMAP.md](ROADMAP.md)), and is not shipped.
 | US10 | uninstall, choosing whether my videos are deleted | nothing is deleted by surprise | `vcm uninstall` (asks for `DELETE`) |
 | US11 | retry a failed video with the smallest speech model in one click | a video that ran out of memory can still be captioned | "Retry with small model" on the failed screen |
 | US12 | have the app follow my system's light or dark theme | it matches the rest of my desktop | Settings → Interface theme → System |
+| US13 | get a short welcome guide the first time, and reopen it from Help | I know what the app does, how to pick the language, and how to fix captions | `welcome-guide.tsx`, `guide_seen` (`SystemInfo`, `PATCH /api/system/settings`) |
 
 ## 5. Core flow
 
@@ -514,6 +515,29 @@ removed.
   data needs.
 - Uninstall only removes images named `/video-caption-maker-`. The shared
   postgres, redis and chroma images are never removed.
+
+### F10. First-run guidance (v1.5.0)
+
+**Acceptance criteria**
+- A welcome guide opens by itself the first time an install is opened, in local
+  mode. Four to five short, skippable steps: captions are made on your own
+  computer (no cloud); picking the caption language (Hindi + English → Hindi
+  then Hinglish/Roman; all Hindi → हिन्दी; another language is a translation);
+  the speech model in Settings; the custom vocabulary (spelling, not hearing);
+  the optional Gemini key (caption text to Google, never the video); and the
+  honest limits (noise, crosstalk, music) with how to fix them.
+- The guide is keyboard-accessible and built on the native `<dialog>` (focus
+  trap, Escape), and reopenable any time from a **Help** link in the header.
+- "Seen" is remembered server-side (`SystemInfo.guide_seen`, set through
+  `PATCH /api/system/settings`), so it stays dismissed on another browser or
+  device, not only in one localStorage. The first dismissal records it;
+  reopening from Help does not.
+- The upload step shows a one-line, context-aware tip under the caption choice
+  (e.g. Hindi heard + English captions chosen → Hinglish (Roman) usually reads
+  better for mixed Hindi and English speech).
+- The editor's caption list has a **Tips** popover (accuracy, and when to use
+  Find & Replace, the custom vocabulary + Redo, Improve, and Redo) in place of
+  the older accuracy (i), which stays on the upload step's Spoken audio.
 
 ## 7. Supported languages, formats, models and hardware tiers
 
