@@ -323,19 +323,41 @@ project is here, and none is in progress. The project's state is in
   like the "सब्सक्राइब" ×3 above, are left: nothing in the words, timings or
   probabilities tells them from "nahin. Nahin. Nahin.".
 
-### Overlapping speech (v1.3.0 Part C2, measured, skipped)
-- **What:** where two people talk at once, the captions mix them or keep
-  one. On new.mp4 the Gemini-flagged overlap lines had about twice the
+### Overlapping speech / dialogue captions (v1.5+)
+- **What:** when two people talk at the same moment — both say "I had a
+  plan", or one says "Yes!" before the other finishes — caption **both**
+  voices, OTT-style in one caption with a dash per speaker:
+  `-<speaker 1>` / `-<speaker 2>`. Today the captions mix the two or keep
+  only one; on new.mp4 the Gemini-flagged overlap lines had about twice the
   error rate of the rest.
-- **Measured (PROGRESS.md v1.3.0):** SpeechBrain SepFormer (whamr16k,
-  Apache-2.0, 108 MB) separated a second voice at 4:18 that the captions
-  had lost, but leaked one voice into both tracks elsewhere (it would be
-  captioned twice), at 1.5 s of CPU per second of audio, and needs
+- **Plan — a measured spike first**, before any UI, on a clip Tanush will
+  record (him and his sister talking over each other, with a truth file)
+  plus new.mp4 2:30–3:15. Compare:
+  - **(a)** newer **local speech-separation** models (successors to the
+    SpeechBrain SepFormer tried below);
+  - **(b)** **pyannote** diarization for overlap *detection* (needs a free
+    Hugging Face token — **check the licence** before shipping);
+  - **(c)** optional **Gemini audio** transcription with speaker dashes,
+    **off by default** — audio leaves the machine only when the user turns
+    it on for that video (the privacy promise holds otherwise).
+  Ship only what captures both voices **without duplicating words**.
+- **Fallback if separation isn't reliable enough:** a manual **"Make
+  dialogue with next"** editor action that joins two captions into one
+  dashed dialogue caption, carried through to SRT/VTT and the burned MP4.
+- **Measured already (PROGRESS.md v1.3.0):** SpeechBrain SepFormer
+  (whamr16k, Apache-2.0, 108 MB) separated a second voice at 4:18 that the
+  captions had lost, but leaked one voice into both tracks elsewhere (it
+  would be captioned twice), at 1.5 s of CPU per second of audio, and needs
   torchaudio, which has no build for the app's torch. Speaker labels (ECAPA,
   Apache-2.0) split the party by voice type, not by person. pyannote is
-  gated and NVIDIA Sortformer is non-commercial, so neither is usable.
-- **Tanush, 2026-11-03:** skip for now; measure again when the truth for
-  2:30-3:15 (the overlaps) is added to `test-assets/truth-new-5min.txt`.
+  gated and NVIDIA Sortformer is non-commercial — re-check pyannote's licence
+  for the spike; Sortformer stays out.
+- **Must:** the overlap truth for 2:30–3:15 added to
+  `test-assets/truth-new-5min.txt`; both voices captioned without duplicated
+  words; nothing leaves the machine unless Gemini audio is turned on; the
+  dashed format in the preview, the editor, SRT/VTT and the burn.
+- **Tanush, 2026-11-03:** skipped then; **2026-11-21:** revisit as this
+  v1.5+ spike.
 
 ### Improve review mode (deferred from v1.3.1 by the finishing plan)
 - **What:** fixes the checks refuse shown as suggestions, with Accept,
@@ -373,6 +395,15 @@ project is here, and none is in progress. The project's state is in
 (Custom vocabulary shipped in v1.3.1, applied to the caption text: D24.)
 
 ## Possible, not planned
+- **Guided tour: spotlight the editor and language step on reopen.** The
+  first-run tour (v1.5.0) spotlights the upload area, the three Settings
+  groups and Help, and shows the language step and the editor as centred
+  cards — because on a fresh install there is no video to open. When the tour
+  is reopened from Help and a completed video exists, those two steps could
+  navigate into the real language step (with a file) and the editor (caption
+  list, Tips, Find & Replace, Improve, Redo, Export) and spotlight them. The
+  mechanism already supports spotlighting any step whose target is present.
+  Tanush, 2026-11-21.
 - **Emotion-aware caption styling.** Style captions from how a line is said,
   not just the words: caps and a "!" for a shout, italics for an aside or an
   under-the-breath remark, maybe a colour or size shift for emphasis. Likely

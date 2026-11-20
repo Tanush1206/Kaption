@@ -21,6 +21,12 @@ underneath), runs as a single-user app with no login, and serves its UI on
 [THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md) and in each image's
 `/licenses`.
 
+A first-run **guided tour** (v1.5.0) walks a new user through the app — it
+spotlights the real UI (the upload area, the speech model, custom vocabulary
+and Gemini key in Settings, and the Help link that reopens it), with a plain
+dialog guide as the fallback. It is keyboard-operable, respects reduced-motion,
+and is remembered server-side so it stays dismissed across browsers.
+
 ## 2. Where it stands
 
 - **Current release: v1.4.3** (16 November 2026, tag on `4d5dd3f`). 23

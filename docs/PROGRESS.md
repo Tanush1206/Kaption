@@ -4339,9 +4339,33 @@ callout. **axe 0** light+dark with the tour open (`/dashboard`); **shoot.js** OK
 at 375 & 1440 (callout clamped on-screen, no overflow/console errors); lint +
 type-check clean; frontend tests 10/10. Dev `guide_seen` left false (first-run).
 Editor/language spotlight-on-reopen-with-a-video is a possible follow-up, not
-needed for first-run. **Still owed:** the full-suite gate (build, E2E, etc.),
-keyboard walkthrough sign-off, reduced-motion visual spot-check, CHANGELOG,
-PROJECT_SUMMARY, Part B.
+needed for first-run (added to ROADMAP "Possible").
+
+**Part B + release docs done (21 Nov, ~01:50):**
+- ROADMAP: the Overlapping-speech item expanded into the **v1.5+ dialogue-
+  captions** plan (measured spike: local separation vs pyannote vs optional
+  Gemini audio; OTT dashed captions; "Make dialogue with next" fallback; licence
+  checks). Confirmed the other items are already listed (emotion-aware styling,
+  cloud transcription, profanity, font-picker ARIA, zod/Next/minimatch, SSRF
+  assert) — none missing. Added the tour reopen-spotlight follow-up.
+- CHANGELOG **[1.5.0] — 2026-11-24** (pre-dated to the planned release day) and
+  PROJECT_SUMMARY §1 updated with the guided tour.
+
+**STILL OWED before the push step (NEXT SESSION — needs a full window; the PC
+may shut down ~1:30–3am and it is already 01:50):**
+1. Backend `pytest` + `ruff` full (fast — may run now if time).
+2. Frontend production **build** (`docker build --target build frontend`) — the
+   client/server `buttonVariants` trap lives here; new client components added.
+3. UI checks on the final commit: axe 0 at **375 & 1440 light+dark** (done for
+   the tour on /dashboard; re-run across pages on the final commit), keyboard
+   walkthrough sign-off, reduced-motion visual spot-check.
+4. The **language-step tip** exercised with a real **Hindi upload** (then delete
+   the test video by id).
+5. **E2E on GPU and CPU**, `music_check` (0 failures), both truth files
+   unchanged (long — the main reason this is deferred).
+6. When all green: the **push step** (anchored trailer check) — NOT given yet.
+Nothing is pushed. If resuming: `git log origin/main..HEAD` shows the unpushed
+v1.5.0 work; run the gate above, then give Tanush the push command.
 - **Checks still owed (once, final commit):** axe 0 at 375 & 1440, light+dark;
   keyboard-only guide; no layout shift; E2E GPU+CPU; music_check; truth files.
 - Both stacks running (dev 3001 local mode, install 3000 = shipped 1.4.6, so the

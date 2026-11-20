@@ -6,6 +6,32 @@ commits between tags; hashes are given for reference.
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.5.0] - 2026-11-24
+
+First-run guidance: a short, skippable guided tour that spotlights the real
+UI. No migration; the update downloads the app layers only. The last feature
+release before the project close.
+
+### Added
+- **A guided tour on first open.** The first time a fresh install is opened,
+  a tour walks through the app: it keeps one real element bright, dims the
+  rest, and floats a callout with Back / Next / Skip. It spotlights the
+  upload area, then the speech model, custom vocabulary and Gemini key in
+  Settings (moving between pages as it goes), and the Help link that reopens
+  it; the language step and the editor show as centred cards until there is a
+  video to open. Fully keyboard-operable (Escape closes, arrows move, Tab
+  stays in the callout), with focus moving to the callout and back, a live
+  region announcing each step, and it respects reduced-motion. That it has
+  been seen is remembered server-side, so it stays dismissed across browsers
+  and devices. If the tour can't run, a plain dialog guide is the fallback.
+- **A context-aware tip on the language step.** Under the caption choice, a
+  one-line note that a different language is a translation — with the nudge,
+  when Hindi is heard and English captions are chosen, toward Hinglish
+  (Roman) for mixed Hindi and English speech.
+- **A "Tips" popover in the caption editor** (replacing the accuracy "i"
+  there): the accuracy note, plus when to use Find & Replace, the custom
+  vocabulary, Improve and Redo.
+
 ## [1.4.6] - 2026-11-20
 
 A caption-quality fix for custom vocabulary, plus a security-triage record.
