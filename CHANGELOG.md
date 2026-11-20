@@ -6,6 +6,32 @@ commits between tags; hashes are given for reference.
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.4.6] - 2026-11-20
+
+A caption-quality fix for custom vocabulary, plus a security-triage record.
+No migration; the update downloads the app layers only. Videos already
+captioned change only with Redo.
+
+### Fixed
+- **Custom vocabulary no longer corrupts common Hindi words.** A vocabulary
+  word was taken over any caption word that shared its bare consonant sound,
+  and the everyday Hindi words "ladki", "ladka", "ladke" sound exactly like
+  the place "Ladakh" ("ldk"), so a list holding "Ladakh" rewrote "ladki kisi
+  aur ladke ke saath hai" into "Ladakh kisi aur Ladakh ke saath hai"
+  (IMG_1343). A common Hindi/Hinglish word is now only respelled by an exact
+  (case-insensitive) match, never by sound, and a short word is only taken
+  when its letters are close to the entry's, not merely its skeleton. The
+  intended fixes stand: "laddaakh" → "Ladakh", "block" → "vlog", "acropovic"
+  → "Akrapovic", "haidraabaad" → "Hyderabad".
+
+### Security
+- **Triaged the open Dependabot and CodeQL alerts; no code change was needed.**
+  The CodeQL SSRF alert on the upload proxy is a false positive (the target is
+  built from the fixed `BACKEND_URL`, not request data; Node follows no
+  redirects), and the six Dependabot alerts (zod, postcss, minimatch) are
+  unreachable in the shipped local-mode app. Recorded in
+  `docs/FINAL_AUDIT.md`, `docs/SECURITY_TEST.md` and the ROADMAP.
+
 ## [1.4.5] - 2026-11-18
 
 A UI fix in the caption editor. No migration; the update downloads the app

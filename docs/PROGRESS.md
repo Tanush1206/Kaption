@@ -4115,3 +4115,56 @@ reachable/broken → no release. **Recorded:** FINAL_AUDIT.md (Dependabot alerts
 after v1.4.1), SECURITY_TEST.md (the SSRF analysis + probes), ROADMAP.md (zod 4
 / Next 16 / minimatch bump / the optional SSRF origin assert). Tanush dismisses
 each GitHub alert.
+
+## v1.4.6 (20 Nov 2026) — custom vocabulary corrupts common Hindi words
+
+**Broken (qualifies under the freeze; Tanush, 20 Nov).** On IMG_1343 (install)
+0:19 "Ladki kisi aur ladke ke saath hai" became "Ladakh kisi aur Ladakh ke
+saath hai": the sound-alike rule in `services/vocabulary.py` matched the
+everyday words ladki/ladke to the vocabulary word "Ladakh" because
+`caption_fix.sound` drops vowels and all three collapse to "ldk".
+
+**Root cause (confirmed in the container):** `sound()` keeps only consonants,
+so ladka/ladki/ladke/laddaakh/Ladakh are all "ldk". A single-token vocabulary
+entry with a short skeleton matched any common word sharing it (`off == 0`).
+
+**Fix (smallest change):**
+- A `COMMON` set in `vocabulary.py` — common Hindi/Hinglish words that are only
+  respelled by an **exact** (case-insensitive) match, never by sound. Built
+  from the everyday-spelling `WORDS` map plus the ladka gender/number family.
+  The places Apex lengthens were split into `hinglish_spelling.PLACES` and left
+  OUT of `COMMON`, because a vocabulary entry legitimately respells them
+  ("laddaakh" → "Ladakh"). `COMMON = (HINDI | ladka-family) − PLACES`.
+- A short single word (`sound` skeleton ≤ `SHORT_SOUND` = 4) is taken by an
+  `off == 0` match only when its letters are close to the entry's
+  (`_respelling`, edit distance ≤ ⌈len/3⌉): "laddaakh"/"Ladakh" yes (dist 2 of
+  6), "vellag"/"vlog" no (dist 3 of 4).
+
+**Reproduction / before→after** (raw Apex → everyday → vocabulary, LEO list
+`[vlog, BMW, F 450 GS, Akrapovic, Ladakh, Hyderabad, S 1000 RR, Instagram]`,
+`scratchpad/vocab_repro.py` over the stored
+`test-assets/results/v1.3.1/vocab-probe/apex_{leo,new,hinglish}_none.json`):
+
+| Clip | Vocabulary changes, current | after the fix |
+|---|---|---|
+| leo | block→vlog ×3, acropovic→Akrapovic ×3, aaraar→RR | **identical** (7 changes) |
+| new | 0 | 0 |
+| hinglish | 0 | 0 |
+| IMG_1343 0:19 | "Ladki…ladke" → "Ladakh…Ladakh" | **unchanged** (fixed) |
+
+No good change is lost (leo identical); new.mp4 had 0 vocabulary changes either
+way, so **the new.mp4 truth file and music_check are unaffected**, and
+truth-hi.txt is Devanagari, which vocabulary never touches.
+
+**Tests (TDD, failing first):** `tests/test_vocabulary.py` —
+`test_common_hindi_words_are_not_rewritten_as_vocabulary` (5 ladka-family
+captions, incl. the IMG_1343 line) and
+`test_a_short_word_needs_a_close_match_not_just_the_same_skeleton` (vellag).
+The existing leo fixes and `laddaakh → Ladakh` still pass. 28 vocab tests
+green; the hinglish/hindi-script/phrasing suites (96) green; ruff clean.
+
+**Files:** `app/services/vocabulary.py`, `app/services/hinglish_spelling.py`
+(PLACES split), `tests/test_vocabulary.py`; CHANGELOG [1.4.6]; this note.
+
+**Resume here:** fix committed; running the full checks on the final commit
+before the push step. No tag yet (Tanush tags).
