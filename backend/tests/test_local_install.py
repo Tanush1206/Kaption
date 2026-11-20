@@ -108,7 +108,7 @@ async def preserved_settings(db_session):
     before = await app_settings.get_all(db_session)
     yield
     for key in (app_settings.GEMINI_API_KEY, app_settings.WHISPER_MODEL, app_settings.WORKER_HARDWARE,
-                app_settings.VOCABULARY):
+                app_settings.VOCABULARY, app_settings.GUIDE_SEEN):
         await app_settings.set_value(db_session, key, before.get(key))
 
 
@@ -147,6 +147,27 @@ async def test_the_vocabulary_is_stored_cleaned_and_validated(client, local_mode
 
     cleared = (await client.patch("/api/system/settings", json={"vocabulary": []})).json()
     assert cleared["vocabulary"] == []
+
+
+@pytest.mark.asyncio
+async def test_the_welcome_guide_is_remembered_per_install(client, local_mode, preserved_settings):
+    """
+    v1.5.0: the first-run guide shows on first open and the install remembers,
+    server-side, that it has been seen — so it stays dismissed on another device
+    or browser, not only in one localStorage.
+    """
+    assert (await client.get("/api/system")).json()["guide_seen"] is False
+
+    seen = (await client.patch("/api/system/settings", json={"guide_seen": True})).json()
+    assert seen["guide_seen"] is True
+    assert (await client.get("/api/system")).json()["guide_seen"] is True
+
+    # Idempotent, and resettable (there is no separate "show it again" state —
+    # the Help link reopens it without changing this flag).
+    again = (await client.patch("/api/system/settings", json={"guide_seen": True})).json()
+    assert again["guide_seen"] is True
+    reset = (await client.patch("/api/system/settings", json={"guide_seen": False})).json()
+    assert reset["guide_seen"] is False
 
 
 @pytest.mark.asyncio

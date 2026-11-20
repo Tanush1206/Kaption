@@ -58,6 +58,7 @@ async def _info(db) -> SystemInfo:
         gemini_source="settings" if stored else ("env" if key else None),
         vocabulary=await app_settings.vocabulary(db),
         vocabulary_max=vocabulary.MAX_WORDS,
+        guide_seen=await app_settings.guide_seen(db),
     )
 
 
@@ -98,6 +99,10 @@ async def update_settings(
             raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=problem)
         await app_settings.set_value(
             db, app_settings.VOCABULARY, json.dumps(words, ensure_ascii=False) if words else None
+        )
+    if "guide_seen" in fields:
+        await app_settings.set_value(
+            db, app_settings.GUIDE_SEEN, "1" if payload.guide_seen else None
         )
 
     return await _info(db)

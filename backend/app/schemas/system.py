@@ -55,6 +55,9 @@ class SystemInfo(BaseModel):
     vocabulary: list[str] = []
     #: How many words it can hold.
     vocabulary_max: int = 100
+    #: Whether the first-run welcome guide has been seen (v1.5.0). False on a
+    #: fresh install, so the guide opens on first visit.
+    guide_seen: bool = False
 
 
 class SystemSettingsUpdate(BaseModel):
@@ -63,3 +66,6 @@ class SystemSettingsUpdate(BaseModel):
     whisper_model: str | None = None
     #: The whole list, replacing the one stored; [] or null clears it.
     vocabulary: list[str] | None = Field(default=None, max_length=1000)
+    #: Set true when the welcome guide is finished or skipped (v1.5.0). The Help
+    #: link reopens the guide without touching this, so it is rarely sent false.
+    guide_seen: bool | None = None

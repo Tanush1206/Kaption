@@ -193,7 +193,7 @@ automatic; in accounts mode it needs a Bearer token, or the route returns
 | Method | Path | Request | Response | Errors |
 |---|---|---|---|---|
 | GET* | `/api/system` | — | `200` [SystemInfo](#systeminfo). `hardware`/`whisper` are null until the worker has reported. **The Gemini key is never returned** by this or any other response, only `gemini_configured` and `gemini_source` (`settings`, `env` or null) | — |
-| PATCH* | `/api/system/settings` | [SystemSettingsUpdate](#systemsettingsupdate): only keys sent are changed. `whisper_model`: `auto`/null, `small`, `medium`, `large-v3-turbo`, `large-v3`. `gemini_api_key`: a key, or `""`/null to clear. `vocabulary` (v1.3.1): the whole list, stored trimmed with repeats dropped; `[]`/null clears it | `200` [SystemInfo](#systeminfo). Audited in `audit.log` (without the value) | 403 in accounts mode · 422 `Unknown speech model`, or a vocabulary over 100 words, a word over 40 characters or with characters a word can't have (the detail names it) |
+| PATCH* | `/api/system/settings` | [SystemSettingsUpdate](#systemsettingsupdate): only keys sent are changed. `whisper_model`: `auto`/null, `small`, `medium`, `large-v3-turbo`, `large-v3`. `gemini_api_key`: a key, or `""`/null to clear. `vocabulary` (v1.3.1): the whole list, stored trimmed with repeats dropped; `[]`/null clears it. `guide_seen` (v1.5.0): `true` once the welcome guide is finished or skipped | `200` [SystemInfo](#systeminfo). Audited in `audit.log` (without the value) | 403 in accounts mode · 422 `Unknown speech model`, or a vocabulary over 100 words, a word over 40 characters or with characters a word can't have (the detail names it) |
 
 ### Auth (`backend/app/api/auth.py`)
 
@@ -713,6 +713,7 @@ Enum: `auto`, `balanced`, `stacked` (v1.0.8)
 | `gemini_source` | string \| null | no |  |
 | `vocabulary` | string[] | no | the custom vocabulary (v1.3.1); default `[]` |
 | `vocabulary_max` | integer | no | how many words it can hold: 100 |
+| `guide_seen` | boolean | no | whether the first-run welcome guide has been seen (v1.5.0); `false` on a fresh install |
 
 ### ModelDownload
 
@@ -728,6 +729,7 @@ Enum: `auto`, `balanced`, `stacked` (v1.0.8)
 | `gemini_api_key` | string \| null | no | maxLength 200 |
 | `whisper_model` | string \| null | no |  |
 | `vocabulary` | string[] \| null | no | the whole list, replacing the stored one (v1.3.1) |
+| `guide_seen` | boolean \| null | no | set `true` when the welcome guide is finished or skipped (v1.5.0) |
 
 ### TokenResponse
 

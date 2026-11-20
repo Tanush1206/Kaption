@@ -20,6 +20,10 @@ WHISPER_MODEL = "whisper_model"
 VOCABULARY = "vocabulary"
 # Written by the worker when it starts: only it can see the GPU.
 WORKER_HARDWARE = "worker_hardware"
+# Whether the first-run welcome guide has been seen (v1.5.0). Stored "1" once
+# seen; absent means not yet. Install-wide, like the settings above, so the
+# guide stays dismissed across browsers and devices, not only in localStorage.
+GUIDE_SEEN = "guide_seen"
 
 
 async def get_value(session: AsyncSession, key: str) -> str | None:
@@ -75,6 +79,11 @@ async def vocabulary(session: AsyncSession) -> list[str]:
     except ValueError:
         return []
     return [w for w in words if isinstance(w, str)] if isinstance(words, list) else []
+
+
+async def guide_seen(session: AsyncSession) -> bool:
+    """Whether the first-run welcome guide has been dismissed (v1.5.0)."""
+    return (await get_value(session, GUIDE_SEEN)) == "1"
 
 
 async def worker_hardware(session: AsyncSession) -> dict | None:

@@ -4185,3 +4185,75 @@ ready. After-release: version 1.4.6 (CUDA, large-v3), alembic head f6b1d8e3a925
 (no migration), the fix live in the shipped image (ladki/ladke kept,
 laddaakh→Ladakh works, COMMON holds the family), data intact (5 videos
 [220,221,273,274,277], 1031 captions, 2 exports), dashboard 200. **v1.4.6 done.**
+
+## v1.5.0 (target 24 Nov 2026) — first-run guidance (freeze lifted for this only)
+
+**Why the freeze is lifted (Tanush, 21 Nov):** v1.5.0 is the last feature
+release before the 25 Nov close, for Part A only (first-run guidance). Part B
+is ROADMAP docs. Everything else still goes to the ROADMAP.
+
+**Schedule (don't move the dates; anything slipping past 23 Nov evening is cut
+to the ROADMAP):**
+- 21–22 Nov: Part A built and checked.
+- 23 Nov: Part B docs, full checks once, push step.
+- 24 Nov: release v1.5.0, after-release checklist.
+- 25 Nov: project close (PROJECT_SUMMARY, ROADMAP, PROGRESS final).
+
+**Part A — first-run guidance (the feature).** Five pieces:
+1. Welcome guide on first open: 4–5 short, skippable, keyboard-accessible
+   steps; remembered **server-side** (not only localStorage); reopenable from a
+   "Help" link in the header. Covers: what the app does (captions on your own
+   computer, no cloud); picking the language (Hindi+English → Hindi then
+   Hinglish Roman; full Hindi → हिन्दी; English captions = a translation);
+   speech model in Settings (GPU large-v3 / CPU smaller / Hinglish separate);
+   custom vocabulary (fixes spelling, not hearing); optional Gemini key (caption
+   text to Google, never the video); honest limits (noise, crosstalk, music →
+   editor, Find & Replace, Improve, Redo).
+2. Language step: a one-line, context-aware tip under the choice.
+3. Replace the caption list's (i) (`captions/accuracy-info.tsx`) with a "Tips"
+   popover (when to Redo, Vocabulary, Improve, Find & Replace).
+4. README "Use" section guidance + one welcome-guide screenshot in the README
+   Screenshots table (no faces or video frames).
+
+**Storage decision (server-side):** reuse the existing key/value
+`app_settings` store — new key `guide_seen` ("1" once seen), surfaced on
+`SystemInfo.guide_seen` and set via the existing `PATCH /system/settings`. **No
+DB migration** (the table is key/value). The Help link reopens the guide
+locally without touching the flag, so there is no separate "show again" state.
+
+**Commit plan:** (1) backend `guide_seen` flag + test ✅; (2) frontend welcome
+guide component + header Help link + show-on-first-open; (3) language-step tip;
+(4) caption-list Tips popover; (5) README Use section + screenshot + docs.
+
+**Checks (once, on the final commit before the tag):** backend pytest+ruff,
+frontend lint/types/tests/build, UI checks axe 0 at 375 and 1440 px, light and
+dark, no layout shift, keyboard-only use of the guide; E2E GPU+CPU; music_check
+0 failures; both truth files unchanged. CHANGELOG [1.5.0] dated the release day;
+PROJECT_SUMMARY updated with the guide.
+
+**Part B — ROADMAP (docs only, don't build):** a richer v1.5+ overlapping /
+dialogue-captions plan (measured spike first: local separation vs pyannote
+diarization vs optional Gemini audio; OTT-style "-s1"/"-s2" in one caption;
+fallback manual "Make dialogue with next"). Confirm already-listed items are
+present (emotion-aware styling ✓ "Possible"; optional cloud transcription ✓;
+profanity setting ✓; font-picker ARIA ✓; zod4/Next16/minimatch ✓; SSRF origin
+assert ✓) and add any missing.
+
+### Resume here (v1.5.0 Part A) — 21 Nov
+
+- **Done & on disk (uncommitted):** Commit 1 — backend `guide_seen`.
+  `app/services/app_settings.py` (GUIDE_SEEN + `guide_seen()`),
+  `app/schemas/system.py` (SystemInfo + SystemSettingsUpdate),
+  `app/api/system.py` (_info + update_settings), `tests/test_local_install.py`
+  (`test_the_welcome_guide_is_remembered_per_install`, preserved_settings
+  extended), `docs/API.md`. Test TDD red→green; `test_local_install.py` 23
+  passed; ruff clean on the touched files.
+- **Next command:** `git add -A && git commit` the six files above as
+  `feat(onboarding): remember the welcome guide server-side`, Co-Authored-By
+  trailer. Then Commit 2: the frontend welcome guide.
+- **Frontend pieces located:** header =
+  `components/layout/dashboard-header.tsx`; system hook =
+  `hooks/use-system.ts` (+ `types/system.ts` needs `guide_seen`); language step
+  = `components/videos/language-step.tsx` / `language-picker.tsx`; caption (i) =
+  `components/captions/accuracy-info.tsx`; popover primitive =
+  `components/ui/popover`. Both stacks running (dev 3001, install 3000).
