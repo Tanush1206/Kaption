@@ -4254,11 +4254,16 @@ assert ✓) and add any missing.
   on dev 3001 (local mode):** auto-open step 1, Next/Back, last step =
   Back+Get started, dismiss persisted `guide_seen:true` server-side, Help
   reopened without re-mutating. Dev flag reset to false (first-run restored).
-- **Next — Commit 3:** the language-step one-line context-aware tip
-  (`components/videos/language-step.tsx` / `language-picker.tsx`). Then Commit 4
-  (caption (i) `components/captions/accuracy-info.tsx` → "Tips" popover), Commit
-  5 (README "Use" section + welcome-guide screenshot, no faces/frames + docs:
-  PRD/DESIGN_SYSTEM/CHANGELOG/PROGRESS).
+- **Commit 3 ✅** — language-step context-aware tip. In
+  `components/videos/language-step.tsx`, a one-line tip under "Caption into"
+  (`aria-live`): Hindi heard + English chosen → nudge to Hinglish (Roman); any
+  other translating choice → "these <X> captions are a translation of the
+  <heard> audio". lint + type-check clean. Not yet visually checked (needs a
+  Hindi upload; do in the final UI pass).
+- **Next — Commit 4:** caption (i) `components/captions/accuracy-info.tsx` →
+  "Tips" popover (when to Redo, Vocabulary, Improve, Find & Replace). Then
+  Commit 5 (README "Use" section + welcome-guide screenshot, no faces/frames +
+  docs: PRD/DESIGN_SYSTEM/CHANGELOG/PROGRESS).
 - **Checks still owed (once, final commit):** axe 0 at 375 & 1440, light+dark;
   keyboard-only guide; no layout shift; E2E GPU+CPU; music_check; truth files.
 - Both stacks running (dev 3001 local mode, install 3000 = shipped 1.4.6, so the

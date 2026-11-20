@@ -85,6 +85,15 @@ export function LanguageStep({
   const model = system?.whisper?.model;
   const busy = starting || waitingToStart;
   const heard = detection.detected ? languageName(detection.detected, options) : null;
+  // A one-line tip under the caption choice: that a different language is a
+  // translation, and the common Hindi+English nudge toward Hinglish (Roman).
+  const captionName = language === "same" ? null : (choices.find((o) => o.code === language)?.label ?? null);
+  const captionTip =
+    detection.detected === "hi" && language === "en"
+      ? "English captions are a translation. For mixed Hindi and English speech, Hinglish (Roman) usually reads better."
+      : translating && heard && captionName && language !== detection.detected
+        ? `These ${captionName} captions are a translation of the ${heard} audio.`
+        : null;
   const needsSpoken = unsupported && spoken === null;
   const needsScript = question.show && question.required && script === null;
   const chosenSpoken = unsupported && spoken !== null && spoken !== TRY_ANYWAY ? spoken : null;
@@ -340,6 +349,11 @@ export function LanguageStep({
         {visible.length === 1 && query.trim() && (
           <p role="status" className="mt-3 text-[13px] text-muted-foreground">
             No caption language matches “{query.trim()}”.
+          </p>
+        )}
+        {captionTip && (
+          <p role="status" aria-live="polite" className="mt-3 text-[13px] text-muted-foreground">
+            {captionTip}
           </p>
         )}
       </section>
