@@ -4,7 +4,7 @@ import { FileText, Loader2, Plus, RefreshCw, Replace, Sparkles } from "lucide-re
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { AccuracyInfo } from "@/components/captions/accuracy-info";
+import { CaptionTips } from "@/components/captions/caption-tips";
 import { FindReplace } from "@/components/captions/find-replace";
 import { ImproveCaptions, isChecking } from "@/components/captions/improve-captions";
 import { CaptionRow } from "@/components/captions/caption-row";
@@ -305,7 +305,7 @@ export function CaptionEditor({ video, playback }: CaptionEditorProps) {
           <span className="label-caps">
             {captions.length} caption{captions.length === 1 ? "" : "s"}
           </span>
-          <AccuracyInfo />
+          <CaptionTips />
         </div>
 
         <div className="flex flex-wrap items-center justify-end gap-1.5">

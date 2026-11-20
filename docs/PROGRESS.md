@@ -4260,10 +4260,17 @@ assert ✓) and add any missing.
   other translating choice → "these <X> captions are a translation of the
   <heard> audio". lint + type-check clean. Not yet visually checked (needs a
   Hindi upload; do in the final UI pass).
-- **Next — Commit 4:** caption (i) `components/captions/accuracy-info.tsx` →
-  "Tips" popover (when to Redo, Vocabulary, Improve, Find & Replace). Then
-  Commit 5 (README "Use" section + welcome-guide screenshot, no faces/frames +
-  docs: PRD/DESIGN_SYSTEM/CHANGELOG/PROGRESS).
+- **Commit 4 ✅** — caption list "Tips" popover. New
+  `components/captions/caption-tips.tsx` (a labelled "Tips" button + lightbulb
+  on the Popover's dialog-panel mode) replaces `<AccuracyInfo/>` in
+  `caption-editor.tsx` next to the caption count; covers accuracy + click to
+  edit, Find & Replace, Vocabulary+Redo, Improve, Redo. `accuracy-info.tsx`
+  stays (still used for "Spoken audio" in the language step). lint + type-check
+  clean; smoke-tested in the editor on dev 3001 (opens, reads, Escape closes).
+- **Next — Commit 5:** README "Use" section guidance + one welcome-guide
+  screenshot in the README Screenshots table (no faces/frames). Then docs:
+  PRD.md (the guide feature), DESIGN_SYSTEM.md if needed, CHANGELOG [1.5.0] on
+  release day, PROGRESS. Part A code is then complete; final checks follow.
 - **Checks still owed (once, final commit):** axe 0 at 375 & 1440, light+dark;
   keyboard-only guide; no layout shift; E2E GPU+CPU; music_check; truth files.
 - Both stacks running (dev 3001 local mode, install 3000 = shipped 1.4.6, so the
