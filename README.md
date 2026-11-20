@@ -4,7 +4,7 @@
 
 Website: **https://tanush1206.github.io/Video-Caption-Maker/**
 
-![The VideoCaptionMaker editor: a video with its captions listed beside it and laid out on a timeline](docs/images/Editor-Captions.png)
+![The VideoCaptionMaker editor: a video playing with its caption burned onto it, and the player controls below](docs/images/Editor-Captions.png)
 
 Captions for your videos, made on your own computer. Upload a video, choose
 the caption language, export it with the captions burned in, or as subtitle
@@ -342,6 +342,21 @@ Backend tests run against an isolated test database; see
   a hosted deployment.
 - Architecture: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). History:
   [docs/MILESTONES.md](docs/MILESTONES.md).
+
+## How this was built
+
+VideoCaptionMaker was built by **Tanush Thakran** with **[Claude Code](https://claude.com/claude-code)**
+(Anthropic) as an AI pair programmer.
+
+- **Claude Code** wrote most of the code, tests and docs, ran the checks, measured
+  model quality and prepared each release.
+- **I** owned the product: what to build and why, reviewing every change, deciding
+  what shipped and what didn't, testing on my Windows PC and MacBook, the release
+  process and the final call on every trade-off.
+
+Every change went through tests, CI, checksummed releases and an after-release check
+of a real install. The full history is in [CHANGELOG.md](CHANGELOG.md) and
+[docs/PROGRESS.md](docs/PROGRESS.md).
 
 ## Documentation
 
