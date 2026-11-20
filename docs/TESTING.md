@@ -639,7 +639,7 @@ else does.
 1. All work committed in small commits; PROGRESS.md updated. Each commit ends
    with `Co-Authored-By: Claude <noreply@anthropic.com>` and no other trailer;
    check with
-   `git log origin/main..HEAD --format=%B | grep -Ei "generated with|signed-off-by|co-authored-by" | grep -viF "Co-Authored-By: Claude <noreply@anthropic.com>"`
+   `git log origin/main..HEAD --format=%B | grep -Ei "^(signed-off-by|co-authored-by):|generated with \[claude code\]" | grep -viF "Co-Authored-By: Claude <noreply@anthropic.com>"`
    (clean when it prints nothing — see [AGENTS.md](../AGENTS.md) rule 14).
    If dependencies, models, fonts or a base image changed, regenerate the
    notices from a CUDA build and commit them:

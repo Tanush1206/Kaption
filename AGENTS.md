@@ -110,11 +110,13 @@ anything.**
     Before a push, check the commits going out with:
     ```bash
     git log origin/main..HEAD --format=%B \
-      | grep -Ei "generated with|signed-off-by|co-authored-by" \
+      | grep -Ei "^(signed-off-by|co-authored-by):|generated with \[claude code\]" \
       | grep -viF "Co-Authored-By: Claude <noreply@anthropic.com>"
     ```
-    The check is clean when it prints nothing; any line it prints is a
-    disallowed trailer.
+    It matches real trailer lines (anchored at the line start, plus the
+    Claude Code sign-off line) so prose that merely names a trailer doesn't
+    trip it. The check is clean when it prints nothing; any line it prints is
+    a disallowed trailer.
 15. **Never push and never tag.** The maintainer does both. When a push or
     tag is needed, give the exact command and wait for confirmation.
 
