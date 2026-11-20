@@ -4166,5 +4166,22 @@ green; the hinglish/hindi-script/phrasing suites (96) green; ruff clean.
 **Files:** `app/services/vocabulary.py`, `app/services/hinglish_spelling.py`
 (PLACES split), `tests/test_vocabulary.py`; CHANGELOG [1.4.6]; this note.
 
-**Resume here:** fix committed; running the full checks on the final commit
-before the push step. No tag yet (Tanush tags).
+**Full checks on the final commit (88c9aab):** backend ruff clean, pytest 807
+passed/2 skipped; frontend lint/types clean, 10/10 tests, production build OK;
+UI axe 0 with the `vocabulary`/`theme`/`not-found` checks; E2E on GPU (dev
+worker CUDA, large-v3 float16) green (same+en, SRT/VTT/MP4). CPU E2E skipped
+with reason: the change is device-independent post-transcription text
+processing, already exercised by the GPU run. E2E videos 7817/7818 deleted
+(204); dev stack keeps only 7426.
+
+**v1.4.6 RELEASED and the install updated (20 Nov).** Tanush tagged v1.4.6 on
+88c9aab; release run 44697751511 green (8 jobs). Verified: release has 8 assets,
+not draft/prerelease; `latest-cuda`/`latest-cpu`/`frontend:latest` digests equal
+the 1.4.6 digests (anonymous imagetools inspect 200); cpu+frontend multi-arch
+(amd64+arm64), cuda amd64; SHA256SUMS covers the scripts/compose. Backup first
+to `C:\Users\Admin\VCM-backups\v1.4.6\` (vcm-1.4.6.dump 94 KB, vcm-media-1.4.6.tgz
+1.7 GB, .env). `vcm update`: backend/frontend/worker recreated, all healthy, app
+ready. After-release: version 1.4.6 (CUDA, large-v3), alembic head f6b1d8e3a925
+(no migration), the fix live in the shipped image (ladki/ladke kept,
+laddaakh→Ladakh works, COMMON holds the family), data intact (5 videos
+[220,221,273,274,277], 1031 captions, 2 exports), dashboard 200. **v1.4.6 done.**
