@@ -238,6 +238,7 @@ export function VideoUpload() {
           // handler: it is focusable and opens the picker from the keyboard
           // with no extra wiring, and the drop handlers sit on it unchanged.
           <label
+            data-tour="upload"
             onDragEnter={(e) => {
               e.preventDefault();
               dragDepth.current += 1;

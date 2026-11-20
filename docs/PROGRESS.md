@@ -4287,6 +4287,61 @@ assert ✓) and add any missing.
   - PROJECT_SUMMARY updated with the guide; Part B ROADMAP docs (23 Nov).
 - Dev 3001 is back at first-run state (`guide_seen` false). Install 3000 is
   still 1.4.6 (no guide until v1.5.0 is imaged).
+
+### Part A upgrade — guided spotlight tour (Tanush, 21 Nov; TIMEBOX 22 Nov eve)
+
+Tanush reviewed the dialog guide (good) and asked to upgrade it to a guided
+tour that spotlights the real UI (element stays bright, rest dims) with a
+callout, arrow, Back/Next/Skip; steps can navigate between pages; a missing
+element (e.g. no video yet) degrades to a centred card. Keep the existing
+dialog guide as the fallback for when the tour can't run. **Timebox: if the
+tour isn't solid by 22 Nov evening, ship the dialog guide in v1.5.0 and move
+the tour to the ROADMAP.** Still remembered server-side (`guide_seen`),
+reopened from Help. a11y: keyboard (Tab in callout, Esc close, ←/→ Back/Next),
+focus to callout and back, aria-live step text, prefers-reduced-motion, 375 px
+(callout flips, never off-screen), light+dark, axe 0, no layout shift.
+
+**Architecture (decided):** `components/tour/` — `TourProvider` (context, in
+the dashboard layout so it survives SPA nav; owns running/index, auto-start on
+first run via `guide_seen`, Help `start()`, and the dialog fallback when the
+tour errors), `TourOverlay` (spotlight via a positioned div with
+`box-shadow 0 0 0 9999px` dim + white outline ring, callout positioned
+below/above/centre with arrow, keyboard + focus trap + reduced-motion), and
+`steps.tsx` (7 steps). `welcome-guide.tsx` refactored to a **controlled**
+dialog `{open,onClose}` (Help button + auto-open + guide_seen moved to the
+provider) and used as the fallback.
+
+**7 tour steps:** 1 upload (`[data-tour="upload"]`, /dashboard) · 2 language
+(centred card, /dashboard) · 3 editor (centred card, /dashboard) · 4 speech
+model (`[data-tour="speech-model"]`, /settings) · 5 vocabulary
+(`[data-tour="vocabulary"]`, /settings) · 6 Gemini (`[data-tour="gemini"]`,
+/settings) · 7 Help (`[data-tour="help"]`, stay). First run has no video, so
+language/editor are centred cards by design (matches the spec's fallback).
+Real editor/language spotlights on reopen-with-a-video = possible follow-up
+/ ROADMAP if the timebox bites.
+
+**`data-tour` anchors to add:** upload `<label>` in `video-upload.tsx`; the
+three `SettingsSection`s in `install-settings.tsx` (add a `dataTour` prop to
+`SettingsSection`); the Help button in `dashboard-header.tsx`.
+
+**Resume:** if interrupted mid-build, the dialog guide (Commits 1–5) is already
+solid and shippable — just revert the header/layout wiring to the dialog and
+ship that, tour to ROADMAP.
+
+**TOUR BUILT ✅ (21 Nov, well inside the timebox).** Commits `43f0606`
+(mechanism + wiring + welcome-guide → controlled fallback) and the anchors
+commit. Verified on dev 3001 (local): auto-opens on first run; Help reopens;
+step 1 spotlights the upload area with an arrow callout; Next/Back/arrows move;
+cross-page nav to /settings spotlights the Speech model / vocabulary / Gemini
+groups (scrolled into view); step 7 spotlights the header Help; language +
+editor are centred cards (no video yet); Esc and Done close; focus moves to the
+callout. **axe 0** light+dark with the tour open (`/dashboard`); **shoot.js** OK
+at 375 & 1440 (callout clamped on-screen, no overflow/console errors); lint +
+type-check clean; frontend tests 10/10. Dev `guide_seen` left false (first-run).
+Editor/language spotlight-on-reopen-with-a-video is a possible follow-up, not
+needed for first-run. **Still owed:** the full-suite gate (build, E2E, etc.),
+keyboard walkthrough sign-off, reduced-motion visual spot-check, CHANGELOG,
+PROJECT_SUMMARY, Part B.
 - **Checks still owed (once, final commit):** axe 0 at 375 & 1440, light+dark;
   keyboard-only guide; no layout shift; E2E GPU+CPU; music_check; truth files.
 - Both stacks running (dev 3001 local mode, install 3000 = shipped 1.4.6, so the

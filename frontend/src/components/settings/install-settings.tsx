@@ -24,13 +24,16 @@ export function SettingsSection({
   title,
   footnote,
   children,
+  dataTour,
 }: {
   title: string;
   footnote?: React.ReactNode;
   children: React.ReactNode;
+  /** Anchor for the guided tour (v1.5.0) to spotlight this group. */
+  dataTour?: string;
 }) {
   return (
-    <section aria-label={title}>
+    <section aria-label={title} data-tour={dataTour}>
       <h2 className="label-caps mb-1.5 px-4">{title}</h2>
       <div className="group-inset">{children}</div>
       {footnote && <div className="mt-1.5 px-4 text-[13px] text-muted-foreground">{footnote}</div>}
@@ -123,6 +126,7 @@ function ModelSection({ info }: { info: SystemInfo }) {
   return (
     <SettingsSection
       title="Speech model"
+      dataTour="speech-model"
       footnote={
         <>
           <p>
@@ -269,6 +273,7 @@ function TranslationSection({ info }: { info: SystemInfo }) {
 
       <SettingsSection
         title="Gemini"
+        dataTour="gemini"
         footnote={
           <>
             <p>
@@ -365,6 +370,7 @@ function VocabularySection({ info }: { info: SystemInfo }) {
   return (
     <SettingsSection
       title="Custom vocabulary"
+      dataTour="vocabulary"
       footnote={
         <>
           <p id="vocabulary-applies">
