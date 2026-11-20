@@ -7,6 +7,7 @@ import { Film, Search, Settings } from "lucide-react";
 import { Brand } from "@/components/layout/brand";
 import { PageHeader } from "@/components/layout/page-frame";
 import { UserMenu } from "@/components/layout/user-menu";
+import { WelcomeGuide } from "@/components/layout/welcome-guide";
 import { LOCAL_MODE } from "@/lib/config";
 import { cn } from "@/lib/utils";
 
@@ -64,12 +65,12 @@ export function DashboardHeader() {
         ))}
       </nav>
 
-      {/* Nobody to sign out as on a local install. */}
-      {!LOCAL_MODE && (
-        <div className="ml-auto flex items-center">
-          <UserMenu />
-        </div>
-      )}
+      {/* The welcome guide is reopenable here; nobody to sign out as on a
+          local install, so the user menu is accounts-mode only. */}
+      <div className="ml-auto flex items-center gap-1">
+        <WelcomeGuide />
+        {!LOCAL_MODE && <UserMenu />}
+      </div>
     </PageHeader>
   );
 }

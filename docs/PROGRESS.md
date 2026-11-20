@@ -4241,19 +4241,25 @@ assert ✓) and add any missing.
 
 ### Resume here (v1.5.0 Part A) — 21 Nov
 
-- **Done & on disk (uncommitted):** Commit 1 — backend `guide_seen`.
-  `app/services/app_settings.py` (GUIDE_SEEN + `guide_seen()`),
-  `app/schemas/system.py` (SystemInfo + SystemSettingsUpdate),
-  `app/api/system.py` (_info + update_settings), `tests/test_local_install.py`
-  (`test_the_welcome_guide_is_remembered_per_install`, preserved_settings
-  extended), `docs/API.md`. Test TDD red→green; `test_local_install.py` 23
-  passed; ruff clean on the touched files.
-- **Next command:** `git add -A && git commit` the six files above as
-  `feat(onboarding): remember the welcome guide server-side`, Co-Authored-By
-  trailer. Then Commit 2: the frontend welcome guide.
-- **Frontend pieces located:** header =
-  `components/layout/dashboard-header.tsx`; system hook =
-  `hooks/use-system.ts` (+ `types/system.ts` needs `guide_seen`); language step
-  = `components/videos/language-step.tsx` / `language-picker.tsx`; caption (i) =
-  `components/captions/accuracy-info.tsx`; popover primitive =
-  `components/ui/popover`. Both stacks running (dev 3001, install 3000).
+- **Commit 1 ✅ `23238a5`** — backend `guide_seen` (app_settings GUIDE_SEEN +
+  `guide_seen()`, SystemInfo + SystemSettingsUpdate, system.py _info +
+  update_settings, test_local_install.py, API.md). TDD red→green; 23 passed;
+  ruff clean.
+- **Commit 2 ✅** — frontend welcome guide. New
+  `components/layout/welcome-guide.tsx` (5 steps on the native-`<dialog>`
+  Dialog; auto-opens once on a fresh install in local mode; Help button in the
+  header reopens it; first dismissal PATCHes `guide_seen:true`, Help never
+  does). Wired into `dashboard-header.tsx` (right slot, both modes);
+  `types/system.ts` gained `guide_seen`. lint + type-check clean. **Smoke-tested
+  on dev 3001 (local mode):** auto-open step 1, Next/Back, last step =
+  Back+Get started, dismiss persisted `guide_seen:true` server-side, Help
+  reopened without re-mutating. Dev flag reset to false (first-run restored).
+- **Next — Commit 3:** the language-step one-line context-aware tip
+  (`components/videos/language-step.tsx` / `language-picker.tsx`). Then Commit 4
+  (caption (i) `components/captions/accuracy-info.tsx` → "Tips" popover), Commit
+  5 (README "Use" section + welcome-guide screenshot, no faces/frames + docs:
+  PRD/DESIGN_SYSTEM/CHANGELOG/PROGRESS).
+- **Checks still owed (once, final commit):** axe 0 at 375 & 1440, light+dark;
+  keyboard-only guide; no layout shift; E2E GPU+CPU; music_check; truth files.
+- Both stacks running (dev 3001 local mode, install 3000 = shipped 1.4.6, so the
+  new UI is only on 3001 until v1.5.0 is imaged).

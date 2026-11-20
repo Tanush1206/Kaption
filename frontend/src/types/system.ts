@@ -34,6 +34,8 @@ export interface SystemInfo {
   vocabulary: string[];
   /** How many words it can hold. */
   vocabulary_max: number;
+  /** Whether the first-run welcome guide has been seen (v1.5.0). */
+  guide_seen: boolean;
 }
 
 export interface SystemSettingsUpdate {
@@ -42,4 +44,6 @@ export interface SystemSettingsUpdate {
   whisper_model?: string;
   /** The whole list, replacing the stored one; [] clears it. */
   vocabulary?: string[];
+  /** Set true when the welcome guide is finished or skipped (v1.5.0). */
+  guide_seen?: boolean;
 }
