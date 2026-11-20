@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import { AppFooter } from "@/components/layout/app-footer";
 import { DashboardHeader, MobileTabBar } from "@/components/layout/dashboard-header";
 import { ServerUnavailable } from "@/components/layout/server-unavailable";
+import { TourProvider } from "@/components/tour/tour-provider";
 import { useAuth } from "@/hooks/use-auth";
 import { useTranscriptionAlerts } from "@/hooks/use-transcription-alerts";
 import { LOCAL_MODE } from "@/lib/config";
@@ -54,13 +55,17 @@ export default function DashboardLayout({
   return (
     // The bottom padding on phones is the tab bar's height, so the last row
     // of any page can scroll clear of it. The editor has no tab bar.
-    <div className={cn("flex min-h-screen flex-col", !pathname.startsWith("/editor") && "pb-16 md:pb-0")}>
-      <DashboardHeader />
-      {children}
-      {/* The editor is a full-height workspace; a footer would only push its
-          panels down. */}
-      {!pathname.startsWith("/editor") && <AppFooter />}
-      <MobileTabBar />
-    </div>
+    // TourProvider wraps the whole layout so the guided tour survives moving
+    // between pages (its Help trigger lives in the header).
+    <TourProvider>
+      <div className={cn("flex min-h-screen flex-col", !pathname.startsWith("/editor") && "pb-16 md:pb-0")}>
+        <DashboardHeader />
+        {children}
+        {/* The editor is a full-height workspace; a footer would only push its
+            panels down. */}
+        {!pathname.startsWith("/editor") && <AppFooter />}
+        <MobileTabBar />
+      </div>
+    </TourProvider>
   );
 }

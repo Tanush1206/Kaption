@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Film, Search, Settings } from "lucide-react";
+import { Film, HelpCircle, Search, Settings } from "lucide-react";
 
 import { Brand } from "@/components/layout/brand";
 import { PageHeader } from "@/components/layout/page-frame";
 import { UserMenu } from "@/components/layout/user-menu";
-import { WelcomeGuide } from "@/components/layout/welcome-guide";
+import { useTour } from "@/components/tour/tour-provider";
+import { Button } from "@/components/ui/button";
 import { LOCAL_MODE } from "@/lib/config";
 import { cn } from "@/lib/utils";
 
@@ -37,6 +38,7 @@ function useIsActive() {
 export function DashboardHeader() {
   const isActive = useIsActive();
   const pathname = usePathname();
+  const { start } = useTour();
 
   return (
     // On a phone the editor's own bar (back, title, Export) is enough.
@@ -65,10 +67,20 @@ export function DashboardHeader() {
         ))}
       </nav>
 
-      {/* The welcome guide is reopenable here; nobody to sign out as on a
-          local install, so the user menu is accounts-mode only. */}
+      {/* Help reopens the guided tour; nobody to sign out as on a local
+          install, so the user menu is accounts-mode only. */}
       <div className="ml-auto flex items-center gap-1">
-        <WelcomeGuide />
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="gap-1.5"
+          data-tour="help"
+          onClick={start}
+        >
+          <HelpCircle aria-hidden="true" />
+          Help
+        </Button>
         {!LOCAL_MODE && <UserMenu />}
       </div>
     </PageHeader>

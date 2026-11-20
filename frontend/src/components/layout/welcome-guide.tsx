@@ -1,21 +1,15 @@
 "use client";
 
-import { HelpCircle } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
-import { useSystem, useUpdateSystemSettings } from "@/hooks/use-system";
-import { LOCAL_MODE } from "@/lib/config";
 
 /**
- * The first-run welcome guide (v1.5.0). A few short, skippable steps that open
- * by themselves the first time someone opens a fresh install, and can be
- * reopened any time from the Help button in the header.
- *
- * "Seen" is remembered server-side (SystemInfo.guide_seen), so it stays
- * dismissed on another browser or device, not only in this localStorage. Only
- * the first dismissal records it; reopening from Help never does.
+ * The plain dialog guide (v1.5.0). A few short, skippable steps. Controlled by
+ * the TourProvider, which uses it as the fallback for when the guided spotlight
+ * tour can't run; the provider owns opening it, remembering it has been seen
+ * (server-side `guide_seen`) and the Help link.
  *
  * Built on the native-<dialog> Dialog, which gives the focus trap, Escape and
  * the inert page behind, so only the step content lives here.
@@ -87,95 +81,59 @@ const STEPS: { title: string; body: React.ReactNode }[] = [
   },
 ];
 
-export function WelcomeGuide() {
-  const { data } = useSystem();
-  const update = useUpdateSystemSettings();
-  const [open, setOpen] = useState(false);
+export function WelcomeGuide({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [step, setStep] = useState(0);
-  const decided = useRef(false);
 
+  // Always start at the first step when it opens.
   useEffect(() => {
-    // Open by itself once, on a fresh install, and only in local mode: in
-    // accounts mode the dismissal below is refused, so it would nag on every
-    // load.
-    if (decided.current || !data) return;
-    decided.current = true;
-    if (LOCAL_MODE && !data.guide_seen) {
-      setStep(0);
-      setOpen(true);
-    }
-  }, [data]);
-
-  function dismiss() {
-    setOpen(false);
-    // Record, once, that the guide has been seen, so it never opens on its own
-    // again. Reopening from Help doesn't come back through here.
-    if (LOCAL_MODE && data && !data.guide_seen) {
-      update.mutate({ guide_seen: true });
-    }
-  }
+    if (open) setStep(0);
+  }, [open]);
 
   const last = step === STEPS.length - 1;
   const current = STEPS[step];
 
   return (
-    <>
-      <Button
-        type="button"
-        variant="ghost"
-        size="sm"
-        className="gap-1.5"
-        onClick={() => {
-          setStep(0);
-          setOpen(true);
-        }}
-      >
-        <HelpCircle aria-hidden="true" />
-        Help
-      </Button>
-
-      <Dialog
-        open={open}
-        onClose={dismiss}
-        title={current.title}
-        description={`Step ${step + 1} of ${STEPS.length}`}
-        className="max-w-lg"
-        footer={
-          <>
-            {step > 0 && (
-              <Button
-                type="button"
-                variant="secondary"
-                size="sm"
-                onClick={() => setStep((s) => Math.max(0, s - 1))}
-              >
-                Back
-              </Button>
-            )}
-            {!last && (
-              <Button type="button" variant="plain" size="sm" onClick={dismiss}>
-                Skip
-              </Button>
-            )}
-            {last ? (
-              <Button type="button" variant="primary" size="sm" onClick={dismiss}>
-                Get started
-              </Button>
-            ) : (
-              <Button
-                type="button"
-                variant="primary"
-                size="sm"
-                onClick={() => setStep((s) => Math.min(STEPS.length - 1, s + 1))}
-              >
-                Next
-              </Button>
-            )}
-          </>
-        }
-      >
-        <div className="text-[15px] leading-6 text-foreground">{current.body}</div>
-      </Dialog>
-    </>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      title={current.title}
+      description={`Step ${step + 1} of ${STEPS.length}`}
+      className="max-w-lg"
+      footer={
+        <>
+          {step > 0 && (
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              onClick={() => setStep((s) => Math.max(0, s - 1))}
+            >
+              Back
+            </Button>
+          )}
+          {!last && (
+            <Button type="button" variant="plain" size="sm" onClick={onClose}>
+              Skip
+            </Button>
+          )}
+          {last ? (
+            <Button type="button" variant="primary" size="sm" onClick={onClose}>
+              Get started
+            </Button>
+          ) : (
+            <Button
+              type="button"
+              variant="primary"
+              size="sm"
+              onClick={() => setStep((s) => Math.min(STEPS.length - 1, s + 1))}
+            >
+              Next
+            </Button>
+          )}
+        </>
+      }
+    >
+      <div className="text-[15px] leading-6 text-foreground">{current.body}</div>
+    </Dialog>
   );
 }
