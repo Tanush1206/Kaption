@@ -6,7 +6,7 @@ commits between tags; hashes are given for reference.
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [1.5.0] - 2026-11-24
+## [1.5.0] - 2026-11-23
 
 First-run guidance: a short, skippable guided tour that spotlights the real
 UI. No migration; the update downloads the app layers only. The last feature
