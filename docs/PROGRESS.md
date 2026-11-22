@@ -4370,3 +4370,47 @@ v1.5.0 work; run the gate above, then give Tanush the push command.
   keyboard-only guide; no layout shift; E2E GPU+CPU; music_check; truth files.
 - Both stacks running (dev 3001 local mode, install 3000 = shipped 1.4.6, so the
   new UI is only on 3001 until v1.5.0 is imaged).
+
+### v1.5.0 RELEASE GATE — run 23 Nov, all green (8 unpushed commits 23238a5..7c9f0e0)
+
+- **Backend:** ruff clean; `pytest` **808 passed, 2 skipped** (isolated `_test` db).
+- **Frontend:** lint + type-check clean; node tests **10/10**; **production build**
+  (`docker build --target build frontend`) ran fresh (not cached) and succeeded —
+  prerender clean, so the client/server `buttonVariants` trap is clear.
+- **UI a11y:** `axe.js` **0 violations** light+dark with the tour open
+  (/dashboard) and across /search /settings /editor; `shoot.js` OK at **375 &
+  1440** (no overflow/console errors); keyboard (Esc/arrows/Tab-trap) and focus
+  verified earlier.
+- **Hindi-upload tip check:** uploaded hinglish.mp4 to dev 3001, detection =
+  "Hindi · 98%", chose English → the tip renders ("English captions are a
+  translation… Hinglish (Roman) usually reads better."). Test video **7819
+  deleted**.
+- **E2E GPU (dev stack, large-v3 float16):** `scripts/e2e.py` on hinglish.mp4,
+  all 6 languages (same/en/hi/fr/de/nl) → **ALL PASSED** (transcribe + translate
+  + SRT/VTT/MP4). fr/de/nl showed the Gemini→local fallback notice (R3), not a
+  failure. Videos **7820–7825 deleted**.
+- **music_check:** new.mp4 transcribed on GPU (video 7826, 366 captions);
+  `music_check.py 7826` → **0 failures**. Note: `--keep` run reported the two
+  Roman guard phrases missing because e2e's "same" produced **Devanagari**
+  (hindi_script=None), so the Roman phrases can't match; the loop-collapse code
+  those phrases guard is byte-identical to v1.4.6, so not re-transcribed in
+  Hinglish. Video **7826 deleted**.
+- **CPU:** tier-selection check (`docker run --memory 8g`) → `8.0 small
+  m2m100_418M` ✅. **Full CPU transcription E2E NOT run** — it needs recreating
+  the live dev worker off its GPU/dev-ports override (the dev stack's 3001
+  mapping isn't accounted for by the base/gpu compose, so a recreate risks the
+  shared host), and the pipeline is **byte-identical to v1.4.6** (only
+  `app_settings.py` +9 lines changed since; `git diff v1.4.6..HEAD -- backend/app/services backend/app/workers`).
+  Covered by: the tier check, the GPU E2E, and the CPU tier unit tests. **Flagged
+  to Tanush to decide** whether he wants a full CPU E2E on a clean CPU setup
+  before tagging.
+- **Truth files:** `test-assets/truth-hi.txt` and `truth-new-5min.txt`
+  **unchanged** (git clean).
+- **Test data:** created 8 videos (7819, 7820–7825, 7826), **all deleted** by id
+  via the API; dev stack back to its prior set [1,20,55,1646,4606,4610,7426];
+  `guide_seen` reset to false; worker untouched (still GPU). Install (3000) not
+  touched.
+- **Trailer check clean.** Nothing pushed. **Push step given to Tanush** (below).
+  After his push + green CI he tags `v1.5.0` on the tip; then release checks,
+  backup, `vcm update`, after-release checklist, and confirm the tour on the
+  install's first open (then reset it).
