@@ -4437,3 +4437,51 @@ PROGRESS record.
   auto-opens the guided tour (step 1 spotlights the upload area) at
   localhost:3000 with `guide_seen` false; then **reset** `guide_seen` to false
   so the install is pristine first-run for Tanush. **v1.5.0 done.**
+
+## Project rename → Kaption (v1.6.0, target 24 Nov; approved by Tanush 23 Nov)
+
+Rename **VideoCaptionMaker → Kaption** (slug `kaption`). **Change:** all
+user-facing text, the repo, the Pages URL, the GHCR image names. **Keep (so
+installs keep their data):** the `vcm` command, Compose project `vcm`, volumes
+`vcm_*`, install folders (`%LOCALAPPDATA%\VideoCaptionMaker`,
+`~/.videocaptionmaker`), `VCM_*` env vars. Say "Kaption (command: `vcm`)".
+**Approved recommendations (Tanush):** keep the internal package/celery names
+(`videocaptionmaker-backend/-frontend`, celery `"videocaptionmaker"`); leave
+historical docs as-is (LAUNCH_AUDIT, past PROGRESS/CHANGELOG entries) — change
+forward-facing docs + the CHANGELOG intro only; keep the install-folder names.
+
+**Inventory (full report in the chat, 23 Nov):** `VideoCaptionMaker` 97×/42,
+`Video-Caption-Maker` 71×/20, `video-caption-maker` 32×/16, `videocaptionmaker`
+37×/19. Images: `release.yml` (REGISTRY `ghcr.io/tanush1206`, base
+`video-caption-maker-{backend,frontend}`), `docker-compose.prod.yml`, `ci.yml`,
+`weekly-check.yml`, `scripts/ci_arch_check.sh`, `update_layers.py`. URLs:
+`REPO_URL=https://github.com/Tanush1206/Video-Caption-Maker` in install.sh/ps1,
+vcm, vcm.ps1; Pages `tanush1206.github.io/Video-Caption-Maker/` in site + og.
+
+**Commit sequence (Phase 3, small commits):**
+- **3.1 ✅** — pin dev Compose project name (`name: videocaptionmaker` in
+  `docker-compose.yml`) so the later folder rename can't orphan the dev volumes.
+  Verified non-disruptive (running stack still project `videocaptionmaker`,
+  video 7426 intact).
+- 3.2 — GHCR image names → `kaption-{backend,frontend}` (release.yml,
+  docker-compose.prod.yml, ci.yml, weekly-check.yml, ci_arch_check.sh,
+  update_layers.py, install tests). **Independent of the repo rename.**
+- 3.3 — URLs → `Tanush1206/Kaption` + Pages `tanush1206.github.io/Kaption/`
+  (REPO_URL in install.sh/ps1/vcm/vcm.ps1, README, docs, site incl. og:image,
+  canonical, sitemap.xml). **After the repo rename + redirect test.**
+- 3.4 — user-facing text → Kaption (app: brand, layout title, footer, 404,
+  dialog guide; README; site; PRIVACY; THIRD_PARTY_NOTICES; issue template);
+  "Kaption (command: `vcm`)".
+- 3.5 — regenerate `site/og.png` with the Kaption wordmark (web-design-
+  guidelines + seo).
+- Checks: playwright 375 & 1440 light+dark axe 0; full suites once; **throwaway
+  install `vcm update` 1.5.0→1.6.0 with a video, data intact, image names
+  swapped**; CHANGELOG `[1.6.0]`; push step. After tag: release checks, backup,
+  update, after-release checklist (data intact, app shows **Kaption**).
+
+**Handoff state (23 Nov):** Tanush is renaming the repo to Kaption now and will
+confirm. **Before relying on the redirect** (old installs' `vcm update`), run:
+`curl -IL https://github.com/Tanush1206/Video-Caption-Maker/releases/latest/download/vcm`
+→ expect a 301 to `/Kaption/...`. Phases 2 (his GitHub steps) and 4 (local
+folder rename, incl. carrying over Claude Code's project memory dir keyed to the
+old path) are in the chat report. Nothing pushed.

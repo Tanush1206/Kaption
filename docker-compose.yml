@@ -9,6 +9,12 @@
 # override: VCM_VARIANT=cuda (in the shell or in .env) builds the CUDA image,
 # and docker-compose.gpu.yml hands the GPU to the worker.
 #
+# The project name is pinned so it never follows the directory name: renaming
+# the repo folder (e.g. to Kaption) would otherwise make Compose start a new
+# project and orphan this stack's `videocaptionmaker_*` volumes and their data.
+# The installed app pins its own name (`vcm`) in docker-compose.prod.yml.
+name: videocaptionmaker
+
 services:
   postgres:
     image: postgres:16-alpine
