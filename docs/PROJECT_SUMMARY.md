@@ -1,6 +1,6 @@
 # Project summary
 
-VideoCaptionMaker, from the first commit (5 August 2026) to the project
+Kaption, from the first commit (5 August 2026) to the project
 close (November 2026). This page says what was built, where it stands, how
 well it works as measured, and where to look for everything else. The
 details live in the docs it links; this page doesn't repeat them.
@@ -35,7 +35,7 @@ and is remembered server-side so it stays dismissed across browsers.
 - **Published:** GitHub Releases (installers, compose files, `vcm`,
   `SHA256SUMS`) and GHCR images: `backend:<version>-cuda` (amd64),
   `backend:<version>-cpu` and `frontend:<version>` (amd64 and arm64).
-- **Website:** https://tanush1206.github.io/Video-Caption-Maker/ (`site/`,
+- **Website:** https://tanush1206.github.io/Kaption/ (`site/`,
   deployed by `pages.yml`).
 - **Checked on the release:** a release is called done only after the
   published version is installed or updated on a real machine and checked

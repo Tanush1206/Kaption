@@ -1,6 +1,6 @@
 # Security
 
-The security design of VideoCaptionMaker as of v1.0.5 (on `main`): a single-user
+The security design of Kaption as of v1.0.5 (on `main`): a single-user
 app that runs on the user's own computer. Every rule names the file that
 enforces it.
 
@@ -149,7 +149,7 @@ replaced (PROGRESS.md, R11). The guard and `audit.log` are the fix
    `Origin` must be listed in `CORS_ORIGINS`.
 
 A refusal returns `403` with
-`{"detail": "This request didn't come from VideoCaptionMaker on this computer, so it was refused."}`
+`{"detail": "This request didn't come from Kaption on this computer, so it was refused."}`
 and is written to the audit log with the reason.
 
 Verified live on both installs at `localhost` and `127.0.0.1`:
@@ -554,7 +554,7 @@ in `install/vcm` and `install/vcm.ps1`):
 ## 9. Reporting a vulnerability
 
 Use **GitHub private vulnerability reporting**:
-`https://github.com/Tanush1206/Video-Caption-Maker/security/advisories/new`
+`https://github.com/Tanush1206/Kaption/security/advisories/new`
 (the repository's **Security** tab → **Report a vulnerability**). Reports
 there are visible only to the maintainer until an advisory is published.
 

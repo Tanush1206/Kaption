@@ -1,6 +1,6 @@
 # Testing
 
-How VideoCaptionMaker is tested, as of v1.0.5 (on `main`): what exists in the repo, the
+How Kaption is tested, as of v1.0.5 (on `main`): what exists in the repo, the
 commands, and the manual procedures recorded in PROGRESS.md for the things
 automated tests can't reach (GPU, installers, updates).
 
@@ -415,8 +415,8 @@ python scripts/update_layers.py snapshot before.json < images.json
 vcm update
 
 # afterwards (anywhere with network access), per image
-python scripts/update_layers.py report before.json video-caption-maker-backend 1.0.4-cuda
-python scripts/update_layers.py report before.json video-caption-maker-frontend 1.0.4
+python scripts/update_layers.py report before.json kaption-backend 1.0.4-cuda
+python scripts/update_layers.py report before.json kaption-frontend 1.0.4
 ```
 
 A layer counts as reused when the daemon already held the same **chain ID**

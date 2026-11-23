@@ -275,7 +275,7 @@ helper lines that used to sit under the timeline and the video.
   a rounded 16:9 thumbnail, the title at 15 semibold, one grey line ("Hindi
   · 3:48 · Ready"). Processing is a thin accent bar on the thumbnail;
   failed is a red dot and "Failed". Actions on hover and in "…". Footer:
-  "VideoCaptionMaker v1.x.x", small and grey (`version` from `/api/system`).
+  "Kaption v1.x.x", small and grey (`version` from `/api/system`).
 - **Language step:** "Spoken audio" as a grouped row ("Hindi · heard at
   62%"); the unsupported-speech `Notice` with the spoken-language picker
   and "Try anyway (low quality)"; the Hindi script as a grouped list with a

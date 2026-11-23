@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to VideoCaptionMaker. Versions are the git tags. Dates
+All notable changes to Kaption. Versions are the git tags. Dates
 are when the GitHub Release was published. Each entry is drawn from the
 commits between tags; hashes are given for reference.
 

@@ -1,4 +1,4 @@
-# Product requirements: VideoCaptionMaker
+# Product requirements: Kaption
 
 Status: describes the product as of **v1.0.6**, the latest release
 (2026-10-15). Everything here is taken from the code,
@@ -7,7 +7,7 @@ answered by the maintainer and recorded in [Decisions recorded](#decisions-recor
 
 ## 1. Product overview
 
-VideoCaptionMaker makes captions for a video **on the user's own computer**.
+Kaption makes captions for a video **on the user's own computer**.
 The user uploads a video and picks a caption language. The app then
 transcribes the speech locally (Whisper, via faster-whisper), translates it
 locally if needed (M2M100, via CTranslate2), and exports the result as a video
@@ -177,7 +177,7 @@ Install ──► Upload ──► Language ──► (processing) ──► Edi
 | Unknown `caption_language` | 422 `That caption language isn't available. Choose one from the list.` |
 | Content type or extension not allowed | 415 `This file type isn't supported. Try MP4, MOV, MKV or WebM (AVI and M4V work too).` |
 | The only picture is a still cover image | 415 `This file has only a still cover image, not a video. Upload the video itself.` (v1.1.1) |
-| The picture is in a codec FFmpeg isn't allowed to decode (PNG, Dirac…) | 415 `This video's picture is in a format VideoCaptionMaker doesn't open (…). Convert it to MP4 (H.264) and upload it again.` (v1.1.1) |
+| The picture is in a codec FFmpeg isn't allowed to decode (PNG, Dirac…) | 415 `This video's picture is in a format Kaption doesn't open (…). Convert it to MP4 (H.264) and upload it again.` (v1.1.1) |
 | A cover image or picture subtitles next to a real video | Accepted; those streams are never decoded, and the video gets the note "This file's cover image / picture subtitles were ignored." (v1.1.1) |
 | Empty file | 400 `This file is empty. Choose the video again.` |
 | Over `MAX_UPLOAD_SIZE_MB` (4096 MB by default; counted while streaming, not from `Content-Length`) | 413, partial file deleted |
@@ -513,7 +513,7 @@ removed.
   app images, install folder and `vcm` command. Anything else keeps the
   `vcm_*` volumes and the install folder, which holds the password the kept
   data needs.
-- Uninstall only removes images named `/video-caption-maker-`. The shared
+- Uninstall only removes images named `/kaption-`. The shared
   postgres, redis and chroma images are never removed.
 
 ### F10. First-run guidance (v1.5.0)

@@ -4,7 +4,7 @@ Instructions for AI coding agents (and humans) working in this repository.
 
 ## Project context
 
-VideoCaptionMaker captions videos **on the user's own computer**. The flow is
+Kaption captions videos **on the user's own computer**. The flow is
 upload → choose a caption language → (optionally) edit and style → export an
 MP4 with burned-in captions, or SRT/VTT/JSON.
 

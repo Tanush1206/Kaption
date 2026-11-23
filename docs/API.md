@@ -94,7 +94,7 @@ in `lib/api.ts`).
 The guard's 403 body is always:
 
 ```json
-{ "detail": "This request didn't come from VideoCaptionMaker on this computer, so it was refused." }
+{ "detail": "This request didn't come from Kaption on this computer, so it was refused." }
 ```
 
 The frontend (`frontend/src/lib/api.ts`, `extractError`) shows `detail` when
