@@ -5,8 +5,8 @@ run the report afterwards (anywhere with network access) for each image:
 
   docker image inspect $(docker image ls -q | sort -u) > images.json
   python scripts/update_layers.py snapshot before.json < images.json
-  python scripts/update_layers.py report before.json video-caption-maker-backend 1.0.4-cuda
-  python scripts/update_layers.py report before.json video-caption-maker-frontend 1.0.4
+  python scripts/update_layers.py report before.json kaption-backend 1.0.4-cuda
+  python scripts/update_layers.py report before.json kaption-frontend 1.0.4
 
 A layer is reused when the daemon already held the same chain of layers up to
 it (containerd/Docker key unpacked layers by chain ID), otherwise its

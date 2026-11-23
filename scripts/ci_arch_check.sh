@@ -26,11 +26,11 @@ docker run -d --name registry -p 127.0.0.1:5000:5000 \
 
 step "Build this commit's images natively ($arch)"
 backend_s=$(seconds docker buildx build --load --target runtime --build-arg VARIANT=cpu --build-arg VERSION=ci \
-    -f backend/Dockerfile -t "$registry/video-caption-maker-backend:ci-cpu" .)
+    -f backend/Dockerfile -t "$registry/kaption-backend:ci-cpu" .)
 frontend_s=$(seconds docker buildx build --load --target runtime --build-arg VERSION=ci --build-context repo=. \
-    -f frontend/Dockerfile -t "$registry/video-caption-maker-frontend:ci" frontend)
-docker push -q "$registry/video-caption-maker-backend:ci-cpu"
-docker push -q "$registry/video-caption-maker-frontend:ci"
+    -f frontend/Dockerfile -t "$registry/kaption-frontend:ci" frontend)
+docker push -q "$registry/kaption-backend:ci-cpu"
+docker push -q "$registry/kaption-frontend:ci"
 
 step "Serve this commit's files as a release"
 mkdir -p "$tmp/release"

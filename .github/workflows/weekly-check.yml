@@ -44,26 +44,26 @@ jobs:
           if [ "$(printf '%s\nv1.4.0\n' "$tag" | sort -V | head -1)" = v1.4.0 ]; then want="amd64 arm64"; else want="amd64"; fi
           echo "latest release $tag: CPU images should be $want"
           for image in backend:latest-cpu frontend:latest; do
-            got="$(platforms "$REGISTRY/video-caption-maker-$image")"
+            got="$(platforms "$REGISTRY/kaption-$image")"
             echo "$image: $got"; [ "$got" = "$want" ]
           done
-          got="$(platforms "$REGISTRY/video-caption-maker-backend:latest-cuda")"
+          got="$(platforms "$REGISTRY/kaption-backend:latest-cuda")"
           echo "backend:latest-cuda: $got"; [ -n "$got" ]
           # The services the compose file pins, and the installer's busybox.
           for image in $(grep -Eo 'image: (postgres|redis|chromadb)[^ ]*' assets/docker-compose.prod.yml | cut -d' ' -f2) busybox:1.37; do
             docker manifest inspect "$image" > /dev/null && echo "$image: ok"
           done
           # One real pull, end to end.
-          docker pull -q "$REGISTRY/video-caption-maker-frontend:latest"
+          docker pull -q "$REGISTRY/kaption-frontend:latest"
 
       - name: The models a release downloads are still there
         run: |
           docker run --rm -v "$PWD/scripts:/s:ro" --entrypoint python \
-            "$REGISTRY/video-caption-maker-backend:latest-cpu" /s/weekly_models.py
+            "$REGISTRY/kaption-backend:latest-cpu" /s/weekly_models.py
 
       - name: Pinned dependencies still resolve
         run: |
-          docker run --rm -v "$PWD/backend:/b:ro" --entrypoint sh "$REGISTRY/video-caption-maker-backend:latest-cpu" -c \
+          docker run --rm -v "$PWD/backend:/b:ro" --entrypoint sh "$REGISTRY/kaption-backend:latest-cpu" -c \
             'pip install --dry-run --quiet --ignore-installed --no-deps --report /dev/null \
                --extra-index-url https://download.pytorch.org/whl/cpu -r /b/constraints.txt'
           cd frontend && npm ci --dry-run --ignore-scripts --no-audit --no-fund > /dev/null
