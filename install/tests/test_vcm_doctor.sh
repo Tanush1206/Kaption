@@ -38,7 +38,7 @@ case "\$1" in
     inspect)
         case "\$*" in
             *image.version*) echo "1.3.9" ;;
-            *) echo "/vcm-backend-1 ghcr.io/tanush1206/video-caption-maker-backend:latest-cpu sha256:abc" ;;
+            *) echo "/vcm-backend-1 ghcr.io/tanush1206/kaption-backend:latest-cpu sha256:abc" ;;
         esac ;;
     compose)
         case "\$*" in

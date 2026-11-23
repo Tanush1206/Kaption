@@ -11,7 +11,7 @@
 name: vcm
 
 x-backend: &backend
-  image: ${VCM_REGISTRY:-ghcr.io/tanush1206}/video-caption-maker-backend:${VCM_VERSION:-latest}-${VCM_VARIANT:-cpu}
+  image: ${VCM_REGISTRY:-ghcr.io/tanush1206}/kaption-backend:${VCM_VERSION:-latest}-${VCM_VARIANT:-cpu}
   # The CPU image is built for Intel/AMD and ARM (v1.4.0), so Docker pulls
   # the one for this machine: native on Apple silicon and ARM Linux. The
   # CUDA image is Intel/AMD only; docker-compose.gpu.yml says so.
@@ -121,7 +121,7 @@ services:
       retries: 5
 
   frontend:
-    image: ${VCM_REGISTRY:-ghcr.io/tanush1206}/video-caption-maker-frontend:${VCM_VERSION:-latest}
+    image: ${VCM_REGISTRY:-ghcr.io/tanush1206}/kaption-frontend:${VCM_VERSION:-latest}
     # Built for Intel/AMD and ARM (v1.4.0): native everywhere.
     restart: unless-stopped
     # Runs as the image's `app` user and needs no privileges at all.

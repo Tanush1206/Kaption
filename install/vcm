@@ -271,7 +271,9 @@ case "$cmd" in
         fi
         # Only this app's own images. postgres, redis and chroma are shared base
         # images that other projects on this machine may be using.
-        compose config --images 2>/dev/null | grep '/video-caption-maker-' | sort -u \
+        # Match the current (kaption-) and the pre-rename (video-caption-maker-)
+        # image names, so an install updated across the rename still prunes both.
+        compose config --images 2>/dev/null | grep -E '/(kaption|video-caption-maker)-' | sort -u \
             | while read -r image; do docker image rm "$image" >/dev/null 2>&1 || true; done
         rm -f "$HOME/.local/bin/vcm"
         cd /

@@ -2,8 +2,8 @@
 # as release assets.
 #
 # Trigger: push a tag like v1.0.0. Produces
-#   ghcr.io/tanush1206/video-caption-maker-backend:{1.0.0,latest}-{cpu,cuda}
-#   ghcr.io/tanush1206/video-caption-maker-frontend:{1.0.0,latest}
+#   ghcr.io/tanush1206/kaption-backend:{1.0.0,latest}-{cpu,cuda}
+#   ghcr.io/tanush1206/kaption-frontend:{1.0.0,latest}
 # The CPU backend and the frontend are multi-arch (v1.4.0): each is built on
 # a native runner per architecture (ubuntu-latest for amd64, ubuntu-24.04-arm
 # for arm64, no emulation), pushed as `<version>-<arch>`, and joined into the
@@ -131,16 +131,16 @@ jobs:
           # Half of a multi-arch image: only `<version><suffix>-<arch>`; the
           # manifests job makes the version and `latest` tags from both halves.
           tags: |
-            ${{ env.REGISTRY }}/video-caption-maker-${{ matrix.name }}:${{ steps.version.outputs.version }}${{ matrix.suffix }}${{ matrix.arch && format('-{0}', matrix.arch) || '' }}
-            ${{ !matrix.arch && startsWith(github.ref, 'refs/tags/v') && format('{0}/video-caption-maker-{1}:latest{2}', env.REGISTRY, matrix.name, matrix.suffix) || '' }}
+            ${{ env.REGISTRY }}/kaption-${{ matrix.name }}:${{ steps.version.outputs.version }}${{ matrix.suffix }}${{ matrix.arch && format('-{0}', matrix.arch) || '' }}
+            ${{ !matrix.arch && startsWith(github.ref, 'refs/tags/v') && format('{0}/kaption-{1}:latest{2}', env.REGISTRY, matrix.name, matrix.suffix) || '' }}
           # A registry cache, not the Actions cache: that one holds 10 GB per
           # repo and evicts after 7 days, and these three images overflow it.
           # A miss rebuilds the Python environment, pip writes new timestamps,
           # the 570 MB layer gets a new digest, and every user re-downloads it
           # on 'vcm update'. Cached in GHCR, unchanged layers stay byte-for-byte
           # identical from release to release.
-          cache-from: type=registry,ref=${{ env.REGISTRY }}/video-caption-maker-${{ matrix.name }}:${{ matrix.cache }}
-          cache-to: type=registry,ref=${{ env.REGISTRY }}/video-caption-maker-${{ matrix.name }}:${{ matrix.cache }},mode=max
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/kaption-${{ matrix.name }}:${{ matrix.cache }}
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/kaption-${{ matrix.name }}:${{ matrix.cache }},mode=max
 
   # One tag for both architectures: Docker on an Intel/AMD machine pulls the
   # amd64 half, on Apple silicon and ARM Linux the arm64 half, natively.
@@ -177,7 +177,7 @@ jobs:
 
       - name: Join the amd64 and arm64 halves
         env:
-          IMAGE: ${{ env.REGISTRY }}/video-caption-maker-${{ matrix.name }}
+          IMAGE: ${{ env.REGISTRY }}/kaption-${{ matrix.name }}
           TAG: ${{ steps.version.outputs.version }}${{ matrix.suffix }}
           LATEST: ${{ startsWith(github.ref, 'refs/tags/v') && format('latest{0}', matrix.suffix) || '' }}
         run: |

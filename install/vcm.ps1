@@ -321,7 +321,9 @@ try {
             # Only this app's own images. postgres, redis and chroma are shared
             # base images that other projects on this machine may be using.
             try {
-                Invoke-Compose @('config', '--images') | Where-Object { $_ -match '/video-caption-maker-' } |
+                # Current (kaption-) and pre-rename (video-caption-maker-) names,
+                # so an install updated across the rename still prunes both.
+                Invoke-Compose @('config', '--images') | Where-Object { $_ -match '/(kaption|video-caption-maker)-' } |
                     Sort-Object -Unique | ForEach-Object { docker image rm $_ *> $null }
             } catch { }
             $userPath = [Environment]::GetEnvironmentVariable('Path', 'User')
