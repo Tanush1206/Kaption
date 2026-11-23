@@ -1,8 +1,8 @@
-# VideoCaptionMaker
+# Kaption
 
 **Private, offline AI captions and translation, on your own computer.**
 
-Website: **https://tanush1206.github.io/Video-Caption-Maker/**
+Website: **https://tanush1206.github.io/Kaption/**
 
 Captions for your videos, made on your own computer. Upload a video, choose
 the caption language, export it with the captions burned in, or as subtitle
@@ -19,13 +19,13 @@ running, then paste one line into a terminal.
 **Windows** (PowerShell)
 
 ```powershell
-irm https://github.com/Tanush1206/Video-Caption-Maker/releases/latest/download/install.ps1 | iex
+irm https://github.com/Tanush1206/Kaption/releases/latest/download/install.ps1 | iex
 ```
 
 **macOS** (Terminal)
 
 ```bash
-curl -fsSL https://github.com/Tanush1206/Video-Caption-Maker/releases/latest/download/install.sh | bash
+curl -fsSL https://github.com/Tanush1206/Kaption/releases/latest/download/install.sh | bash
 ```
 
 macOS needs
@@ -46,7 +46,7 @@ same transcription takes under a minute on a PC with an RTX 5080.
 **Linux**
 
 ```bash
-curl -fsSL https://github.com/Tanush1206/Video-Caption-Maker/releases/latest/download/install.sh | bash
+curl -fsSL https://github.com/Tanush1206/Kaption/releases/latest/download/install.sh | bash
 ```
 
 The installer:
@@ -236,9 +236,9 @@ times faster, with lower accuracy.
 **Anything else.** Run `vcm logs`, and `vcm status` to see which part isn't
 healthy. To report a bug, run `vcm doctor` in the folder you want the report
 in, read the file it writes, and attach it to a
-[bug report](https://github.com/Tanush1206/Video-Caption-Maker/issues/new/choose).
+[bug report](https://github.com/Tanush1206/Kaption/issues/new/choose).
 A security problem goes to the
-[private report](https://github.com/Tanush1206/Video-Caption-Maker/security/advisories/new)
+[private report](https://github.com/Tanush1206/Kaption/security/advisories/new)
 instead.
 
 ## Known limitations
@@ -356,7 +356,7 @@ Backend tests run against an isolated test database; see
 
 ## How this was built
 
-VideoCaptionMaker was built by **Tanush Thakran** with **[Claude Code](https://claude.com/claude-code)**
+Kaption was built by **Tanush Thakran** with **[Claude Code](https://claude.com/claude-code)**
 (Anthropic) as an AI pair programmer.
 
 - **Claude Code** wrote most of the code, tests and docs, ran the checks, measured

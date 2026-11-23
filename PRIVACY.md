@@ -1,6 +1,6 @@
 # Privacy
 
-VideoCaptionMaker runs on your own computer. It has no servers and no
+Kaption runs on your own computer. It has no servers and no
 accounts, and it sends nothing to its developer: no telemetry, no crash
 reports, no usage statistics. Your videos, captions and exports stay on your
 computer.
@@ -39,7 +39,7 @@ translates with its own model, on your computer.
 
 ## The website
 
-The website (tanush1206.github.io/Video-Caption-Maker) is hosted on GitHub
+The website (tanush1206.github.io/Kaption) is hosted on GitHub
 Pages; GitHub records visitors' IP addresses in its server logs under
 [GitHub's privacy statement](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement).
 
@@ -58,6 +58,6 @@ itself collects no personal data on any server, because it has none.
 
 ## Questions
 
-Ask in a [GitHub issue](https://github.com/Tanush1206/Video-Caption-Maker/issues).
+Ask in a [GitHub issue](https://github.com/Tanush1206/Kaption/issues).
 For anything you'd rather not post publicly, use the repository's
-[private reporting](https://github.com/Tanush1206/Video-Caption-Maker/security/advisories/new).
+[private reporting](https://github.com/Tanush1206/Kaption/security/advisories/new).

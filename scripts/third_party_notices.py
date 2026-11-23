@@ -17,7 +17,7 @@ import subprocess
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-REPO = "https://github.com/Tanush1206/Video-Caption-Maker"
+REPO = "https://github.com/Tanush1206/Kaption"
 
 PYTHON_LIST = r"""
 import json
@@ -107,7 +107,7 @@ def main() -> None:
 
     text = f"""# Third-party notices
 
-VideoCaptionMaker's own code is under the MIT licence ([LICENSE](LICENSE)).
+Kaption's own code is under the MIT licence ([LICENSE](LICENSE)).
 It is distributed as Docker images (GHCR) and install scripts, and it uses
 the software, models and fonts below under their own licences.
 
@@ -156,7 +156,7 @@ providing it.
 
 The backend images run Debian's FFmpeg {ffmpeg_version}, which is built with
 `{ffmpeg_flags.strip()}`. With the GPL parts (libx264 and libx265) the FFmpeg
-programs are under the **GNU GPL, version 2 or later**. VideoCaptionMaker runs
+programs are under the **GNU GPL, version 2 or later**. Kaption runs
 them as separate programs (`ffmpeg`, `ffprobe`); its own code is not derived
 from them. Source: the `ffmpeg`, `x264` and `x265` lines in
 `/licenses/SOURCES-debian.txt`.
