@@ -4414,3 +4414,26 @@ v1.5.0 work; run the gate above, then give Tanush the push command.
   After his push + green CI he tags `v1.5.0` on the tip; then release checks,
   backup, `vcm update`, after-release checklist, and confirm the tour on the
   install's first open (then reset it).
+
+### v1.5.0 RELEASED and the install updated (23 Nov)
+
+Tanush pushed main and tagged **v1.5.0 on `ac6e042`**. Post-tag docs commits
+(unpushed, his to push): `5770233` (CHANGELOG dated 23 Nov, not 24) and this
+PROGRESS record.
+
+- **Release run 45063604651 green** (8 jobs). Release has **8 assets**, not
+  draft/prerelease, target main. `latest-cuda`/`latest-cpu`/`frontend:latest`
+  digests **equal** the 1.5.0 digests (anonymous imagetools inspect); cuda
+  amd64, cpu + frontend multi-arch (amd64+arm64). **SHA256SUMS** covers the
+  scripts/compose and the `vcm` checksum verified OK.
+- **Backup** first to `C:\Users\Admin\VCM-backups\v1.5.0\`: `vcm-1.5.0.dump`
+  (94 KB), `vcm-media-1.5.0.tgz` (1.74 GB, 21 entries verified), `.env`.
+- **`vcm update`**: backend/frontend/worker recreated, all healthy, app ready
+  on :3000.
+- **After-release:** version **1.5.0** (CUDA, large-v3), alembic head
+  **f6b1d8e3a925** (no migration — `guide_seen` is a key/value app_setting),
+  data intact (**5 videos, 1031 captions**), dashboard 200.
+- **Tour confirmed on the install's first open:** the shipped 1.5.0 frontend
+  auto-opens the guided tour (step 1 spotlights the upload area) at
+  localhost:3000 with `guide_seen` false; then **reset** `guide_seen` to false
+  so the install is pristine first-run for Tanush. **v1.5.0 done.**
