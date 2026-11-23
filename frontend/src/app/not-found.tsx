@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Brand } from "@/components/layout/brand";
 import { buttonVariants } from "@/components/ui/button-variants";
 
-export const metadata: Metadata = { title: "Page not found · VideoCaptionMaker" };
+export const metadata: Metadata = { title: "Page not found · Kaption" };
 
 /**
  * Any URL that matches no route at all: a mistyped address, an old bookmark.
@@ -25,7 +25,7 @@ export default function NotFound() {
         <p className="label-caps">Error 404</p>
         <h1 className="mt-1 text-2xl font-semibold">Page not found</h1>
         <p className="mt-2 text-[15px] text-muted-foreground">
-          This address doesn&apos;t match any page in VideoCaptionMaker. Your
+          This address doesn&apos;t match any page in Kaption. Your
           videos are where you left them.
         </p>
         <Link href="/dashboard" className={`mt-6 ${buttonVariants()}`}>

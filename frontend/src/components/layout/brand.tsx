@@ -22,7 +22,7 @@ export function Brand({
     <Link
       href={href}
       className={cn("group flex shrink-0 items-center gap-2 rounded-md", className)}
-      aria-label="VideoCaptionMaker home"
+      aria-label="Kaption home"
     >
       {/* The glyph alone, in the text colour: the accent is kept for the
           screen's one primary action. Shown only without the wordmark. */}
@@ -61,7 +61,7 @@ export function Brand({
       </span>
 
       {showText && (
-        <span className="truncate text-[15px] font-semibold tracking-[-0.01em]">VideoCaptionMaker</span>
+        <span className="truncate text-[15px] font-semibold tracking-[-0.01em]">Kaption</span>
       )}
     </Link>
   );

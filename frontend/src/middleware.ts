@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import { LOCAL_MODE } from "@/lib/config";
 
-const REFUSED = "This request didn't come from VideoCaptionMaker on this computer, so it was refused.";
+const REFUSED = "This request didn't come from Kaption on this computer, so it was refused.";
 const THIS_COMPUTER = new Set(["localhost", "127.0.0.1", "[::1]"]);
 
 /**

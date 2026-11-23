@@ -20,7 +20,7 @@ const STEPS: { title: string; body: React.ReactNode }[] = [
     body: (
       <p>
         {
-          "VideoCaptionMaker transcribes and translates your videos right here on this machine. Your video never leaves your computer — there's no cloud and no account to sign in to."
+          "Kaption transcribes and translates your videos right here on this machine. Your video never leaves your computer — there's no cloud and no account to sign in to."
         }
       </p>
     ),

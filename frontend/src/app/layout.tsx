@@ -25,7 +25,7 @@ const themeInitScript = `
 // caption faces are separate, in public/fonts, and unchanged.
 
 export const metadata: Metadata = {
-  title: "VideoCaptionMaker — AI Captions & Transcript Search",
+  title: "Kaption — AI Captions & Transcript Search",
   description:
     "Upload videos, get AI-generated captions, and search across your video library by meaning, not just keywords.",
 };
