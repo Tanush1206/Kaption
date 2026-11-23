@@ -6,6 +6,28 @@ commits between tags; hashes are given for reference.
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.6.0] - 2026-11-24
+
+The project is renamed to **Kaption**. No migration, and the update downloads
+the app layers only — an existing install keeps all its videos, captions and
+settings.
+
+### Changed
+- **VideoCaptionMaker is now Kaption.** The app, the landing site and the
+  repository are renamed. The repo moved to
+  [github.com/Tanush1206/Kaption](https://github.com/Tanush1206/Kaption) and the
+  site to [tanush1206.github.io/Kaption](https://tanush1206.github.io/Kaption/);
+  GitHub redirects the old links, so existing installs still find updates. The
+  published images are now `ghcr.io/tanush1206/kaption-backend` and
+  `…/kaption-frontend`; earlier versions keep their previous images.
+- The install command, the `vcm` command, the install folders
+  (`%LOCALAPPDATA%\VideoCaptionMaker`, `~/.videocaptionmaker`) and the `VCM_*`
+  settings are unchanged, so `vcm update` moves an install to the new image
+  names **without touching its data**.
+- The social-share image (`og.png`) is now a Kaption wordmark card. The
+  landing-page product screenshots are re-captured as Kaption shots that show no
+  faces or video frames.
+
 ## [1.5.0] - 2026-11-23
 
 First-run guidance: a short, skippable guided tour that spotlights the real

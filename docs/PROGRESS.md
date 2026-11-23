@@ -4513,3 +4513,34 @@ IMG_1343 0:19/0:30). Check by eye 375 & 1440 light+dark, axe 0.
   an editor shot with grey-boxed thumbnails + a dark editor-video placeholder,
   own videos only, no IMG_1343 0:19/0:30; re-add them to index.html; check by
   eye 375 & 1440 light+dark, axe 0; redeploy the site.
+
+### Kaption rename CODE-COMPLETE + checks green (23 Nov) — push step given
+
+Repo rename to Kaption is live; redirect verified
+(`…/Video-Caption-Maker/releases/…` 301 → `…/Kaption/…`, asset 200). Phase 3
+commits (14 unpushed, `b6ac8d7..` through the CHANGELOG commit):
+3.1 dev project name · 3.2a/3.2b images→kaption-* · 3.4a app text · og.png ·
+screenshots dropped · 3.3a installers+OCI label (prune matches both labels) ·
+3.3b site+URLs · 3.4b-1 README/legal · 3.4b-2 docs/AGENTS/CHANGELOG intro ·
+3.4b-3 code strings+ui-check grep · fix (prod-compose comment + weekly-check
+Pages URL). **Kept:** vcm command, Compose project vcm, vcm_* volumes, install
+folders (`%LOCALAPPDATA%\VideoCaptionMaker`, `~/.videocaptionmaker`), VCM_* vars,
+lowercase dev project `videocaptionmaker` + its volumes, the
+`videocaptionmaker-backend/-frontend` package + celery names; historical docs
+(LAUNCH_AUDIT, FINAL_AUDIT, SECURITY_TEST, DECISIONS, PROGRESS, CHANGELOG
+entries) left as-is.
+
+**Full checks once — all green:** backend ruff clean + pytest **808 passed, 2
+skipped**; frontend lint/type-check clean, tests **10/10**, production build OK;
+**axe 0** at 375 & 1440 light+dark (/dashboard+tour, /search, /settings,
+/editor); shoot.js OK; ui-check `theme` (6/6) + `not-found` (4/4) — the theme
+check needs `guide_seen=true` first, or the tour overlay blocks the interaction.
+Dev app serves "Kaption API" and the Kaption wordmark. CHANGELOG `[1.6.0]` dated
+2026-11-24 (target; fix to the real release day post-release, as with v1.5.0).
+
+**STILL OWED:** the **throwaway-install `vcm update` 1.5.0→1.6.0 test** (needs the
+1.6.0 images → do it after the release, before updating the real install; both
+are backed up). After the tag: release checks, backup, `vcm update` on the real
+install, after-release checklist (data intact, app shows Kaption), then
+**capture the 4 Kaption no-people screenshots** from the updated install and
+re-add them to the site. Phase 4 (local folder rename) is the last step.
