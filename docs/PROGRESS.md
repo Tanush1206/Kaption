@@ -4503,10 +4503,13 @@ IMG_1343 0:19/0:30). Check by eye 375 & 1440 light+dark, axe 0.
   "Private, offline AI captions for your videos" + caption-bar motif, no photo),
   1200×630, at `site/og.png`. The og:image **URL** in index.html flips to the
   Kaption Pages path in 3.3.
-- **4 screenshots — PENDING a decision:** they show the header wordmark
-  (VideoCaptionMaker) + the own videos' faces, so they need the Kaption app +
-  own videos, which coincide only on the install once it's updated to v1.6.0.
-  Options put to Tanush: (A) drop the 4 shots in the rename commit, capture clean
-  Kaption ones post-update; (B) grey-box the current shots now (keeps old
-  wordmark briefly), replace post-update; (C) capture now via a temp Kaption
-  frontend against the install data. Await his choice.
+- **4 screenshots — decided (A): drop now, capture post-update.** They showed
+  the VideoCaptionMaker wordmark + the own videos' faces, so a clean version
+  needs the Kaption app + own videos, which coincide only on the install once
+  it's updated to v1.6.0. **Done:** removed the hero editor image and the whole
+  "A calm, focused app" gallery from site/index.html, deleted the 4 webp files
+  (site/images/ now empty). HTML balanced (6/6 sections). **To do post-update:**
+  update the install to v1.6.0 (Kaption), capture dashboard/search/settings and
+  an editor shot with grey-boxed thumbnails + a dark editor-video placeholder,
+  own videos only, no IMG_1343 0:19/0:30; re-add them to index.html; check by
+  eye 375 & 1440 light+dark, axe 0; redeploy the site.
