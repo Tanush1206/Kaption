@@ -69,7 +69,7 @@ jobs:
           cd frontend && npm ci --dry-run --ignore-scripts --no-audit --no-fund > /dev/null
 
       - name: The website is up
-        run: curl -fsS -o /dev/null https://tanush1206.github.io/Video-Caption-Maker/
+        run: curl -fsS -o /dev/null https://tanush1206.github.io/Kaption/
 
   report:
     needs: check
