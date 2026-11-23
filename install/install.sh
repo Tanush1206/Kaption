@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# VideoCaptionMaker installer for macOS and Linux.
+# Kaption installer for macOS and Linux.
 #
-#   curl -fsSL https://github.com/Tanush1206/Video-Caption-Maker/releases/latest/download/install.sh | bash
+#   curl -fsSL https://github.com/Tanush1206/Kaption/releases/latest/download/install.sh | bash
 #
 # Checks Docker, disk space and the GPU, generates this install's secrets,
 # pulls the images, starts everything, waits until it is healthy, and opens
@@ -17,7 +17,7 @@
 #   VCM_NO_OPEN    1 = don't open the browser
 set -euo pipefail
 
-REPO_URL="https://github.com/Tanush1206/Video-Caption-Maker"
+REPO_URL="https://github.com/Tanush1206/Kaption"
 BASE_URL="${VCM_BASE_URL:-$REPO_URL/releases/latest/download}"
 VCM_HOME="${VCM_HOME:-$HOME/.videocaptionmaker}"
 PROJECT=vcm
@@ -31,7 +31,7 @@ warn() { printf '  \033[33m!\033[0m %s\n' "$*"; }
 die()  { printf '\n  \033[31m✗ %s\033[0m\n' "$1"; shift; for line in "$@"; do printf '    %s\n' "$line"; done; echo; exit 1; }
 
 OS="$(uname -s)"
-bold "VideoCaptionMaker installer"
+bold "Kaption installer"
 echo
 
 # ── 1. Docker ───────────────────────────────────────────────────────────────

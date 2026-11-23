@@ -50,8 +50,8 @@ RUN --mount=type=secret,id=extra_ca,required=false \
 # ── runtime ──────────────────────────────────────────────────────────────────
 FROM ${PYTHON_IMAGE} AS runtime
 ARG VARIANT=cpu
-LABEL org.opencontainers.image.source="https://github.com/Tanush1206/Video-Caption-Maker" \
-      org.opencontainers.image.title="VideoCaptionMaker backend (${VARIANT})"
+LABEL org.opencontainers.image.source="https://github.com/Tanush1206/Kaption" \
+      org.opencontainers.image.title="Kaption backend (${VARIANT})"
 
 # FFmpeg for audio extraction and burning captions in; Liberation for the
 # Arial/Times/Courier metric-compatible faces; fontconfig so libass finds the
@@ -135,7 +135,7 @@ RUN set -e \
     && cp /usr/share/fonts/truetype/vcm/OFL-*.txt /licenses/fonts/ \
     && { echo "Debian $(cat /etc/debian_version) packages in this image: source package, exact version, and where that source is."; \
          echo "Licence texts: /usr/share/doc/<binary package>/copyright"; \
-         echo "If a link stops working, ask for the source in a GitHub issue: https://github.com/Tanush1206/Video-Caption-Maker/issues"; \
+         echo "If a link stops working, ask for the source in a GitHub issue: https://github.com/Tanush1206/Kaption/issues"; \
          echo; \
          dpkg-query -W -f='${source:Package}\t${source:Version}\n' | sort -u | while IFS="$(printf '\t')" read -r pkg ver; do \
              enc="$(printf '%s' "$ver" | sed -e 's/%/%25/g' -e 's/:/%3A/g' -e 's/+/%2B/g' -e 's/~/%7E/g')"; \

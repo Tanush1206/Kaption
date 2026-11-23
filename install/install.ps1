@@ -1,6 +1,6 @@
-# VideoCaptionMaker installer for Windows (PowerShell 5.1+).
+# Kaption installer for Windows (PowerShell 5.1+).
 #
-#   irm https://github.com/Tanush1206/Video-Caption-Maker/releases/latest/download/install.ps1 | iex
+#   irm https://github.com/Tanush1206/Kaption/releases/latest/download/install.ps1 | iex
 #
 # Checks Docker Desktop, disk space and the GPU, generates this install's
 # secrets, pulls the images, starts everything, waits until it is healthy, and
@@ -19,7 +19,7 @@ $ErrorActionPreference = 'Continue'
     $ProgressPreference = 'SilentlyContinue'   # Invoke-WebRequest is 10x slower with it
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
-    $RepoUrl = 'https://github.com/Tanush1206/Video-Caption-Maker'
+    $RepoUrl = 'https://github.com/Tanush1206/Kaption'
     $BaseUrl = if ($env:VCM_BASE_URL) { $env:VCM_BASE_URL } else { "$RepoUrl/releases/latest/download" }
     $VcmHome = if ($env:VCM_HOME) { $env:VCM_HOME } else { Join-Path $env:LOCALAPPDATA 'VideoCaptionMaker' }
     $Project = 'vcm'
@@ -35,7 +35,7 @@ $ErrorActionPreference = 'Continue'
         throw "Installation stopped: $m"
     }
 
-    Write-Host "VideoCaptionMaker installer" -ForegroundColor White
+    Write-Host "Kaption installer" -ForegroundColor White
     Write-Host ""
 
     # -- 1. Docker ------------------------------------------------------------

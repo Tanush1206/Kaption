@@ -1,4 +1,4 @@
-# vcm - run VideoCaptionMaker (Windows).
+# vcm - run Kaption (Windows).
 #
 #   vcm start       start the app and open it in the browser
 #   vcm stop        stop it (your videos stay)
@@ -18,7 +18,7 @@ param([string]$Command = 'help', [string]$Service = '')
 $ErrorActionPreference = 'Continue'
 $ProgressPreference = 'SilentlyContinue'
 $VcmHome = $PSScriptRoot
-$RepoUrl = 'https://github.com/Tanush1206/Video-Caption-Maker'
+$RepoUrl = 'https://github.com/Tanush1206/Kaption'
 $BaseUrl = if ($env:VCM_BASE_URL) { $env:VCM_BASE_URL } else { "$RepoUrl/releases/latest/download" }
 $Project = 'vcm'
 $EnvFile = Join-Path $VcmHome '.env'
@@ -126,7 +126,9 @@ function Complete-Update {
     Invoke-Compose @('up', '-d', '--remove-orphans')
     Wait-Ready | Out-Null
     # Only this app's old images (the ones the update just replaced, now
-    # untagged), never anything else on the machine.
+    # untagged), never anything else on the machine. Both source labels, so an
+    # install updated across the Kaption rename also clears the old images.
+    docker image prune -f --filter 'label=org.opencontainers.image.source=https://github.com/Tanush1206/Kaption' *> $null
     docker image prune -f --filter 'label=org.opencontainers.image.source=https://github.com/Tanush1206/Video-Caption-Maker' *> $null
     Write-Host 'Updated.'
 }
@@ -176,7 +178,7 @@ function Invoke-Doctor {
     $lines = New-Object System.Collections.Generic.List[string]
     function Add([string]$line) { $lines.Add($line) }
     function Run([scriptblock]$block) { (& $block 2>&1 | ForEach-Object { "$_" }) -join "`n" }
-    Add "VideoCaptionMaker doctor report, $((Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ'))"
+    Add "Kaption doctor report, $((Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ'))"
     Add "Version: $(Get-RunningVersion) (VCM_VERSION=$(Get-EnvValue 'VCM_VERSION') in .env)"
     Add ''; Add '== App (from .env: these three keys only)'
     foreach ($key in 'VCM_VERSION', 'VCM_VARIANT', 'VCM_PORT') { Add "$key=$(Get-EnvValue $key)" }
@@ -305,7 +307,7 @@ try {
         'doctor'  { Invoke-Doctor }
         'uninstall' {
             Assert-Docker
-            Write-Host 'This removes VideoCaptionMaker from this computer.'
+            Write-Host 'This removes Kaption from this computer.'
             # Asked before anything stops: `down -v` only removes the anonymous
             # volumes (redis /data) of containers it is removing in the same call.
             $answer = Read-Host 'Also delete ALL your videos, captions and downloaded models? This cannot be undone. Type DELETE to confirm, or press Enter to keep them'
