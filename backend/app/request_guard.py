@@ -42,7 +42,7 @@ AUDIT_FILE = "audit.log"
 AUDIT_MAX_BYTES = 5 * 1024 * 1024
 
 REFUSED = (
-    "This request didn't come from VideoCaptionMaker on this computer, so it was refused."
+    "This request didn't come from Kaption on this computer, so it was refused."
 )
 
 

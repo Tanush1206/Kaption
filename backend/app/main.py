@@ -29,7 +29,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="VideoCaptionMaker API",
+    title="Kaption API",
     description="AI-powered video captioning & transcript search",
     # The release, not a separate API number: there is one thing to version.
     version=settings.vcm_version,
@@ -74,4 +74,4 @@ app.include_router(api_router)
 
 @app.get("/")
 async def root() -> dict[str, str]:
-    return {"message": "VideoCaptionMaker API — see /docs for the interactive API explorer"}
+    return {"message": "Kaption API — see /docs for the interactive API explorer"}

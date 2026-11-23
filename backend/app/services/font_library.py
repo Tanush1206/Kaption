@@ -330,7 +330,7 @@ def ensure(key: str, weight: str = "regular") -> Path:
         log.info("fetching %s %s from %s", font.family, weight, url)
         try:
             request = urllib.request.Request(
-                url, headers={"User-Agent": "VideoCaptionMaker"}
+                url, headers={"User-Agent": "Kaption"}
             )
             data = urllib.request.urlopen(request, timeout=DOWNLOAD_TIMEOUT).read()
         except (urllib.error.URLError, TimeoutError) as exc:

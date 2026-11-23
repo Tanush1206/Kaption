@@ -1,6 +1,6 @@
 # UI checks
 
-Browser checks run against a **running** VideoCaptionMaker: an install, or a
+Browser checks run against a **running** Kaption: an install, or a
 dev server. Playwright (Chromium) and axe-core, pinned in `package.json`.
 
 ```bash

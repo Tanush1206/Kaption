@@ -121,7 +121,7 @@ class Streams:
         """Why this upload can't be used, in words for the user, or None."""
         if self.video is None and self.unsupported_video:
             return (
-                f"This video's picture is in a format VideoCaptionMaker doesn't open "
+                f"This video's picture is in a format Kaption doesn't open "
                 f"({self.unsupported_video}). Convert it to MP4 (H.264) and upload it again."
             )
         if self.video is None and self.cover_image:

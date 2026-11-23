@@ -59,7 +59,7 @@ MAX_BYTES = 6_000_000
 
 
 def fetch(url: str, *, accept: str | None = None) -> bytes:
-    headers = {"User-Agent": "VideoCaptionMaker font catalogue builder"}
+    headers = {"User-Agent": "Kaption font catalogue builder"}
     if accept:
         headers["Accept"] = accept
     return urllib.request.urlopen(

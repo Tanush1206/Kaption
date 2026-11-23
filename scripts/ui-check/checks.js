@@ -330,7 +330,7 @@ const CHECKS = {
     const rendered = [];
     for (const frame of page.frames().slice(1)) {
       const text = await frame.evaluate(() => document.body?.innerText ?? "").catch(() => "");
-      if (/Videos|Settings|VideoCaptionMaker/.test(text)) rendered.push(frame.url());
+      if (/Videos|Settings|Kaption/.test(text)) rendered.push(frame.url());
     }
     ok("framing: another origin can't render the app in a frame", rendered.length === 0, rendered.join(", "));
     ok("framing: the browser says why", refused.length > 0, refused[0]?.slice(0, 90));

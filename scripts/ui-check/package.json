@@ -1,7 +1,7 @@
 {
   "name": "vcm-ui-check",
   "private": true,
-  "description": "Screenshots, axe-core and UI flow checks against a running VideoCaptionMaker",
+  "description": "Screenshots, axe-core and UI flow checks against a running Kaption",
   "scripts": {
     "shoot": "node shoot.js",
     "axe": "node axe.js",

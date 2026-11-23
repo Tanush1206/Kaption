@@ -156,7 +156,7 @@ def friendly_error(exc: BaseException) -> str:
         return "The disk is full. Free some space, then try again."
     if "unsupported audio format" in message:
         return (
-            "This video's sound is in a format VideoCaptionMaker doesn't open. "
+            "This video's sound is in a format Kaption doesn't open. "
             "Convert it to MP4 (H.264 with AAC sound) and upload it again."
         )
     if "could not read this video's streams" in message:
