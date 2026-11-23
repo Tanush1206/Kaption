@@ -4485,3 +4485,28 @@ confirm. **Before relying on the redirect** (old installs' `vcm update`), run:
 → expect a 301 to `/Kaption/...`. Phases 2 (his GitHub steps) and 4 (local
 folder rename, incl. carrying over Claude Code's project memory dir keyed to the
 old path) are in the chat report. Nothing pushed.
+
+**Phase 3 progress (23 Nov):** Commits done and unpushed — **3.1** `b6ac8d7`
+(dev project name), **3.2a** `db56883` + **3.2b** `3c71c10` (GHCR images →
+kaption-*), **3.4a** `a7f20db` (app wordmark/title/footer/404/dialog/refusal →
+Kaption; lint+types+10/10 green). Origin has Tanush's 2 post-release docs
+commits. **Redirect test 23 Nov: repo NOT renamed yet** (302 stays on
+Video-Caption-Maker) → holding 3.3 (URLs).
+
+**No-people site images (added to Phase 3 by Tanush, 23 Nov):** site/images/
+(editor, dashboard, search, settings) + og.png must show no face or video frame.
+dashboard/search → grey-box thumbnails; editor → dark placeholder for the video
+area (keep overlay/controls/side panel) or drop it; og.png → Kaption wordmark
+card, no photo. Own videos only for any text (never leo/new/hinglish/Latent; no
+IMG_1343 0:19/0:30). Check by eye 375 & 1440 light+dark, axe 0.
+- **og.png ✅ DONE** — regenerated as a Kaption wordmark card (glyph + Kaption +
+  "Private, offline AI captions for your videos" + caption-bar motif, no photo),
+  1200×630, at `site/og.png`. The og:image **URL** in index.html flips to the
+  Kaption Pages path in 3.3.
+- **4 screenshots — PENDING a decision:** they show the header wordmark
+  (VideoCaptionMaker) + the own videos' faces, so they need the Kaption app +
+  own videos, which coincide only on the install once it's updated to v1.6.0.
+  Options put to Tanush: (A) drop the 4 shots in the rename commit, capture clean
+  Kaption ones post-update; (B) grey-box the current shots now (keeps old
+  wordmark briefly), replace post-update; (C) capture now via a temp Kaption
+  frontend against the install data. Await his choice.
