@@ -4544,3 +4544,30 @@ are backed up). After the tag: release checks, backup, `vcm update` on the real
 install, after-release checklist (data intact, app shows Kaption), then
 **capture the 4 Kaption no-people screenshots** from the updated install and
 re-add them to the site. Phase 4 (local folder rename) is the last step.
+
+### 23 Nov — main pushed, BLOCKED on the v1.6.0 tag (Tanush to push)
+
+`origin/main` is at **cd725c5** (all 13 rename commits pushed); ci/pages/arm64
+ran green. **Live Kaption site verified** (tanush1206.github.io/Kaption/): title
+"Kaption", canonical/og → /Kaption/, new og.png (278 KB) served, 0 old-name /
+old-URL / dropped-screenshot refs, old Pages URL 404s.
+
+**BLOCKER:** the **v1.6.0 tag does not exist** — not on origin and not local
+(`git ls-remote --tags origin` shows only v1.5.0; `git tag -l v1.6.0` empty). So
+the release workflow never ran, **no `kaption-*` images were built** (anonymous
+`imagetools inspect ghcr.io/tanush1206/kaption-backend:1.6.0-cuda` → 403 because
+the package doesn't exist yet, NOT a visibility problem). Everything downstream
+(throwaway `vcm update` test, release checks, backup, real-install update,
+after-release, site screenshots) is blocked until the tag is pushed and the
+release builds. **Autonomous work is paused here; the tag is Tanush's to push.**
+
+**Anticipated next GitHub-settings step (after the build):** new GHCR packages
+`kaption-backend` and `kaption-frontend` are **private by default** on first
+publish, so installs would fail to pull without login. They'll need to be set
+**public** and linked to the repo (exact clicks given to Tanush). I'll verify
+with an anonymous pull once the images exist.
+
+**On resume (after the tag + release build):** CHANGELOG date → 2026-11-23 in
+the post-release docs commit; throwaway-install `vcm update` 1.5.0→1.6.0 test;
+release checks; backup; `vcm update` on the real install; after-release
+checklist; capture + re-add the 4 Kaption screenshots; then Phase 4.
