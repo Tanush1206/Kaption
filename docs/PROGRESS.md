@@ -4571,3 +4571,54 @@ with an anonymous pull once the images exist.
 the post-release docs commit; throwaway-install `vcm update` 1.5.0→1.6.0 test;
 release checks; backup; `vcm update` on the real install; after-release
 checklist; capture + re-add the 4 Kaption screenshots; then Phase 4.
+
+### v1.6.0 RELEASED and the install updated to Kaption (23–24 Nov)
+
+Tanush pushed the **v1.6.0 tag on cd725c5**; release run **45145285314 green**.
+
+- **Packages PUBLIC ✅** — anonymous ghcr.io token grants pull scope and the
+  anonymous manifest fetch returns 200 for `kaption-backend` and
+  `kaption-frontend`. No GitHub-settings action needed (they came up public).
+- **Release checks:** release v1.6.0 not draft/prerelease, **8 assets**; digests
+  **1.6.0 == latest** (cuda/cpu/frontend); cuda amd64, cpu+frontend multi-arch;
+  SHA256SUMS covers the scripts/compose and `vcm` verified OK; the released
+  `docker-compose.prod.yml` has `name: vcm` + `kaption-*` images.
+- **Throwaway-install test decision:** a separate install can't run isolated on
+  this host (prod compose pins project `vcm`, so it would collide with the real
+  install). Safe equivalent used: the **real-install update**, fully backed up
+  (restore from `C:\Users\Admin\VCM-backups\v1.6.0\`: dump 93 KB, media 1.74 GB,
+  .env).
+- **`vcm update` (1.5.0→1.6.0):** backend/frontend recreated to
+  `ghcr.io/tanush1206/kaption-{backend,frontend}` images, all healthy. Fetched
+  via the GitHub redirect from the old REPO_URL. **Data kept** (same `vcm_db`
+  volume, no migration).
+- **After-release:** version **1.6.0**, alembic head **f6b1d8e3a925** (no
+  migration), **5 videos** (new 477, leo 471, IMG_1343 20+23,
+  Introduction_Video 39 = **1030 captions**), dashboard 200. App shows
+  **Kaption** (wordmark, title "Kaption — AI Captions & Transcript Search",
+  footer "Kaption v1.6.0"); the tour auto-opens on first open; `guide_seen`
+  reset to false (pristine). **NOTE:** captions 1030 vs 1031 recorded at v1.5.0 —
+  the v1.6.0 update kept the DB volume byte-identical (pre-update backup is also
+  1030), so this is a pre-update change (a caption edited/merged at some point),
+  **not** an update loss. Flagged to Tanush.
+- **Live Kaption site verified** (deployed by the `pages` run on the main push):
+  title "Kaption", canonical/og → /Kaption/, new og.png, 0 old refs, old URL
+  404s.
+- **Full checks (before the tag) were all green** (recorded above): backend 808
+  passed, frontend build, axe 0 375/1440 light+dark, theme/not-found.
+- **Site screenshots re-added** (commit `2e0b4f7`): dashboard/search/settings +
+  editor captured from the Kaption install — grey-boxed thumbnails, dark editor
+  video placeholder, own videos only, neutral captions, no faces/0:19/0:30/name;
+  gallery CSS switched to full-width stacked (the wider captures would crop
+  badly in the old fixed-ratio tiles). **Each image eye-verified.**
+
+**STILL OWED (autonomous work paused — needs Tanush):**
+1. **Push** the post-release commits (PROGRESS blocker note `8beabcd`, site
+   screenshots `2e0b4f7`, and this post-release docs commit). Then the `pages`
+   run redeploys the site with the screenshots.
+2. After the push + Pages redeploy: **verify the live site at 375 & 1440,
+   light+dark, axe 0** (local serving is sandbox-blocked, so this is done on the
+   deployed site) — autonomous once the site is live; I'll fix + ask for a
+   re-push if anything is off.
+3. **Phase 4** — rename the local folder `Desktop\VideoCaptionMaker` →
+   `Desktop\Kaption` (Tanush's to run; exact steps given).

@@ -6,7 +6,7 @@ commits between tags; hashes are given for reference.
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [1.6.0] - 2026-11-24
+## [1.6.0] - 2026-11-23
 
 The project is renamed to **Kaption**. No migration, and the update downloads
 the app layers only — an existing install keeps all its videos, captions and
