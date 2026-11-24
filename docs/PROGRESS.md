@@ -4622,3 +4622,23 @@ Tanush pushed the **v1.6.0 tag on cd725c5**; release run **45145285314 green**.
    re-push if anything is off.
 3. **Phase 4** — rename the local folder `Desktop\VideoCaptionMaker` →
    `Desktop\Kaption` (Tanush's to run; exact steps given).
+
+### 24 Nov — Pages deploy fix (artifact-backend mismatch)
+
+The Pages deploy for `3047df8` failed twice: `upload-pages-artifact` passed in
+1 s, then `deploy-pages` reported "Found 0 artifact(s) … ensure artifacts are
+uploaded with actions/upload-artifact@v4 or later". Root cause: commit
+`f80e414` (launch-audit action bump) moved the Pages actions to
+configure-pages **v6.0.0** / upload-pages-artifact **v5.0.0** / deploy-pages
+**v5.0.1** (all confirmed = their newest via the tags API). That set deployed
+fine until overnight, when GitHub removed the older artifact backend that
+upload-pages-artifact v5.0.0 writes to, while deploy-pages reads the v4 backend.
+**Fix:** reverted pages.yml to the proven v4-backend trio — configure-pages
+v5.0.0 (`983d7736`), upload-pages-artifact v3.0.1 (`56afc609`), deploy-pages
+v4.0.5 (`d6db9016`) — with a comment warning not to group-bump them. **Other
+workflows checked:** only `arm64.yml` uses artifact actions
+(upload-artifact v7.0.2 + download-artifact v8.0.2 — the mainline actions, a
+different code path from the Pages wrapper; passed in its last run, on the live
+backend) — not the same issue, left as-is. Commit + push step to Tanush; pages
+redeploys on its own on the push (pages.yml changed). Issue #1 (weekly check):
+green again — close with a comment (below).
