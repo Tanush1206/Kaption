@@ -4642,3 +4642,22 @@ different code path from the Pages wrapper; passed in its last run, on the live
 backend) — not the same issue, left as-is. Commit + push step to Tanush; pages
 redeploys on its own on the push (pages.yml changed). Issue #1 (weekly check):
 green again — close with a comment (below).
+
+### 24 Nov — Pages fix pushed, live site verified, Dependabot guard added
+
+- Pages fix (`821b047`) pushed; **pages deploy green** (run 45352149431). **Live
+  site verified** (tanush1206.github.io/Kaption/): all 4 screenshots 200, gallery
+  present, **axe 0** light+dark, `shoot.js` OK at **375 & 1440** light+dark (no
+  overflow/console errors). Eye-checked desktop + mobile: Kaption branding and
+  Kaption URLs throughout, hero editor with a dark video placeholder, gallery
+  screenshots framed and stacked, **no faces/frames anywhere**.
+- Issue #1 closed by Tanush with the supplied comment.
+- **Dependabot guard:** `.github/dependabot.yml` now ignores **major** updates
+  for `actions/configure-pages`, `upload-pages-artifact`, `deploy-pages` (they
+  must move together on one artifact backend; a lone/mismatched major bump makes
+  the deploy fail silently with "Found 0 artifacts"). Patch/minor still
+  proposed. Commit + push step to Tanush.
+
+**v1.6.0 Kaption rename — essentially COMPLETE.** Remaining: **Phase 4** (Tanush
+renames the local folder `Desktop\VideoCaptionMaker` → `Desktop\Kaption`; exact
+steps given earlier, incl. carrying over the Claude Code memory dir).

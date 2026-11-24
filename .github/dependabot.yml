@@ -13,3 +13,18 @@ updates:
         patterns: ["*"]
     commit-message:
       prefix: ci
+    # The three GitHub Pages actions must stay a matching set on the same
+    # artifact backend: upload-pages-artifact uploads what deploy-pages reads.
+    # A major bump of one (or all) to a backend the others don't share makes the
+    # deploy fail with "Found 0 artifacts" — and the build/upload steps still
+    # pass, so it breaks silently (it happened on the v6/v5.0.0/v5.0.1 bump,
+    # 24 Nov 2026). Ignore their major updates; bump them by hand as a set, and
+    # confirm the deploy still finds the "github-pages" artifact. Patch/minor
+    # within the current major are still proposed.
+    ignore:
+      - dependency-name: "actions/configure-pages"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "actions/upload-pages-artifact"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "actions/deploy-pages"
+        update-types: ["version-update:semver-major"]
