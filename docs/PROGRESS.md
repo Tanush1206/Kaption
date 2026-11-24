@@ -4661,3 +4661,27 @@ green again — close with a comment (below).
 **v1.6.0 Kaption rename — essentially COMPLETE.** Remaining: **Phase 4** (Tanush
 renames the local folder `Desktop\VideoCaptionMaker` → `Desktop\Kaption`; exact
 steps given earlier, incl. carrying over the Claude Code memory dir).
+
+### 24 Nov — Phase 4 DONE: local folder renamed to Desktop\Kaption
+
+Tanush renamed `C:\Users\Admin\Desktop\VideoCaptionMaker` →
+`C:\Users\Admin\Desktop\Kaption`. Verified intact: `git remote` =
+`https://github.com/Tanush1206/Kaption.git`, 0 unpushed (the Dependabot guard
+`f9e6043` is on origin), the Claude Code project memory carried over to
+`~/.claude/projects/c--Users-Admin-Desktop-Kaption\memory`. **Dev stack up on
+3001** as project **videocaptionmaker** (pinned name in docker-compose.yml, so
+the rename did not orphan the `videocaptionmaker_*` volumes) — **video 7426
+still there**. The dev stack is brought up with three compose files (the 3001
+ports + CORS live in the gitignored `test-assets/compose/dev-3001.yml`, which is
+the override that produces the 3001 mapping noted earlier):
+
+```
+docker compose -f docker-compose.yml -f docker-compose.gpu.yml \
+  -f test-assets/compose/dev-3001.yml up -d
+```
+
+**The Kaption rename (v1.6.0) and all four phases are COMPLETE.** App, site,
+repo, images and docs renamed; install on Kaption with data intact; packages
+public; release, weekly check and the live site all green; internal names (vcm
+command, project `vcm`, volumes, install folders, VCM_* vars, dev project
+`videocaptionmaker`) kept so nothing lost its data; local folder renamed.
