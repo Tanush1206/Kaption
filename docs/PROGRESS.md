@@ -4732,9 +4732,31 @@ peak memory, **GPU and CPU**.
 get truth word starts for the timing metric; romanise Devanagari for scripts it
 can't read.
 
-**RESUME / next steps:** (a) Tanush provides IMG_1551 + a comedy clip + a pure-
-Hindi clip, and OKs extracting IMG_1343/Introduction_Video from the install; (b)
-build `scripts/bench/` (slice clips → bench/, scoring harness, model runners);
-(c) draft truth → Tanush corrects; (d) run Apex baseline + the 3–4 candidates
-(GPU+CPU), forced alignment; (e) optional cloud with a key; (f) report table +
-recommendation. Dev stack up on 3001 (large-v3). Nothing built yet — plan only.
+**BUILT so far (26 Nov):**
+- Own-clips copied read-only from `vcm_media` → `test-assets/bench/sources/`
+  (img_1343.mov ~50s, introduction_video.mp4 ~1:27). Local only, gitignored.
+- **6 bench clips sliced** (16 kHz mono WAV, `test-assets/bench/clips/`):
+  b1_clean_hinglish (img_1343 0–50), b2_vlog (leo 1:00–2:00), b3_noisy_room
+  (leo 8:25–9:10), b4_music (new 0–45, intro), b5_overlap (new 2:30–3:15),
+  b6_english (introduction_video 0–55). ~5 min. **Still needed in
+  `bench/incoming/`:** IMG_1551, a comedy/live-show clip, a pure-Hindi clip.
+- **Harness:** `scripts/bench/run_asr.py` (tracked) — runs a CT2/faster-whisper
+  model over the WAVs, uniform params (beam 5, no VAD, no condition-on-prev),
+  word timestamps, writes raw transcript+timings JSON. Runs via the dev worker
+  (`docker cp` clips+script in; model + GPU there).
+- **Apex baseline run** (GPU, 0.01–0.14×RT) → `test-assets/results/v2/apex/`;
+  raw transcripts look good across all 6.
+- **Draft truth** generated (Apex text → `hinglish_spelling.everyday()`) in
+  `test-assets/bench/truth/`. Word counts (correction order, shortest first):
+  b4_music 100, b1_clean_hinglish 112, b3_noisy_room 112, b6_english 122,
+  b5_overlap 190, b2_vlog 271. Speaker turns NOT yet marked (Tanush adds while
+  correcting, esp. b3 and b5).
+
+**NEXT:** (a) Tanush corrects truth by ear (shortest first) + drops the 3 gap
+clips; (b) check `shunyalabs/zero-stt-hinglish` openrail use-restrictions (HF
+tool gone — fetch the card) and record each model's licence in the results;
+(c) convert/run Trelis, zero-stt, Qwen3-ASR ("Srota", transformers+romanise)
+over the clips (GPU+CPU); (d) forced alignment (torchaudio MMS_FA) for timing;
+(e) build the scoring harness (strict/loose WER, Eng-word acc, missed,
+hallucination, timing, speed/mem); (f) end-to-end pipeline score; (g) table +
+recommendation. Dev stack on 3001 (large-v3).
