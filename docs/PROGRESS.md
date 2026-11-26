@@ -4701,7 +4701,7 @@ only, never published** (test-assets is gitignored).
 | **Apex** `Oriserve/Whisper-Hindi2Hinglish-Apex` (current) | whisper | large | (Oriserve) | CT2 pipeline (services/hinglish.py) |
 | `Trelis/whisper-hinglish-preview` | whisper-large-v3 ft | 1.54B | **apache-2.0** | convert → CT2 / faster-whisper |
 | `nikh360pro/capsbro-hinglish-ct2` (= Trelis, pre-converted) | whisper CT2 | — | apache-2.0 | **drop-in** faster-whisper |
-| `shunyalabs/zero-stt-hinglish` | whisper-medium ft | 764M | openrail | convert → CT2 |
+| `shunyalabs/zero-stt-hinglish` | whisper-medium ft | 0.8B | **openrail (bare tag — commercial/redistribution NOT stated → treat NOT SHIPPABLE until licence text obtained)** | convert → CT2 |
 | `moorlee/qwen3-asr-0.6b-hinglish` ("Srota") | qwen3_asr | 782M | **apache-2.0** | transformers (AutoModelForMultimodalLM), own code path; Devanagari output → romanise; demo Space `moorlee/hinglish-asr-demo` |
 Cloud (opt-in, only with Tanush's key, audio never sent otherwise): Sarvam
 Saarika/Saaras, ElevenLabs Scribe.
@@ -4752,11 +4752,53 @@ can't read.
   b5_overlap 190, b2_vlog 271. Speaker turns NOT yet marked (Tanush adds while
   correcting, esp. b3 and b5).
 
-**NEXT:** (a) Tanush corrects truth by ear (shortest first) + drops the 3 gap
-clips; (b) check `shunyalabs/zero-stt-hinglish` openrail use-restrictions (HF
-tool gone — fetch the card) and record each model's licence in the results;
-(c) convert/run Trelis, zero-stt, Qwen3-ASR ("Srota", transformers+romanise)
-over the clips (GPU+CPU); (d) forced alignment (torchaudio MMS_FA) for timing;
-(e) build the scoring harness (strict/loose WER, Eng-word acc, missed,
-hallucination, timing, speed/mem); (f) end-to-end pipeline score; (g) table +
-recommendation. Dev stack on 3001 (large-v3).
+**Licences recorded (26 Nov):** Apex = Oriserve (current, in use). Trelis =
+apache-2.0 (shippable). zero-stt = bare `openrail` tag only; commercial &
+redistribution rights NOT stated on the card, OpenRAIL variant/use-restrictions
+not reproduced → **measure but flag NOT SHIPPABLE until the real licence text is
+obtained**. Qwen3-ASR "Srota" = apache-2.0 (shippable; training data CC BY 4.0 →
+attribution if used).
+
+**Bake-off run method (26 Nov):** Trelis & zero-stt convert HF→CT2 (float16,
+`ct2-transformers-converter`) and run on the dev worker GPU via `run_asr.py`
+(CTranslate2 GPU — does not touch the worker's CPU-only torch). Qwen "Srota"
+runs via the `qwen-asr` package in **throwaway containers** (NOT the live worker
+— pip there would shift transformers/torch and break dev captioning,
+AGENTS.md §17): `kaption_bench_qwen` (CPU, on the worker image's CPU torch) **and**
+`kaption_bench_qwen_gpu` (GPU, on a `pytorch/pytorch:*-cuda12.8` image with
+`--gpus all`). GPU is an **RTX 5080 (Blackwell sm_120)** → needs torch built for
+CUDA 12.8+, hence the cu128 image (older cu124 torch throws "no kernel image").
+flash-attn isn't in the stock image, so the GPU run falls back to default
+attention (backend recorded in the summary). Srota measured **both CPU and GPU**.
+Qwen output is mixed Devanagari+Latin; long clips chunked ≤28 s (card ≤30 s/call).
+
+**BAKE-OFF RAN (26–27 Nov) — all 4 models over the 6 clips.** Harness:
+`scripts/bench/run_qwen.py` (Srota, soundfile chunking) + `compare_models.py`
+(disagreement overlay) added, tracked. Raw transcripts + speeds + licences +
+findings in `test-assets/results/v2/` (README there). Mean ×RT on the RTX 5080
+(Blackwell sm_120): **apex 0.043 (Roman-native, fastest)**, trelis 0.117,
+qwen/Srota 0.360 (GPU; CPU = 1.40×RT + 392 s load → GPU-only), zerostt 0.502.
+Big findings: **only Apex emits Roman Hinglish** (Trelis/zerostt/Srota all write
+Devanagari for Hindi → need lossy transliteration); **Trelis drops into English
+translation mid-clip** (b2); **zerostt garbles under music/noise** and dropped
+~12 s of b1; **zerostt licence unclear → not shippable**. Early read: bar to
+replace Apex is high; final call waits on WER vs corrected truth. Peak GPU/CPU
+memory NOT captured yet (do in the scoring harness).
+
+**Disagreement overlay (addresses the Apex-seed bias):** all 6 truth drafts were
+seeded from Apex. `compare_models.py` token-aligns the roman models
+(apex/trelis/zerostt) to Apex, writes `test-assets/bench/truth_marked/<clip>.txt`
+(everyday spelling + `[?]` after every contested span) and
+`test-assets/results/v2/disagreement.md` (each contested span with approx
+timecode from Apex word timestamps + every model's reading; Qwen shown as a
+mixed-script reference, not scored). Tanush listens to the `[?]` spans first.
+
+**NEXT:** (a) Tanush corrects truth by ear — use `bench/truth_marked/`, `[?]`
+spans first; caveat: unmarked ≠ correct (all-models-agree isn't flagged, so ear
+the whole of b4 music) — + drops the 3 gap clips (IMG_1551, comedy, pure-Hindi)
+in `bench/incoming/`; (b) forced alignment (torchaudio MMS_FA) for timing;
+(c) scoring harness (strict/loose WER, Eng-word acc, missed, hallucination,
+timing, peak GPU/CPU mem); (d) end-to-end pipeline score; (e) table +
+recommendation. Throwaway bench containers `kaption_bench_qwen` /
+`kaption_bench_qwen_gpu` kept for the scoring phase (delete when step 1 done;
+live worker untouched). Dev stack on 3001 (large-v3).
