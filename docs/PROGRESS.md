@@ -4793,12 +4793,25 @@ seeded from Apex. `compare_models.py` token-aligns the roman models
 timecode from Apex word timestamps + every model's reading; Qwen shown as a
 mixed-script reference, not scored). Tanush listens to the `[?]` spans first.
 
-**NEXT:** (a) Tanush corrects truth by ear — use `bench/truth_marked/`, `[?]`
-spans first; caveat: unmarked ≠ correct (all-models-agree isn't flagged, so ear
-the whole of b4 music) — + drops the 3 gap clips (IMG_1551, comedy, pure-Hindi)
-in `bench/incoming/`; (b) forced alignment (torchaudio MMS_FA) for timing;
-(c) scoring harness (strict/loose WER, Eng-word acc, missed, hallucination,
-timing, peak GPU/CPU mem); (d) end-to-end pipeline score; (e) table +
-recommendation. Throwaway bench containers `kaption_bench_qwen` /
+**SCORER BUILT (27 Nov):** `scripts/bench/score.py` (tracked) parses Tanush's
+`truth/` format (`[m:ss] text`, `-s1/-s2`, dup-timecode overlap, `[Music]`
+non-speech) and scores strict + loose WER (Devanagari hyps romanised via ITRANS),
+English-word accuracy (wordfreq zipf_en ≥ 3.0), missed speech (deletions),
+hallucination (insertions + words time-stamped inside a `[Music]` span). Timing
+error (needs forced alignment) + peak GPU/CPU memory NOT in it yet.
+**Partial scores** (b1, b4 only — the corrected clips; format-validation +
+directional, NOT the verdict) in `test-assets/results/v2/scores_partial.json`:
+Apex leads both on loose WER + English acc by a wide margin (b1 loose WER
+apex 0.34 / trelis 0.43 / zerostt 0.75 / qwen 0.72; b4 apex 0.42 / trelis 0.53 /
+zerostt 0.85 / qwen 0.99). zero-stt & qwen drop/garble heavily; qwen failed the
+music clip.
+
+**NEXT:** (a) Tanush corrects remaining truth by ear (b1✓ b4✓; b3 next) — use
+`bench/truth_marked/` `[?]` spans first; caveat: unmarked ≠ correct
+(all-models-agree isn't flagged, so ear the whole of b4 music) — + drops the 3
+gap clips (IMG_1551, comedy, pure-Hindi) in `bench/incoming/`; (b) forced
+alignment (torchaudio MMS_FA) → add caption-timing error + peak GPU/CPU mem to
+the scorer; (c) re-run scorer over all corrected clips; (d) end-to-end pipeline
+score; (e) table + recommendation. Throwaway bench containers `kaption_bench_qwen` /
 `kaption_bench_qwen_gpu` kept for the scoring phase (delete when step 1 done;
 live worker untouched). Dev stack on 3001 (large-v3).
