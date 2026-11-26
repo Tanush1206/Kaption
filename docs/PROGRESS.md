@@ -4685,3 +4685,56 @@ repo, images and docs renamed; install on Kaption with data intact; packages
 public; release, weekly check and the live site all green; internal names (vcm
 command, project `vcm`, volumes, install folders, VCM_* vars, dev project
 `videocaptionmaker`) kept so nothing lost its data; local folder renamed.
+
+## Kaption v2 — step 1: caption-quality benchmark & model bake-off (26 Nov)
+
+**MEASURE ONLY — ship nothing.** Goal: a fixed benchmark + scoring harness, score
+today's pipeline, bake off candidate Hinglish ASR models, measure forced
+alignment for timing, then one table + a recommendation. Results (local,
+gitignored) in `test-assets/results/v2/`; benchmark in `test-assets/bench/`;
+harness in `scripts/bench/` (tracked). All benchmark clips/truth are **local
+only, never published** (test-assets is gitignored).
+
+**Model feasibility (HF research 26 Nov — licences checked):**
+| Model | Arch | Params | Licence | How to run |
+|---|---|---|---|---|
+| **Apex** `Oriserve/Whisper-Hindi2Hinglish-Apex` (current) | whisper | large | (Oriserve) | CT2 pipeline (services/hinglish.py) |
+| `Trelis/whisper-hinglish-preview` | whisper-large-v3 ft | 1.54B | **apache-2.0** | convert → CT2 / faster-whisper |
+| `nikh360pro/capsbro-hinglish-ct2` (= Trelis, pre-converted) | whisper CT2 | — | apache-2.0 | **drop-in** faster-whisper |
+| `shunyalabs/zero-stt-hinglish` | whisper-medium ft | 764M | openrail | convert → CT2 |
+| `moorlee/qwen3-asr-0.6b-hinglish` ("Srota") | qwen3_asr | 782M | **apache-2.0** | transformers (AutoModelForMultimodalLM), own code path; Devanagari output → romanise; demo Space `moorlee/hinglish-asr-demo` |
+Cloud (opt-in, only with Tanush's key, audio never sent otherwise): Sarvam
+Saarika/Saaras, ElevenLabs Scribe.
+
+**Benchmark plan — 8–10 clips, ~10–15 min, categories → source:**
+1. clean talking-head Hinglish → IMG_1343 (install) or hinglish.mp4 slice
+2. vlog → leo.mp4 slice
+3. noisy room → leo.mp4 ~8:34 (shop background)
+4. music under speech → new.mp4 (music section)
+5. two people at once → new.mp4 2:30–3:15 (overlaps)
+6. comedy/live show → **NEEDED** (Latent footage was removed; Tanush to provide)
+7. pure Hindi → **NEEDED** (no pure-Hindi clip local; Tanush to provide or point to one)
+8. English → Introduction_Video (install)
+Own clips: IMG_1343 + Introduction_Video are on the **install** (extract from the
+`vcm_media` volume, local only); **IMG_1551 is NOT present — Tanush to add**.
+
+**Draft truth per clip:** Roman Hinglish, everyday spelling, speaker turns marked
+(`-s1`/`-s2`). I draft from Apex output + by-ear; **Tanush corrects by ear before
+any score counts.**
+
+**Metrics (harness):** strict WER (exact) + loose WER (lowercased, punctuation
+stripped, everyday-spelling-normalised); English-word accuracy; missed speech
+(truth words/time uncaptioned); hallucinations (captioned-not-said / over
+non-speech); caption-start timing error vs forced-aligned truth; speed (×RT) and
+peak memory, **GPU and CPU**.
+
+**Forced alignment:** CTC aligner (torchaudio `MMS_FA`, as the ROADMAP item) to
+get truth word starts for the timing metric; romanise Devanagari for scripts it
+can't read.
+
+**RESUME / next steps:** (a) Tanush provides IMG_1551 + a comedy clip + a pure-
+Hindi clip, and OKs extracting IMG_1343/Introduction_Video from the install; (b)
+build `scripts/bench/` (slice clips → bench/, scoring harness, model runners);
+(c) draft truth → Tanush corrects; (d) run Apex baseline + the 3–4 candidates
+(GPU+CPU), forced alignment; (e) optional cloud with a key; (f) report table +
+recommendation. Dev stack up on 3001 (large-v3). Nothing built yet — plan only.
