@@ -4799,19 +4799,53 @@ non-speech) and scores strict + loose WER (Devanagari hyps romanised via ITRANS)
 English-word accuracy (wordfreq zipf_en ≥ 3.0), missed speech (deletions),
 hallucination (insertions + words time-stamped inside a `[Music]` span). Timing
 error (needs forced alignment) + peak GPU/CPU memory NOT in it yet.
-**Partial scores** (b1, b4 only — the corrected clips; format-validation +
-directional, NOT the verdict) in `test-assets/results/v2/scores_partial.json`:
-Apex leads both on loose WER + English acc by a wide margin (b1 loose WER
-apex 0.34 / trelis 0.43 / zerostt 0.75 / qwen 0.72; b4 apex 0.42 / trelis 0.53 /
-zerostt 0.85 / qwen 0.99). zero-stt & qwen drop/garble heavily; qwen failed the
-music clip.
+**Partial scores** (b1, b3, b4 corrected; b2/b5/b6 skipped until corrected;
+directional, NOT the verdict) in `test-assets/results/v2/scores_partial.json`.
+Loose WER / English-acc — Apex wins all three by a wide margin:
+b1 apex 0.34/0.85 · trelis 0.43/0.71 · zerostt 0.75/0.31 · qwen 0.72/0.31;
+b3 apex 0.24/0.89 · trelis 0.94/0.13 · zerostt 0.88/0.21 · qwen 1.35/0.15;
+b4 apex 0.42/0.67 · trelis 0.53/0.63 · zerostt 0.85/0.19 · qwen 0.99/0.01.
 
-**NEXT:** (a) Tanush corrects remaining truth by ear (b1✓ b4✓; b3 next) — use
-`bench/truth_marked/` `[?]` spans first; caveat: unmarked ≠ correct
-(all-models-agree isn't flagged, so ear the whole of b4 music) — + drops the 3
-gap clips (IMG_1551, comedy, pure-Hindi) in `bench/incoming/`; (b) forced
-alignment (torchaudio MMS_FA) → add caption-timing error + peak GPU/CPU mem to
-the scorer; (c) re-run scorer over all corrected clips; (d) end-to-end pipeline
-score; (e) table + recommendation. Throwaway bench containers `kaption_bench_qwen` /
+**Where Apex loses words** (b1+b3, `analyze_errors.py` → `apex_error_types.md`):
+much of the raw WER is scoring artifacts (Hindi number-words vs digits; spelling
+twins). Real losses rank: **(1) names/brands** — `Akrapovic` mangled 4× in b3,
+`Udit Rajput`, `Kushal` → fix with faster-whisper `initial_prompt`/`hotwords`
+biasing (cheapest, biggest win); **(2) numbers** — `70,126`→`26` + number-word
+normalisation in the scorer; **(3) English/tech terms** (`slip-on`, `rev`) rides
+with #1; (4) fast speech, (5) overlap/2nd-speaker, (6) rare filler = model limits.
+
+### RESUME TOMORROW (27→28 Nov) — exact steps
+Corrected so far: **b1, b3, b4** (truth/). Tanush still to correct **b2, b5, b6**
+and drop gap clips (IMG_1551, comedy, pure-Hindi) in `bench/incoming/`. The
+scorer auto-skips uncorrected clips, so re-run any time.
+
+**State:** throwaway containers `kaption_bench_qwen` (CPU + compare env: has
+`indic_transliteration`, `wordfreq`, `/app` everyday(); holds `/tmp/cmp/res`
+[4 model outputs], `/tmp/cmp/truth`, `score.py`, `analyze_errors.py`) and
+`kaption_bench_qwen_gpu` (torch 2.8+cu128, `qwen-asr`, `/tmp/clips`). **These may
+be gone after the overnight shutdown** — if so, recreate per
+`test-assets/results/v2/README.md`. All raw results are safe on host in
+`test-assets/results/v2/`. Live worker untouched.
+
+1. **Forced aligner** — `scripts/bench/align.py` is WRITTEN but NOT YET RUN.
+   In a GPU torch container (recreate `kaption_bench_qwen_gpu` if gone):
+   `pip install torchaudio` (matching torch 2.8.0+cu128, from the cu128 index),
+   cp clips+truth+`score.py`+`align.py`, then
+   `python align.py --clips-dir /tmp/clips --truth /tmp/cmp/truth --out /tmp/cmp/align --device cuda`
+   (downloads MMS_FA ~1.2 GB first run). Debug the torchaudio aligner API if it
+   trips. Copy `align/` to host results. Bare numerals (e.g. `70,126`) drop from
+   alignment by design.
+2. **Scorer timing metric** — add caption-start timing error (model caption/word
+   start vs aligned truth word onset) to `score.py`, plus **peak GPU/CPU memory**
+   capture per model run. Then re-run the full scorer over all corrected clips.
+3. **Scorer fairness** — add Hindi number-word ↔ digit equivalence to the loose
+   normaliser (removes the fake number errors in apex_error_types.md).
+4. **Pipeline-fix spike** (optional, after scoring): test faster-whisper
+   `initial_prompt`/`hotwords` biasing on Apex for names/brands — expected the
+   biggest quality win.
+5. End-to-end pipeline score → final one-table result + recommendation.
+
+Unpushed as of tonight: commits for the scorer-format + aligner/analyzer/progress
+(Tanush pushes). Dev stack on 3001 (large-v3). Throwaway bench containers `kaption_bench_qwen` /
 `kaption_bench_qwen_gpu` kept for the scoring phase (delete when step 1 done;
 live worker untouched). Dev stack on 3001 (large-v3).
